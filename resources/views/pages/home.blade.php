@@ -20,7 +20,7 @@
         right: -20%;
         width: 600px;
         height: 600px;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
         border-radius: 50%;
     }
 
@@ -70,7 +70,7 @@
 
     .btn-hero-primary:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
 
     .btn-hero-outline {
@@ -210,7 +210,7 @@
     }
 
     .info-section .section-subtitle {
-        color: rgba(255,255,255,0.8);
+        color: rgba(255, 255, 255, 0.8);
     }
 
     .info-list {
@@ -219,7 +219,7 @@
     }
 
     .info-item {
-        background: rgba(255,255,255,0.1);
+        background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         border-radius: 12px;
         padding: 20px 25px;
@@ -231,7 +231,7 @@
     }
 
     .info-item:hover {
-        background: rgba(255,255,255,0.2);
+        background: rgba(255, 255, 255, 0.2);
         transform: translateX(10px);
     }
 
@@ -316,7 +316,7 @@
 <section class="stats">
     <div class="stats-grid">
         <div class="stat-item">
-            <span class="stat-number">{{ $featuredTeachers->count() }}+</span>
+            <span class="stat-number">{{ $featuredTeachers }}+</span>
             <span class="stat-label">Guru Berpengalaman</span>
         </div>
         <div class="stat-item">
@@ -381,10 +381,14 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('enrollmentChart').getContext('2d');
-        
+
         // Data from controller
-        const years = {!! json_encode($enrollmentData->pluck('enrollment_year')) !!};
-        const counts = {!! json_encode($enrollmentData->pluck('total')) !!};
+        const years = {
+            !!json_encode($enrollmentData - > pluck('enrollment_year')) !!
+        };
+        const counts = {
+            !!json_encode($enrollmentData - > pluck('total')) !!
+        };
 
         new Chart(ctx, {
             type: 'bar',
@@ -442,33 +446,33 @@
         <p class="section-subtitle">Ikuti perkembangan terbaru dari sekolah kami</p>
 
         @if($latestActivities->isEmpty())
-            <p style="text-align: center; color: var(--text-light);">Belum ada kegiatan terbaru.</p>
+        <p style="text-align: center; color: var(--text-light);">Belum ada kegiatan terbaru.</p>
         @else
-            <div class="news-grid">
-                @foreach($latestActivities as $activity)
-                <a href="{{ route('activities.show', $activity->slug) }}" class="news-card" style="text-decoration: none;">
-                    <div class="news-image">
-                        @if($activity->image)
-                            @if(Str::startsWith($activity->image, 'data:'))
-                                <img src="{{ $activity->image }}" alt="{{ $activity->title }}">
-                            @else
-                                <img src="{{ asset('storage/' . $activity->image) }}" alt="{{ $activity->title }}">
-                            @endif
-                        @else
-                            <i class="fas fa-newspaper"></i>
-                        @endif
-                    </div>
-                    <div class="news-content">
-                        <span class="news-category">{{ $activity->category == 'news' ? 'Berita' : 'Acara' }}</span>
-                        <h3 class="news-title">{{ $activity->title }}</h3>
-                        <span class="news-date">
-                            <i class="far fa-calendar-alt"></i> 
-                            {{ $activity->published_at ? $activity->published_at->format('d M Y') : '-' }}
-                        </span>
-                    </div>
-                </a>
-                @endforeach
-            </div>
+        <div class="news-grid">
+            @foreach($latestActivities as $activity)
+            <a href="{{ route('activities.show', $activity->slug) }}" class="news-card" style="text-decoration: none;">
+                <div class="news-image">
+                    @if($activity->image)
+                    @if(Str::startsWith($activity->image, 'data:'))
+                    <img src="{{ $activity->image }}" alt="{{ $activity->title }}">
+                    @else
+                    <img src="{{ asset('storage/' . $activity->image) }}" alt="{{ $activity->title }}">
+                    @endif
+                    @else
+                    <i class="fas fa-newspaper"></i>
+                    @endif
+                </div>
+                <div class="news-content">
+                    <span class="news-category">{{ $activity->category == 'news' ? 'Berita' : 'Acara' }}</span>
+                    <h3 class="news-title">{{ $activity->title }}</h3>
+                    <span class="news-date">
+                        <i class="far fa-calendar-alt"></i>
+                        {{ $activity->published_at ? $activity->published_at->format('d M Y') : '-' }}
+                    </span>
+                </div>
+            </a>
+            @endforeach
+        </div>
         @endif
 
         <div style="text-align: center; margin-top: 40px;">

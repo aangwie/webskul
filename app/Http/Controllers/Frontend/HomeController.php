@@ -15,7 +15,7 @@ class HomeController extends Controller
         $school = SchoolProfile::first();
         $latestActivities = Activity::published()->latest('published_at')->take(3)->get();
         $importantInfo = Information::active()->important()->latest()->take(5)->get();
-        $featuredTeachers = Teacher::active()->ordered()->take(4)->get();
+        $featuredTeachers = Teacher::active()->count();
 
         // Student Statistics
         $studentStats = [
@@ -28,9 +28,15 @@ class HomeController extends Controller
         // Class Breakdown
         $classStats = \App\Models\SchoolClass::active()
             ->withCount([
-                'students as total' => function($q) { $q->where('is_active', true); },
-                'students as male' => function($q) { $q->where('is_active', true)->where('gender', 'male'); },
-                'students as female' => function($q) { $q->where('is_active', true)->where('gender', 'female'); }
+                'students as total' => function ($q) {
+                    $q->where('is_active', true);
+                },
+                'students as male' => function ($q) {
+                    $q->where('is_active', true)->where('gender', 'male');
+                },
+                'students as female' => function ($q) {
+                    $q->where('is_active', true)->where('gender', 'female');
+                }
             ])
             ->ordered()
             ->get();
