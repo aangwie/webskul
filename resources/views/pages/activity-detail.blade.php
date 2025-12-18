@@ -69,7 +69,7 @@
 
     .article-image i {
         font-size: 6rem;
-        color: rgba(255,255,255,0.3);
+        color: rgba(255, 255, 255, 0.3);
     }
 
     .article-body {
@@ -147,7 +147,7 @@
 
     .related-image i {
         font-size: 2.5rem;
-        color: rgba(255,255,255,0.5);
+        color: rgba(255, 255, 255, 0.5);
     }
 
     .related-info {
@@ -197,13 +197,17 @@
     <div class="article-card">
         @if($activity->image)
         <div class="article-image">
-            <img src="data:image/jpeg;base64,{{ $activity->image }}" alt="{{ $activity->title }}">
+            @if(Str::startsWith($activity->image, 'data:'))
+            <img src="{{ $activity->image }}" alt="{{ $activity->title }}">
+            @else
+            <img src="{{ asset('storage/' . $activity->image) }}" alt="{{ $activity->title }}">
+            @endif
         </div>
         @endif
-        
+
         <div class="article-body">
             {!! nl2br(e($activity->content)) !!}
-            
+
             <a href="{{ route('activities.index') }}" class="back-link">
                 <i class="fas fa-arrow-left"></i> Kembali ke Kegiatan
             </a>
@@ -218,9 +222,9 @@
             <a href="{{ route('activities.show', $related->slug) }}" class="related-card">
                 <div class="related-image">
                     @if($related->image)
-                        <img src="data:image/jpeg;base64,{{ $related->image }}" alt="{{ $related->title }}">
+                    <img src="data:image/jpeg;base64,{{ $related->image }}" alt="{{ $related->title }}">
                     @else
-                        <i class="fas fa-newspaper"></i>
+                    <i class="fas fa-newspaper"></i>
                     @endif
                 </div>
                 <div class="related-info">

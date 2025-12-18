@@ -69,7 +69,7 @@
 
     .activity-image i {
         font-size: 4rem;
-        color: rgba(255,255,255,0.5);
+        color: rgba(255, 255, 255, 0.5);
     }
 
     .activity-category {
@@ -189,36 +189,40 @@
 
 <div class="activities-content">
     @if($activities->isEmpty())
-        <div class="empty-state">
-            <i class="fas fa-newspaper"></i>
-            <p>Belum ada kegiatan atau berita.</p>
-        </div>
+    <div class="empty-state">
+        <i class="fas fa-newspaper"></i>
+        <p>Belum ada kegiatan atau berita.</p>
+    </div>
     @else
-        <div class="activities-grid">
-            @foreach($activities as $activity)
-            <a href="{{ route('activities.show', $activity->slug) }}" class="activity-card">
-                <div class="activity-image">
-                    @if($activity->image)
-                        <img src="data:image/jpeg;base64,{{ $activity->image }}" alt="{{ $activity->title }}">
-                    @else
-                        <i class="fas fa-newspaper"></i>
-                    @endif
-                    <span class="activity-category">{{ $activity->category == 'news' ? 'Berita' : 'Acara' }}</span>
+    <div class="activities-grid">
+        @foreach($activities as $activity)
+        <a href="{{ route('activities.show', $activity->slug) }}" class="activity-card">
+            <div class="activity-image">
+                @if($activity->image)
+                @if(Str::startsWith($activity->image, 'data:'))
+                <img src="{{ $activity->image }}" alt="{{ $activity->title }}">
+                @else
+                <img src="{{ asset('storage/' . $activity->image) }}" alt="{{ $activity->title }}">
+                @endif
+                @else
+                <i class="fas fa-newspaper"></i>
+                @endif
+                <span class="activity-category">{{ $activity->category == 'news' ? 'Berita' : 'Acara' }}</span>
+            </div>
+            <div class="activity-content">
+                <h3 class="activity-title">{{ $activity->title }}</h3>
+                <p class="activity-excerpt">{{ Str::limit(strip_tags($activity->content), 120) }}</p>
+                <div class="activity-meta">
+                    <span><i class="far fa-calendar-alt"></i> {{ $activity->published_at ? $activity->published_at->format('d M Y') : '-' }}</span>
                 </div>
-                <div class="activity-content">
-                    <h3 class="activity-title">{{ $activity->title }}</h3>
-                    <p class="activity-excerpt">{{ Str::limit(strip_tags($activity->content), 120) }}</p>
-                    <div class="activity-meta">
-                        <span><i class="far fa-calendar-alt"></i> {{ $activity->published_at ? $activity->published_at->format('d M Y') : '-' }}</span>
-                    </div>
-                </div>
-            </a>
-            @endforeach
-        </div>
+            </div>
+        </a>
+        @endforeach
+    </div>
 
-        <div class="pagination-wrapper">
-            {{ $activities->links() }}
-        </div>
+    <div class="pagination-wrapper">
+        {{ $activities->links() }}
+    </div>
     @endif
 </div>
 @endsection

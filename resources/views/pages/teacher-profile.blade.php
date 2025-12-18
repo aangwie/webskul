@@ -68,7 +68,7 @@
 
     .teacher-photo i {
         font-size: 5rem;
-        color: rgba(255,255,255,0.5);
+        color: rgba(255, 255, 255, 0.5);
     }
 
     .teacher-info {
@@ -143,34 +143,38 @@
 
 <div class="teachers-content">
     @if($teachers->isEmpty())
-        <div class="empty-state">
-            <i class="fas fa-users"></i>
-            <p>Data guru belum tersedia.</p>
-        </div>
+    <div class="empty-state">
+        <i class="fas fa-users"></i>
+        <p>Data guru belum tersedia.</p>
+    </div>
     @else
-        <div class="teachers-grid">
-            @foreach($teachers as $teacher)
-            <div class="teacher-card">
-                <div class="teacher-photo">
-                    @if($teacher->photo)
-                        <img src="data:image/jpeg;base64,{{ $teacher->photo }}" alt="{{ $teacher->name }}">
-                    @else
-                        <i class="fas fa-user"></i>
-                    @endif
-                </div>
-                <div class="teacher-info">
-                    <h3 class="teacher-name">{{ $teacher->name }}</h3>
-                    <p class="teacher-position">{{ $teacher->position ?? 'Guru' }}</p>
-                    @if($teacher->education)
-                        <p class="teacher-education"><i class="fas fa-graduation-cap"></i> {{ $teacher->education }}</p>
-                    @endif
-                    @if($teacher->nip)
-                        <span class="teacher-nip">NIP: {{ $teacher->nip }}</span>
-                    @endif
-                </div>
+    <div class="teachers-grid">
+        @foreach($teachers as $teacher)
+        <div class="teacher-card">
+            <div class="teacher-photo">
+                @if($teacher->photo)
+                @if(Str::startsWith($teacher->photo, 'data:'))
+                <img src="{{ $teacher->photo }}" alt="{{ $teacher->name }}">
+                @else
+                <img src="{{ asset('storage/' . $teacher->photo) }}" alt="{{ $teacher->name }}">
+                @endif
+                @else
+                <i class="fas fa-user"></i>
+                @endif
             </div>
-            @endforeach
+            <div class="teacher-info">
+                <h3 class="teacher-name">{{ $teacher->name }}</h3>
+                <p class="teacher-position">{{ $teacher->position ?? 'Guru' }}</p>
+                @if($teacher->education)
+                <p class="teacher-education"><i class="fas fa-graduation-cap"></i> {{ $teacher->education }}</p>
+                @endif
+                @if($teacher->nip)
+                <span class="teacher-nip">NIP: {{ $teacher->nip }}</span>
+                @endif
+            </div>
         </div>
+        @endforeach
+    </div>
     @endif
 </div>
 @endsection
