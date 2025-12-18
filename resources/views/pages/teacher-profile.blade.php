@@ -153,7 +153,7 @@
             <div class="teacher-card">
                 <div class="teacher-photo">
                     @if($teacher->photo)
-                        <img src="{{ asset('storage/' . $teacher->photo) }}" alt="{{ $teacher->name }}">
+                        <img src="data:image/jpeg;base64,{{ $teacher->photo }}" alt="{{ $teacher->name }}">
                     @else
                         <i class="fas fa-user"></i>
                     @endif

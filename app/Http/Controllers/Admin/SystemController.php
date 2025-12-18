@@ -43,6 +43,8 @@ class SystemController extends Controller
             $token = env('GITHUB_TOKEN');
             $repo = env('GITHUB_REPO'); // example: "username/repo"
 
+            $rootPath = base_path();
+            
             if ($token && $repo) {
                 // Use Basic Auth URL
                 $repoUrl = "https://{$token}@github.com/{$repo}.git";
@@ -50,7 +52,7 @@ class SystemController extends Controller
                     $repoUrl = "https://{$username}:{$token}@github.com/{$repo}.git";
                 }
                 
-                $command = "git pull {$repoUrl} main 2>&1";
+                $command = "cd {$rootPath} && git pull {$repoUrl} main 2>&1";
                 
                 // For log safety, we will replace the command in output 
                 $safeCommand = "git pull https://***:***@github.com/{$repo}.git main";
@@ -58,7 +60,7 @@ class SystemController extends Controller
 
             } else {
                 // Default to origin
-                $command = "git pull origin main 2>&1";
+                $command = "cd {$rootPath} && git pull origin main 2>&1";
                 $output[] = "Command: git pull origin main";
             }
 
@@ -78,11 +80,11 @@ class SystemController extends Controller
                  if ($token && $repo) {
                      $repoUrl = "https://{$token}@github.com/{$repo}.git";
                      if ($username) $repoUrl = "https://{$username}:{$token}@github.com/{$repo}.git";
-                     exec("git fetch {$repoUrl} 2>&1", $fetchOutput);
-                     exec("git reset --hard origin/main 2>&1", $resetOutput);
+                     exec("cd {$rootPath} && git fetch {$repoUrl} 2>&1", $fetchOutput);
+                     exec("cd {$rootPath} && git reset --hard origin/main 2>&1", $resetOutput);
                  } else {
-                     exec('git fetch --all 2>&1');
-                     exec('git reset --hard origin/main 2>&1', $resetOutput);
+                     exec("cd {$rootPath} && git fetch --all 2>&1");
+                     exec("cd {$rootPath} && git reset --hard origin/main 2>&1", $resetOutput);
                  }
                  // Add reset output to main output (masked)
                  // ... (Detailed masking omitted for brevity in reset fallback for now)

@@ -199,7 +199,7 @@
             <a href="{{ route('activities.show', $activity->slug) }}" class="activity-card">
                 <div class="activity-image">
                     @if($activity->image)
-                        <img src="{{ asset('storage/' . $activity->image) }}" alt="{{ $activity->title }}">
+                        <img src="data:image/jpeg;base64,{{ $activity->image }}" alt="{{ $activity->title }}">
                     @else
                         <i class="fas fa-newspaper"></i>
                     @endif

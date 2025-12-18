@@ -197,7 +197,7 @@
     <div class="article-card">
         @if($activity->image)
         <div class="article-image">
-            <img src="{{ asset('storage/' . $activity->image) }}" alt="{{ $activity->title }}">
+            <img src="data:image/jpeg;base64,{{ $activity->image }}" alt="{{ $activity->title }}">
         </div>
         @endif
         
@@ -218,7 +218,7 @@
             <a href="{{ route('activities.show', $related->slug) }}" class="related-card">
                 <div class="related-image">
                     @if($related->image)
-                        <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->title }}">
+                        <img src="data:image/jpeg;base64,{{ $related->image }}" alt="{{ $related->title }}">
                     @else
                         <i class="fas fa-newspaper"></i>
                     @endif
