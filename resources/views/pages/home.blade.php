@@ -320,19 +320,120 @@
             <span class="stat-label">Guru Berpengalaman</span>
         </div>
         <div class="stat-item">
-            <span class="stat-number">500+</span>
+            <span class="stat-number">{{ $studentStats['total_students'] }}+</span>
             <span class="stat-label">Siswa Aktif</span>
         </div>
         <div class="stat-item">
-            <span class="stat-number">20+</span>
-            <span class="stat-label">Tahun Berdiri</span>
+            <span class="stat-number">{{ $studentStats['total_classes'] }}</span>
+            <span class="stat-label">Rombongan Belajar</span>
         </div>
         <div class="stat-item">
             <span class="stat-number">{{ $latestActivities->count() }}+</span>
-            <span class="stat-label">Kegiatan</span>
+            <span class="stat-label">Kegiatan Sekolah</span>
         </div>
     </div>
 </section>
+
+<!-- Student Statistics Details -->
+<section class="section" style="background: var(--secondary);">
+    <div class="container">
+        <h2 class="section-title">Data Statistik Siswa</h2>
+        <p class="section-subtitle">Komposisi siswa berdasarkan kelas dan gender</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
+            <!-- Chart -->
+            <div>
+                <canvas id="enrollmentChart" style="width: 100%; height: 300px;"></canvas>
+            </div>
+
+            <!-- Class Breakdown -->
+            <div style="background: var(--accent); padding: 25px; border-radius: 16px;">
+                <h3 style="margin-bottom: 20px; color: var(--primary);">Detail Sisiwa Per Kelas</h3>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid rgba(0,0,0,0.1);">
+                                <th style="text-align: left; padding: 10px; color: var(--text-light);">Kelas</th>
+                                <th style="text-align: center; padding: 10px; color: var(--primary);"><i class="fas fa-male"></i></th>
+                                <th style="text-align: center; padding: 10px; color: #e83e8c;"><i class="fas fa-female"></i></th>
+                                <th style="text-align: center; padding: 10px; font-weight: bold;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($classStats as $class)
+                            <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                <td style="padding: 12px 10px; font-weight: 600;">{{ $class->name }}</td>
+                                <td style="text-align: center;">{{ $class->male }}</td>
+                                <td style="text-align: center;">{{ $class->female }}</td>
+                                <td style="text-align: center; font-weight: bold;">{{ $class->total }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('enrollmentChart').getContext('2d');
+        
+        // Data from controller
+        const years = {!! json_encode($enrollmentData->pluck('enrollment_year')) !!};
+        const counts = {!! json_encode($enrollmentData->pluck('total')) !!};
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: years,
+                datasets: [{
+                    label: 'Jumlah Siswa Masuk per Tahun',
+                    data: counts,
+                    backgroundColor: 'rgba(30, 58, 95, 0.7)',
+                    borderColor: 'rgba(30, 58, 95, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Grafik Enrollment Siswa',
+                        font: {
+                            size: 16,
+                            family: 'Inter',
+                            weight: '600'
+                        }
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endsection
 
 <!-- Latest News Section -->
 <section class="section">

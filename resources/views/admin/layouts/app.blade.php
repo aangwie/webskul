@@ -554,6 +554,15 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('admin.classes.index') }}" class="{{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
+                    <i class="fas fa-layer-group"></i> Kelas
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.students.index') }}" class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
+                    <i class="fas fa-user-graduate"></i> Siswa</a>
+            </li>
+            <li>
                 <a href="{{ route('admin.activities.index') }}" class="{{ request()->routeIs('admin.activities.*') ? 'active' : '' }}">
                     <i class="fas fa-newspaper"></i> Kegiatan
                 </a>

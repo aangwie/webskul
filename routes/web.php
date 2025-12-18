@@ -48,6 +48,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Activities
     Route::resource('activities', AdminActivityController::class)->except(['show']);
     
+    // Classes & Students
+    Route::resource('classes', \App\Http\Controllers\Admin\SchoolClassController::class)->except(['show']);
+    
+    // Student Import Routes (Must be before resource to avoid ID conflict)
+    Route::get('/students/import', [\App\Http\Controllers\Admin\StudentController::class, 'import'])->name('students.import');
+    Route::post('/students/import', [\App\Http\Controllers\Admin\StudentController::class, 'storeImport'])->name('students.import.store');
+    Route::get('/students/import/template', [\App\Http\Controllers\Admin\StudentController::class, 'downloadTemplate'])->name('students.import.template');
+    
+    Route::resource('students', \App\Http\Controllers\Admin\StudentController::class)->except(['show']);
+    
     // Information
     Route::resource('information', AdminInformationController::class)->except(['show']);
     
