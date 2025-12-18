@@ -70,4 +70,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/settings/smtp', [SettingsController::class, 'smtp'])->name('settings.smtp');
     Route::put('/settings/smtp', [SettingsController::class, 'updateSmtp'])->name('settings.smtp.update');
     Route::post('/settings/smtp/test', [SettingsController::class, 'testSmtp'])->name('settings.smtp.test');
+    
+    // System Updates & Fixes
+    Route::get('/system', [\App\Http\Controllers\Admin\SystemController::class, 'index'])->name('system.index');
+    Route::post('/system/storage-link', [\App\Http\Controllers\Admin\SystemController::class, 'storageLink'])->name('system.storage-link');
+    Route::post('/system/update', [\App\Http\Controllers\Admin\SystemController::class, 'updateApp'])->name('system.update');
+    Route::post('/system/cache-clear', [\App\Http\Controllers\Admin\SystemController::class, 'cacheClear'])->name('system.cache-clear');
 });

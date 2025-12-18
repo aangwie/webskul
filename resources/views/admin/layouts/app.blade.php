@@ -583,6 +583,11 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('admin.system.index') }}" class="{{ request()->routeIs('admin.system.*') ? 'active' : '' }}">
+                    <i class="fas fa-tools"></i> Pengaturan Sistem
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('admin.settings.smtp') }}" class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                     <i class="fas fa-cog"></i> Pengaturan SMTP
                 </a>
