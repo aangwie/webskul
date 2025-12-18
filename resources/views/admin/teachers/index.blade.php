@@ -32,7 +32,11 @@
                         <tr>
                             <td>
                                 @if($teacher->photo)
-                                    <img src="{{ asset('storage/' . $teacher->photo) }}" alt="{{ $teacher->name }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                                    @if(Str::startsWith($teacher->photo, 'data:'))
+                                        <img src="{{ $teacher->photo }}" alt="{{ $teacher->name }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                                    @else
+                                        <img src="{{ asset('storage/' . $teacher->photo) }}" alt="{{ $teacher->name }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                                    @endif
                                 @else
                                     <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center;">
                                         <i class="fas fa-user" style="color: var(--text-light);"></i>

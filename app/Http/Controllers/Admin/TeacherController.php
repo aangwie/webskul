@@ -36,7 +36,9 @@ class TeacherController extends Controller
         $validated['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('photo')) {
-            $validated['photo'] = $request->file('photo')->store('teachers', 'public');
+            $image = $request->file('photo');
+            $base64 = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
+            $validated['photo'] = $base64;
         }
 
         Teacher::create($validated);
@@ -66,10 +68,9 @@ class TeacherController extends Controller
         $validated['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('photo')) {
-            if ($teacher->photo) {
-                Storage::disk('public')->delete($teacher->photo);
-            }
-            $validated['photo'] = $request->file('photo')->store('teachers', 'public');
+            $image = $request->file('photo');
+            $base64 = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
+            $validated['photo'] = $base64;
         }
 
         $teacher->update($validated);

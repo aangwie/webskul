@@ -449,7 +449,11 @@
                 <a href="{{ route('activities.show', $activity->slug) }}" class="news-card" style="text-decoration: none;">
                     <div class="news-image">
                         @if($activity->image)
-                            <img src="{{ asset('storage/' . $activity->image) }}" alt="{{ $activity->title }}">
+                            @if(Str::startsWith($activity->image, 'data:'))
+                                <img src="{{ $activity->image }}" alt="{{ $activity->title }}">
+                            @else
+                                <img src="{{ asset('storage/' . $activity->image) }}" alt="{{ $activity->title }}">
+                            @endif
                         @else
                             <i class="fas fa-newspaper"></i>
                         @endif

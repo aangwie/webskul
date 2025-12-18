@@ -39,7 +39,9 @@ class ActivityController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('activities', 'public');
+            $image = $request->file('image');
+            $base64 = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
+            $validated['image'] = $base64;
         }
 
         Activity::create($validated);
@@ -71,10 +73,9 @@ class ActivityController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            if ($activity->image) {
-                Storage::disk('public')->delete($activity->image);
-            }
-            $validated['image'] = $request->file('image')->store('activities', 'public');
+            $image = $request->file('image');
+            $base64 = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
+            $validated['image'] = $base64;
         }
 
         $activity->update($validated);

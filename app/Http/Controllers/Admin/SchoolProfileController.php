@@ -43,10 +43,9 @@ class SchoolProfileController extends Controller
         }
 
         if ($request->hasFile('logo')) {
-            if ($school->logo) {
-                Storage::disk('public')->delete($school->logo);
-            }
-            $validated['logo'] = $request->file('logo')->store('logos', 'public');
+            $image = $request->file('logo');
+            $base64 = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
+            $validated['logo'] = $base64;
         }
 
         $school->fill($validated);

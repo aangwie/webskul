@@ -17,7 +17,11 @@
                 @if($school->logo)
                     <div>
                         <strong>Logo Sekolah:</strong><br>
-                        <img src="{{ asset('storage/' . $school->logo) }}" alt="Logo" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
+                        @if(Str::startsWith($school->logo, 'data:'))
+                             <img src="{{ $school->logo }}" alt="Logo" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
+                        @else
+                             <img src="{{ asset('storage/' . $school->logo) }}" alt="Logo" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
+                        @endif
                     </div>
                 @endif
                 <div><strong>Nama Sekolah:</strong> {{ $school->name }}</div>
