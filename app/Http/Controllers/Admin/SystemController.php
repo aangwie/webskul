@@ -56,32 +56,58 @@ class SystemController extends Controller
                 }
 
                 // Initialize and Fetch
+                // We split commands to handle potential intermediate failures gracefully or conditional steps
                 $initCommands = [
-                    "cd {$rootPath} && git init",
-                    "cd {$rootPath} && git remote add origin {$repoUrl}",
-                    "cd {$rootPath} && git fetch origin",
-                    "cd {$rootPath} && git reset --hard origin/main",
-                    "cd {$rootPath} && git branch --set-upstream-to=origin/main main"
+                    "git init",
+                    "git checkout -b main || git checkout main", // Force branch to be 'main'
+                    "git remote remove origin || echo 'No origin to remove'", // Clean up just in case
+                    "git remote add origin {$repoUrl}",
                 ];
 
+                // Execute Setup Commands
                 foreach ($initCommands as $cmd) {
-                    // Mask token in output log
-                    $logCmd = str_replace($token, '*****', $cmd);
-                    $output[] = "Exec: " . $logCmd;
+                    exec("cd {$rootPath} && " . $cmd . " 2>&1", $cmdOutput, $cmdReturn);
+                    // Allow some commands to "fail" (like remove origin if not exists, or checkout -b if exists)
+                    // But we should log them.
+                    $output[] = "Exec: " . $cmd;
+                    // We don't throw here immediately unless critical, but let's keep it simple:
+                    // The critical ones are fetch and reset.
+                    $cmdOutput = [];
+                }
 
-                    exec($cmd . " 2>&1", $cmdOutput, $cmdReturn);
+                // Now critical steps
+                $fetchCmd = "git fetch origin";
+                $output[] = "Exec: " . $fetchCmd;
+                exec("cd {$rootPath} && {$fetchCmd} 2>&1", $fetchOutput, $fetchReturn);
 
-                    // Mask token in result
-                    $safeOutput = array_map(function ($line) use ($token) {
-                        return str_replace($token, '*****', $line);
-                    }, $cmdOutput);
+                // Secure log for fetch
+                $safeFetchOutput = array_map(function ($line) use ($token) {
+                    return str_replace($token, '*****', $line);
+                }, $fetchOutput);
+                $output = array_merge($output, $safeFetchOutput);
 
-                    $output = array_merge($output, $safeOutput);
-
-                    if ($cmdReturn !== 0) {
-                        throw new \Exception("Git Init Failed: " . end($safeOutput));
+                if ($fetchReturn !== 0) {
+                    // Check for 403
+                    $errorStr = implode("\n", $safeFetchOutput);
+                    if (strpos($errorStr, '403') !== false) {
+                        throw new \Exception("Git Auth Error (403). Please check your GITHUB_TOKEN and GITHUB_USERNAME in .env. The token may be invalid or expired.");
                     }
-                    $cmdOutput = []; // Reset buffer
+                    throw new \Exception("Git Fetch Failed: " . $errorStr);
+                }
+
+                // Reset and Upstream
+                $resetCommands = [
+                    "git reset --hard origin/main",
+                    "git branch --set-upstream-to=origin/main main"
+                ];
+
+                foreach ($resetCommands as $cmd) {
+                    exec("cd {$rootPath} && " . $cmd . " 2>&1", $cmdOutput, $cmdReturn);
+                    $output = array_merge($output, $cmdOutput);
+                    if ($cmdReturn !== 0) {
+                        throw new \Exception("Git Config Failed ({$cmd}): " . end($cmdOutput));
+                    }
+                    $cmdOutput = [];
                 }
 
                 $output[] = "Git initialized successfully!";
@@ -116,18 +142,33 @@ class SystemController extends Controller
                 $output = array_merge($output, $gitOutput);
 
                 if ($returnVar !== 0) {
-                    $output[] = "Git pull failed, trying fetch + reset...";
-                    // Try fetching first if pull fails
-                    if ($token && $repo) {
-                        $repoUrl = "https://{$token}@github.com/{$repo}.git";
-                        if ($username) $repoUrl = "https://{$username}:{$token}@github.com/{$repo}.git";
-                        exec("cd {$rootPath} && git fetch {$repoUrl} 2>&1", $fetchOutput);
-                        exec("cd {$rootPath} && git reset --hard origin/main 2>&1", $resetOutput);
-                    } else {
-                        exec("cd {$rootPath} && git fetch --all 2>&1");
-                        exec("cd {$rootPath} && git reset --hard origin/main 2>&1", $resetOutput);
+                    // Check if it's an Auth error
+                    $errorStr = implode("\n", $gitOutput);
+                    if (strpos($errorStr, '403') !== false) {
+                        $output[] = "CRITICAL: Git Authorization Failed (403). Check your .env GITHUB_TOKEN.";
                     }
-                    // No detailed logging for reset fallback to keep it simple, just hope it works or user sees error
+
+                    $output[] = "Git pull failed, trying fetch + reset...";
+
+                    // Setup correct repo URL again for fetch
+                    $fetchUrl = "origin";
+                    if ($token && $repo) {
+                        $fetchUrl = "https://{$token}@github.com/{$repo}.git";
+                        if ($username) $fetchUrl = "https://{$username}:{$token}@github.com/{$repo}.git";
+                    }
+
+                    exec("cd {$rootPath} && git fetch {$fetchUrl} 2>&1", $fetchOutput);
+                    exec("cd {$rootPath} && git reset --hard origin/main 2>&1", $resetOutput);
+
+                    // Masking output again...
+                    if ($token) {
+                        $safeFetchAndReset = array_map(function ($line) use ($token) {
+                            return str_replace($token, '*****', $line);
+                        }, array_merge($fetchOutput, $resetOutput));
+                        $output = array_merge($output, $safeFetchAndReset);
+                    } else {
+                        $output = array_merge($output, $fetchOutput, $resetOutput);
+                    }
                 }
             }
 
