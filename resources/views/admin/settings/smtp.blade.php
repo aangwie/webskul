@@ -67,7 +67,7 @@
 
                 <div class="form-group">
                     <label class="form-label">From Name</label>
-                    <input type="text" name="mail_from_name" class="form-input" value="{{ $settings['mail_from_name'] }}" placeholder="SMP Negeri 6 Sudimoro">
+                    <input type="text" name="mail_from_name" class="form-input" value="{{ $settings['mail_from_name'] }}" placeholder="{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}">
                 </div>
             </div>
 

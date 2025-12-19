@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - SMP Negeri 6 Sudimoro</title>
-    @php $schoolFavicon = \App\Models\SchoolProfile::first(); @endphp
-    @if($schoolFavicon && $schoolFavicon->logo)
-        <link rel="icon" type="image/png" href="{{ asset('storage/' . $schoolFavicon->logo) }}">
+    <title>Reset Password - {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</title>
+    @if(isset($school) && $school && $school->logo)
+    <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
     @else
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,7 +25,11 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -37,7 +41,10 @@
             padding: 20px;
         }
 
-        .container { width: 100%; max-width: 420px; }
+        .container {
+            width: 100%;
+            max-width: 420px;
+        }
 
         .card {
             background: var(--secondary);
@@ -47,14 +54,40 @@
             text-align: center;
         }
 
-        .logo { margin-bottom: 30px; }
-        .logo i { font-size: 4rem; color: var(--primary); }
+        .logo {
+            margin-bottom: 30px;
+        }
 
-        h1 { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
-        .subtitle { color: var(--text-light); font-size: 0.9rem; margin-bottom: 35px; }
+        .logo i {
+            font-size: 4rem;
+            color: var(--primary);
+        }
 
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 35px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
 
         .form-input {
             width: 100%;
@@ -67,7 +100,11 @@
             background: var(--accent);
         }
 
-        .form-input:focus { outline: none; border-color: var(--primary); background: var(--secondary); }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--secondary);
+        }
 
         .btn {
             width: 100%;
@@ -84,10 +121,23 @@
             margin-top: 10px;
         }
 
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(30, 58, 95, 0.3); }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(30, 58, 95, 0.3);
+        }
 
-        .alert { padding: 12px 18px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 20px; text-align: left; }
-        .alert-error { background: #ffeaea; color: #e74c3c; }
+        .alert {
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .alert-error {
+            background: #ffeaea;
+            color: #e74c3c;
+        }
 
         .back-link {
             display: inline-flex;
@@ -100,11 +150,18 @@
             transition: var(--transition);
         }
 
-        .back-link:hover { color: var(--primary); }
+        .back-link:hover {
+            color: var(--primary);
+        }
 
-        @media (max-width: 480px) { .card { padding: 40px 25px; } }
+        @media (max-width: 480px) {
+            .card {
+                padding: 40px 25px;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="card">
@@ -146,4 +203,5 @@
         </div>
     </div>
 </body>
+
 </html>

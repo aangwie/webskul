@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin Panel') - SMP Negeri 6 Sudimoro</title>
-    @php $schoolFavicon = \App\Models\SchoolProfile::first(); @endphp
-    @if($schoolFavicon && $schoolFavicon->logo)
-        <link rel="icon" type="image/png" href="{{ asset('storage/' . $schoolFavicon->logo) }}">
+    <title>@yield('title', 'Admin Panel') - {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</title>
+    @if(isset($school) && $school && $school->logo)
+    <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
     @else
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -61,7 +61,7 @@
 
         .sidebar-brand {
             padding: 15px 25px 30px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 20px;
         }
 
@@ -89,7 +89,7 @@
             align-items: center;
             gap: 12px;
             padding: 14px 18px;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             border-radius: 10px;
             transition: var(--transition);
@@ -98,7 +98,7 @@
 
         .sidebar-menu a:hover,
         .sidebar-menu a.active {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
             color: var(--secondary);
         }
 
@@ -109,7 +109,7 @@
 
         .sidebar-divider {
             height: 1px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             margin: 20px 25px;
         }
 
@@ -529,11 +529,12 @@
     </style>
     @yield('styles')
 </head>
+
 <body>
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <h2><i class="fas fa-school"></i> SMP N 6 Sudimoro</h2>
+            <h2><i class="fas fa-school"></i> {{ $school->name ?? 'SMP N 6 Sudimoro' }}</h2>
             <span>Panel Admin</span>
         </div>
 
@@ -634,17 +635,17 @@
         <!-- Content -->
         <div class="content">
             @if(session('success'))
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    {{ session('success') }}
-                </div>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                {{ session('success') }}
+            </div>
             @endif
 
             @if(session('error'))
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle"></i>
-                    {{ session('error') }}
-                </div>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ session('error') }}
+            </div>
             @endif
 
             @yield('content')
@@ -658,4 +659,5 @@
     </script>
     @yield('scripts')
 </body>
+
 </html>

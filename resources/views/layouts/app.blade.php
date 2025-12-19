@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SMP Negeri 6 Sudimoro - Sekolah Menengah Pertama Negeri">
-    <title>@yield('title', 'SMP Negeri 6 Sudimoro')</title>
+    <meta name="description" content="{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }} - Sekolah Menengah Pertama Negeri">
+    <title>@yield('title', $school->name ?? 'SMP Negeri 6 Sudimoro')</title>
     @if(isset($school) && $school && $school->logo)
-        <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
+    <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
     @else
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -380,6 +381,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -392,18 +394,19 @@
     </style>
     @yield('styles')
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="{{ route('home') }}" class="nav-brand">
                 @if(isset($school) && $school && $school->logo)
-                    <img src="{{ asset('storage/' . $school->logo) }}" alt="Logo">
+                <img src="{{ asset('storage/' . $school->logo) }}" alt="Logo">
                 @else
-                    <i class="fas fa-school" style="font-size: 2rem;"></i>
+                <i class="fas fa-school" style="font-size: 2rem;"></i>
                 @endif
                 <div class="nav-brand-text">
-                    <span class="nav-brand-name">SMP Negeri 6 Sudimoro</span>
+                    <span class="nav-brand-name">{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</span>
                     <span class="nav-brand-sub">Excellence in Education</span>
                 </div>
             </a>
@@ -450,7 +453,7 @@
         <div class="footer-container">
             <div class="footer-section">
                 <h3>Tentang Kami</h3>
-                <p>SMP Negeri 6 Sudimoro adalah sekolah menengah pertama yang berkomitmen memberikan pendidikan berkualitas untuk generasi masa depan.</p>
+                <p>{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }} adalah sekolah menengah pertama yang berkomitmen memberikan pendidikan berkualitas untuk generasi masa depan.</p>
             </div>
             <div class="footer-section">
                 <h3>Link Cepat</h3>
@@ -467,7 +470,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; {{ date('Y') }} SMP Negeri 6 Sudimoro. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}. All rights reserved.</p>
         </div>
     </footer>
 
@@ -493,4 +496,5 @@
     </script>
     @yield('scripts')
 </body>
+
 </html>

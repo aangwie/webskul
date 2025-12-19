@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $activity->title . ' - SMP Negeri 6 Sudimoro')
+@section('title', $activity->title . ' - ' . ($school->name ?? 'SMP Negeri 6 Sudimoro'))
 
 @section('styles')
 <style>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Profil Guru - SMP Negeri 6 Sudimoro')
+@section('title', 'Profil Guru - ' . ($school->name ?? 'SMP Negeri 6 Sudimoro'))
 
 @section('styles')
 <style>
@@ -138,7 +138,7 @@
 @section('content')
 <div class="page-header">
     <h1>Profil Guru</h1>
-    <p>Tenaga pendidik profesional SMP Negeri 6 Sudimoro</p>
+    <p>Tenaga pendidik profesional {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</p>
 </div>
 
 <div class="teachers-content">

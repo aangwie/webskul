@@ -12,7 +12,6 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $school = SchoolProfile::first();
         $latestActivities = Activity::published()->latest('published_at')->take(3)->get();
         $importantInfo = Information::active()->important()->latest()->take(5)->get();
         $featuredTeachers = Teacher::active()->count();
@@ -48,6 +47,6 @@ class HomeController extends Controller
             ->limit(5) // Last 5 years
             ->get();
 
-        return view('pages.home', compact('school', 'latestActivities', 'importantInfo', 'featuredTeachers', 'studentStats', 'classStats', 'enrollmentData'));
+        return view('pages.home', compact('latestActivities', 'importantInfo', 'featuredTeachers', 'studentStats', 'classStats', 'enrollmentData'));
     }
 }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Profil Sekolah - SMP Negeri 6 Sudimoro')
+@section('title', 'Profil Sekolah - ' . ($school->name ?? 'SMP Negeri 6 Sudimoro'))
 
 @section('styles')
 <style>
@@ -123,49 +123,49 @@
 @section('content')
 <div class="page-header">
     <h1>Profil Sekolah</h1>
-    <p>Mengenal lebih dekat SMP Negeri 6 Sudimoro</p>
+    <p>Mengenal lebih dekat {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</p>
 </div>
 
 <div class="profile-content">
     <div class="profile-card">
         <div class="school-logo">
             @if($school && $school->logo)
-                <img src="{{ asset('storage/' . $school->logo) }}" alt="Logo Sekolah">
+            <img src="{{ asset('storage/' . $school->logo) }}" alt="Logo Sekolah">
             @else
-                <i class="fas fa-school"></i>
+            <i class="fas fa-school"></i>
             @endif
         </div>
 
         @if($school)
-            <div class="profile-section">
-                <h2><i class="fas fa-eye"></i> Visi</h2>
-                <p>{!! nl2br(e($school->vision ?? 'Menjadi sekolah unggulan yang menghasilkan lulusan berilmu, berakhlak mulia, dan berdaya saing tinggi.')) !!}</p>
-            </div>
+        <div class="profile-section">
+            <h2><i class="fas fa-eye"></i> Visi</h2>
+            <p>{!! nl2br(e($school->vision ?? 'Menjadi sekolah unggulan yang menghasilkan lulusan berilmu, berakhlak mulia, dan berdaya saing tinggi.')) !!}</p>
+        </div>
 
-            <div class="profile-section">
-                <h2><i class="fas fa-bullseye"></i> Misi</h2>
-                <div>{!! nl2br(e($school->mission ?? 'Menyelenggarakan pendidikan berkualitas yang mengembangkan potensi peserta didik secara optimal.')) !!}</div>
-            </div>
+        <div class="profile-section">
+            <h2><i class="fas fa-bullseye"></i> Misi</h2>
+            <div>{!! nl2br(e($school->mission ?? 'Menyelenggarakan pendidikan berkualitas yang mengembangkan potensi peserta didik secara optimal.')) !!}</div>
+        </div>
 
-            <div class="profile-section">
-                <h2><i class="fas fa-history"></i> Sejarah</h2>
-                <p>{!! nl2br(e($school->history ?? 'SMP Negeri 6 Sudimoro didirikan dengan tekad untuk memberikan pendidikan terbaik bagi generasi muda. Sejak berdiri, sekolah ini telah menghasilkan banyak alumni yang sukses di berbagai bidang.')) !!}</p>
-            </div>
+        <div class="profile-section">
+            <h2><i class="fas fa-history"></i> Sejarah</h2>
+            <p>{!! nl2br(e($school->history ?? ($school->name ?? 'SMP Negeri 6 Sudimoro') . ' didirikan dengan tekad untuk memberikan pendidikan terbaik bagi generasi muda. Sejak berdiri, sekolah ini telah menghasilkan banyak alumni yang sukses di berbagai bidang.')) !!}</p>
+        </div>
 
-            <div class="profile-section">
-                <h2><i class="fas fa-map-marker-alt"></i> Alamat</h2>
-                <p>{{ $school->address ?? 'Sudimoro, Indonesia' }}</p>
-            </div>
+        <div class="profile-section">
+            <h2><i class="fas fa-map-marker-alt"></i> Alamat</h2>
+            <p>{{ $school->address ?? 'Sudimoro, Indonesia' }}</p>
+        </div>
 
-            <div class="profile-section">
-                <h2><i class="fas fa-phone-alt"></i> Kontak</h2>
-                <p>
-                    <strong>Telepon:</strong> {{ $school->phone ?? '-' }}<br>
-                    <strong>Email:</strong> {{ $school->email ?? '-' }}
-                </p>
-            </div>
+        <div class="profile-section">
+            <h2><i class="fas fa-phone-alt"></i> Kontak</h2>
+            <p>
+                <strong>Telepon:</strong> {{ $school->phone ?? '-' }}<br>
+                <strong>Email:</strong> {{ $school->email ?? '-' }}
+            </p>
+        </div>
         @else
-            <p style="text-align: center; color: var(--text-light);">Profil sekolah belum tersedia.</p>
+        <p style="text-align: center; color: var(--text-light);">Profil sekolah belum tersedia.</p>
         @endif
     </div>
 </div>

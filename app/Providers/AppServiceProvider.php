@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $school = \App\Models\SchoolProfile::first();
+        \Illuminate\Support\Facades\View::share('school', $school);
     }
 }

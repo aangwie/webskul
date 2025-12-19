@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lupa Password - SMP Negeri 6 Sudimoro</title>
-    @php $schoolFavicon = \App\Models\SchoolProfile::first(); @endphp
-    @if($schoolFavicon && $schoolFavicon->logo)
-        <link rel="icon" type="image/png" href="{{ asset('storage/' . $schoolFavicon->logo) }}">
+    <title>Lupa Password - {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</title>
+    @if(isset($school) && $school && $school->logo)
+    <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
     @else
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -168,6 +168,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="card">
@@ -207,4 +208,5 @@
         </div>
     </div>
 </body>
+
 </html>

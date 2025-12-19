@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SMP Negeri 6 Sudimoro</title>
+    <title>Login - {{$school->name}}</title>
     @php $schoolFavicon = \App\Models\SchoolProfile::first(); @endphp
     @if($schoolFavicon && $schoolFavicon->logo)
-        <link rel="icon" type="image/png" href="{{ asset('storage/' . $schoolFavicon->logo) }}">
+    <link rel="icon" type="image/png" href="{{ asset('storage/' . $schoolFavicon->logo) }}">
     @else
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -181,6 +182,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-card">
@@ -207,14 +209,14 @@
                 @csrf
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-input @error('email') error @enderror" 
-                           value="{{ old('email') }}" placeholder="admin@email.com" required>
+                    <input type="email" name="email" class="form-input @error('email') error @enderror"
+                        value="{{ old('email') }}" placeholder="admin@email.com" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-input @error('password') error @enderror" 
-                           placeholder="••••••••" required>
+                    <input type="password" name="password" class="form-input @error('password') error @enderror"
+                        placeholder="••••••••" required>
                 </div>
 
                 <div class="form-group">
@@ -239,4 +241,5 @@
         </div>
     </div>
 </body>
+
 </html>

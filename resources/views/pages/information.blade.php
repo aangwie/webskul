@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Informasi - SMP Negeri 6 Sudimoro')
+@section('title', 'Informasi - ' . ($school->name ?? 'SMP Negeri 6 Sudimoro'))
 
 @section('styles')
 <style>
@@ -173,32 +173,32 @@
 
 <div class="info-content">
     @if($informations->isEmpty())
-        <div class="empty-state">
-            <i class="fas fa-bullhorn"></i>
-            <p>Belum ada informasi atau pengumuman.</p>
-        </div>
+    <div class="empty-state">
+        <i class="fas fa-bullhorn"></i>
+        <p>Belum ada informasi atau pengumuman.</p>
+    </div>
     @else
-        <div class="info-list">
-            @foreach($informations as $info)
-            <div class="info-card {{ $info->is_important ? 'important' : '' }}">
-                <h3 class="info-title">
-                    <i class="fas fa-info-circle"></i>
-                    {{ $info->title }}
-                </h3>
-                <div class="info-text">
-                    {!! nl2br(e($info->content)) !!}
-                </div>
-                <div class="info-date">
-                    <i class="far fa-clock"></i>
-                    {{ $info->created_at->format('d M Y, H:i') }}
-                </div>
+    <div class="info-list">
+        @foreach($informations as $info)
+        <div class="info-card {{ $info->is_important ? 'important' : '' }}">
+            <h3 class="info-title">
+                <i class="fas fa-info-circle"></i>
+                {{ $info->title }}
+            </h3>
+            <div class="info-text">
+                {!! nl2br(e($info->content)) !!}
             </div>
-            @endforeach
+            <div class="info-date">
+                <i class="far fa-clock"></i>
+                {{ $info->created_at->format('d M Y, H:i') }}
+            </div>
         </div>
+        @endforeach
+    </div>
 
-        <div class="pagination-wrapper">
-            {{ $informations->links() }}
-        </div>
+    <div class="pagination-wrapper">
+        {{ $informations->links() }}
+    </div>
     @endif
 </div>
 @endsection

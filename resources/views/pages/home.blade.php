@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Beranda - SMP Negeri 6 Sudimoro')
+@section('title', 'Beranda - ' . ($school->name ?? 'SMP Negeri 6 Sudimoro'))
 
 @section('styles')
 <style>
@@ -295,7 +295,7 @@
 <section class="hero">
     <div class="hero-container">
         <div class="hero-content animate-fade-in">
-            <h1>Selamat Datang di<br>SMP Negeri 6 Sudimoro</h1>
+            <h1>Selamat Datang di<br>{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</h1>
             <p>Mewujudkan generasi muda yang berilmu, berakhlak mulia, dan siap menghadapi tantangan masa depan dengan pendidikan berkualitas.</p>
             <div class="hero-buttons">
                 <a href="{{ route('profile.school') }}" class="btn-hero btn-hero-primary">
@@ -377,18 +377,31 @@
 </section>
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('enrollmentChart').getContext('2d');
 
         // Data from controller
-        const years = {
-            !!json_encode($enrollmentData - > pluck('enrollment_year')) !!
-        };
-        const counts = {
-            !!json_encode($enrollmentData - > pluck('total')) !!
-        };
+        let years = 
+            {!! json_encode($enrollmentData->pluck('enrollment_year')) !!}
+        ;
+        let counts = 
+            {!! json_encode($enrollmentData->pluck('total')) !!}
+        ;
+
+        // Debugging
+        console.log('Enrollment Data:', {
+            years,
+            counts
+        });
+
+        // Fallback for demo/testing if data is empty
+        if (!years || years.length === 0) {
+            console.warn('No data available. Showing demo data.');
+            years = ['2020', '2021', '2022', '2023', '2024'];
+            counts = [100, 150, 200, 180, 220];
+        }
 
         new Chart(ctx, {
             type: 'bar',
@@ -513,3 +526,4 @@
 </section>
 @endif
 @endsection
+
