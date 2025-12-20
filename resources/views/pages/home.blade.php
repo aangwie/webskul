@@ -287,6 +287,43 @@
             grid-template-columns: 1fr;
         }
     }
+
+    /* Social Media Section */
+    .social-section {
+        padding: 60px 20px;
+        background: var(--secondary);
+        text-align: center;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .social-link {
+        width: 60px;
+        height: 60px;
+        background: var(--primary);
+        color: var(--secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        transition: var(--transition);
+        text-decoration: none;
+    }
+
+    .social-link:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        background: var(--accent-gold);
+        color: var(--primary);
+    }
 </style>
 @endsection
 
@@ -343,7 +380,10 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
             <!-- Chart -->
             <div>
-                <canvas id="enrollmentChart" style="width: 100%; height: 300px;"></canvas>
+                <canvas id="enrollmentChart"
+                    data-years='@json($enrollmentData->pluck("enrollment_year")??[])'
+                    data-counts='@json($enrollmentData->pluck("total")??[])'
+                    style="width: 100%; height: 300px;"></canvas>
             </div>
 
             <!-- Class Breakdown -->
@@ -377,78 +417,80 @@
 </section>
 
 @section('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('enrollmentChart').getContext('2d');
+    (function() {
+        const initChart = function() {
+            const canvas = document.getElementById('enrollmentChart');
+            if (!canvas) {
+                console.error('Canvas enrollmentChart not found');
+                return;
+            }
 
-        // Data from controller
-        let years = 
-            {!! json_encode($enrollmentData->pluck('enrollment_year')) !!}
-        ;
-        let counts = 
-            {!! json_encode($enrollmentData->pluck('total')) !!}
-        ;
+            const ctx = canvas.getContext('2d');
 
-        // Debugging
-        console.log('Enrollment Data:', {
-            years,
-            counts
-        });
+            // Data from data-attributes
+            let years = JSON.parse(canvas.dataset.years || '[]');
+            let counts = JSON.parse(canvas.dataset.counts || '[]');
 
-        // Fallback for demo/testing if data is empty
-        if (!years || years.length === 0) {
-            console.warn('No data available. Showing demo data.');
-            years = ['2020', '2021', '2022', '2023', '2024'];
-            counts = [100, 150, 200, 180, 220];
-        }
+            // Fallback for demo/testing if data is empty
+            if (!years || years.length === 0) {
+                years = ['2020', '2021', '2022', '2023', '2024'];
+                counts = [100, 150, 200, 180, 220];
+            }
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: years,
-                datasets: [{
-                    label: 'Jumlah Siswa Masuk per Tahun',
-                    data: counts,
-                    backgroundColor: 'rgba(30, 58, 95, 0.7)',
-                    borderColor: 'rgba(30, 58, 95, 1)',
-                    borderWidth: 1,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Grafik Enrollment Siswa',
-                        font: {
-                            size: 16,
-                            family: 'Inter',
-                            weight: '600'
-                        }
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Jumlah Siswa Masuk per Tahun',
+                        data: counts,
+                        backgroundColor: 'rgba(30, 58, 95, 0.7)',
+                        borderColor: 'rgba(30, 58, 95, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0,0,0,0.05)'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Grafik Enrollment Siswa',
+                            font: {
+                                size: 16,
+                                family: 'Inter',
+                                weight: '600'
+                            }
+                        },
+                        legend: {
+                            position: 'bottom'
                         }
                     },
-                    x: {
-                        grid: {
-                            display: false
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
                         }
                     }
                 }
-            }
-        });
-    });
+            });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initChart);
+        } else {
+            initChart();
+        }
+    })();
 </script>
 @endsection
 
@@ -525,5 +567,22 @@
     </div>
 </section>
 @endif
-@endsection
 
+<!-- Social Media Section -->
+@if($socials->isNotEmpty())
+<section class="social-section">
+    <div class="container text-center">
+        <h2 class="section-title">Terhubung Dengan Kami</h2>
+        <p class="section-subtitle">Ikuti media sosial resmi kami untuk informasi terkini</p>
+
+        <div class="social-links">
+            @foreach($socials as $social)
+            <a href="{{ $social->url }}" target="_blank" class="social-link" title="{{ $social->platform }}">
+                <i class="{{ $social->icon }}"></i>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+@endsection

@@ -22,7 +22,8 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label class="form-label">NIP</label>
-                    <input type="text" name="nip" class="form-input" value="{{ old('nip', $teacher->nip) }}">
+                    <input type="text" name="nip" class="form-input" value="{{ old('nip', $teacher->nip) }}" maxlength="18" pattern="[0-9-]+" title="Hanya angka dan tanda hubung (-) yang diperbolehkan" oninput="this.value = this.value.replace(/[^0-9-]/g, '');">
+                    @error('nip')<span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>@enderror
                 </div>
                 <div class="form-group">
                     <label class="form-label">Jabatan</label>
@@ -50,7 +51,7 @@
                 <label class="form-label">Foto</label>
                 <input type="file" name="photo" class="form-input" accept="image/*">
                 @if($teacher->photo)
-                    <img src="{{ asset('storage/' . $teacher->photo) }}" alt="Current Photo" class="preview-image">
+                <img src="{{ asset('storage/' . $teacher->photo) }}" alt="Current Photo" class="preview-image">
                 @endif
             </div>
 

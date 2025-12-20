@@ -5,6 +5,7 @@
 
 @section('content')
 <div class="stats-grid">
+    @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
     <div class="stat-card">
         <div class="stat-icon primary">
             <i class="fas fa-chalkboard-teacher"></i>
@@ -14,6 +15,7 @@
             <p>Total Guru</p>
         </div>
     </div>
+    @endif
     <div class="stat-card">
         <div class="stat-icon success">
             <i class="fas fa-newspaper"></i>
@@ -32,6 +34,7 @@
             <p>Dipublikasikan</p>
         </div>
     </div>
+    @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
     <div class="stat-card">
         <div class="stat-icon gold">
             <i class="fas fa-bullhorn"></i>
@@ -41,6 +44,7 @@
             <p>Total Informasi</p>
         </div>
     </div>
+    @endif
 </div>
 
 <div class="card">
@@ -52,36 +56,36 @@
     </div>
     <div class="card-body">
         @if($latestActivities->isEmpty())
-            <p style="color: var(--text-light); text-align: center; padding: 30px;">Belum ada kegiatan.</p>
+        <p style="color: var(--text-light); text-align: center; padding: 30px;">Belum ada kegiatan.</p>
         @else
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Judul</th>
-                            <th>Kategori</th>
-                            <th>Status</th>
-                            <th>Tanggal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($latestActivities as $activity)
-                        <tr>
-                            <td>{{ $activity->title }}</td>
-                            <td>{{ $activity->category == 'news' ? 'Berita' : 'Acara' }}</td>
-                            <td>
-                                @if($activity->is_published)
-                                    <span class="badge badge-success">Dipublikasikan</span>
-                                @else
-                                    <span class="badge badge-warning">Draft</span>
-                                @endif
-                            </td>
-                            <td>{{ $activity->created_at->format('d M Y') }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Judul</th>
+                        <th>Kategori</th>
+                        <th>Status</th>
+                        <th>Tanggal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($latestActivities as $activity)
+                    <tr>
+                        <td>{{ $activity->title }}</td>
+                        <td>{{ $activity->category == 'news' ? 'Berita' : 'Acara' }}</td>
+                        <td>
+                            @if($activity->is_published)
+                            <span class="badge badge-success">Dipublikasikan</span>
+                            @else
+                            <span class="badge badge-warning">Draft</span>
+                            @endif
+                        </td>
+                        <td>{{ $activity->created_at->format('d M Y') }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
         @endif
     </div>
 </div>

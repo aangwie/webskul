@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ActivityController as AdminActivityController;
 use App\Http\Controllers\Admin\InformationController as AdminInformationController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SocialMediaController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -36,44 +37,56 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('
 // Admin routes (protected)
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // School Profile
-    Route::get('/school-profile', [SchoolProfileController::class, 'index'])->name('school-profile.index');
-    Route::get('/school-profile/edit', [SchoolProfileController::class, 'edit'])->name('school-profile.edit');
-    Route::put('/school-profile', [SchoolProfileController::class, 'update'])->name('school-profile.update');
-    
-    // Teachers
-    Route::resource('teachers', TeacherController::class)->except(['show']);
-    
-    // Activities
-    Route::resource('activities', AdminActivityController::class)->except(['show']);
-    
-    // Classes & Students
-    Route::resource('classes', \App\Http\Controllers\Admin\SchoolClassController::class)->except(['show']);
-    
-    // Student Import Routes (Must be before resource to avoid ID conflict)
-    Route::get('/students/import', [\App\Http\Controllers\Admin\StudentController::class, 'import'])->name('students.import');
-    Route::post('/students/import', [\App\Http\Controllers\Admin\StudentController::class, 'storeImport'])->name('students.import.store');
-    Route::get('/students/import/template', [\App\Http\Controllers\Admin\StudentController::class, 'downloadTemplate'])->name('students.import.template');
-    
-    Route::resource('students', \App\Http\Controllers\Admin\StudentController::class)->except(['show']);
-    
-    // Information
-    Route::resource('information', AdminInformationController::class)->except(['show']);
-    
-    // Admin Profile
-    Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
-    Route::put('/profile', [AdminProfileController::class, 'updateProfile'])->name('profile.update');
-    Route::put('/profile/password', [AdminProfileController::class, 'updatePassword'])->name('profile.password');
-    
-    // Settings
-    Route::get('/settings/smtp', [SettingsController::class, 'smtp'])->name('settings.smtp');
-    Route::put('/settings/smtp', [SettingsController::class, 'updateSmtp'])->name('settings.smtp.update');
-    Route::post('/settings/smtp/test', [SettingsController::class, 'testSmtp'])->name('settings.smtp.test');
-    
-    // System Updates & Fixes
-    Route::get('/system', [\App\Http\Controllers\Admin\SystemController::class, 'index'])->name('system.index');
-    Route::post('/system/storage-link', [\App\Http\Controllers\Admin\SystemController::class, 'storageLink'])->name('system.storage-link');
-    Route::post('/system/update', [\App\Http\Controllers\Admin\SystemController::class, 'updateApp'])->name('system.update');
-    Route::post('/system/cache-clear', [\App\Http\Controllers\Admin\SystemController::class, 'cacheClear'])->name('system.cache-clear');
+
+    // Routes accessible by Admin and Teacher
+    Route::middleware(['role:admin,teacher'])->group(function () {
+        // School Profile
+        Route::get('/school-profile', [SchoolProfileController::class, 'index'])->name('school-profile.index');
+        Route::get('/school-profile/edit', [SchoolProfileController::class, 'edit'])->name('school-profile.edit');
+        Route::put('/school-profile', [SchoolProfileController::class, 'update'])->name('school-profile.update');
+
+        // Teachers
+        Route::resource('teachers', TeacherController::class)->except(['show']);
+
+        // Classes & Students
+        Route::resource('classes', \App\Http\Controllers\Admin\SchoolClassController::class)->except(['show']);
+        Route::get('/students/import', [\App\Http\Controllers\Admin\StudentController::class, 'import'])->name('students.import');
+        Route::post('/students/import', [\App\Http\Controllers\Admin\StudentController::class, 'storeImport'])->name('students.import.store');
+        Route::get('/students/import/template', [\App\Http\Controllers\Admin\StudentController::class, 'downloadTemplate'])->name('students.import.template');
+        Route::resource('students', \App\Http\Controllers\Admin\StudentController::class)->except(['show']);
+
+        // Information
+        Route::resource('information', AdminInformationController::class)->except(['show']);
+    });
+
+    // Routes accessible by Admin, Teacher, and Student
+    Route::middleware(['role:admin,teacher,student'])->group(function () {
+        // Activities
+        Route::resource('activities', AdminActivityController::class)->except(['show']);
+
+        // Social Media
+        Route::resource('social-media', SocialMediaController::class)->except(['show']);
+    });
+
+    // Admin Only Routes
+    Route::middleware(['role:admin'])->group(function () {
+        // User Management
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
+
+        // Admin Profile (User restricted "Profil Admin" to admin only for teacher)
+        Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
+        Route::put('/profile', [AdminProfileController::class, 'updateProfile'])->name('profile.update');
+        Route::put('/profile/password', [AdminProfileController::class, 'updatePassword'])->name('profile.password');
+
+        // Settings
+        Route::get('/settings/smtp', [SettingsController::class, 'smtp'])->name('settings.smtp');
+        Route::put('/settings/smtp', [SettingsController::class, 'updateSmtp'])->name('settings.smtp.update');
+        Route::post('/settings/smtp/test', [SettingsController::class, 'testSmtp'])->name('settings.smtp.test');
+
+        // System Updates & Fixes
+        Route::get('/system', [\App\Http\Controllers\Admin\SystemController::class, 'index'])->name('system.index');
+        Route::post('/system/storage-link', [\App\Http\Controllers\Admin\SystemController::class, 'storageLink'])->name('system.storage-link');
+        Route::post('/system/update', [\App\Http\Controllers\Admin\SystemController::class, 'updateApp'])->name('system.update');
+        Route::post('/system/cache-clear', [\App\Http\Controllers\Admin\SystemController::class, 'cacheClear'])->name('system.cache-clear');
+    });
 });

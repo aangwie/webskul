@@ -47,6 +47,9 @@ class HomeController extends Controller
             ->limit(5) // Last 5 years
             ->get();
 
-        return view('pages.home', compact('latestActivities', 'importantInfo', 'featuredTeachers', 'studentStats', 'classStats', 'enrollmentData'));
+        // Social Media
+        $socials = \App\Models\SocialMedia::active()->ordered()->get();
+
+        return view('pages.home', compact('latestActivities', 'importantInfo', 'featuredTeachers', 'studentStats', 'classStats', 'enrollmentData', 'socials'));
     }
 }

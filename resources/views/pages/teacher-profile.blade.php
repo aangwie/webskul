@@ -169,7 +169,21 @@
                 <p class="teacher-education"><i class="fas fa-graduation-cap"></i> {{ $teacher->education }}</p>
                 @endif
                 @if($teacher->nip)
-                <span class="teacher-nip">NIP: {{ $teacher->nip }}</span>
+                <span class="teacher-nip">NIP:
+                    @php
+                    $nip = $teacher->nip;
+                    $length = strlen($nip);
+                    $masked = substr($nip, 0, 2);
+                    if ($length > 2) {
+                    $maskLength = min($length, 16) - 2;
+                    $masked .= str_repeat('*', $maskLength);
+                    }
+                    if ($length > 16) {
+                    $masked .= substr($nip, 16);
+                    }
+                    echo $masked;
+                    @endphp
+                </span>
                 @endif
             </div>
         </div>

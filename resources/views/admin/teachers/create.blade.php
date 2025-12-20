@@ -21,7 +21,8 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label class="form-label">NIP</label>
-                    <input type="text" name="nip" class="form-input" value="{{ old('nip') }}">
+                    <input type="text" name="nip" class="form-input" value="{{ old('nip') }}" maxlength="18" pattern="[0-9-]+" placeholder="Hanya angka dan tanda hubung (-) yang diperbolehkan" oninput="this.value = this.value.replace(/[^0-9-]/g, '');">
+                    @error('nip')<span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>@enderror
                 </div>
                 <div class="form-group">
                     <label class="form-label">Jabatan</label>

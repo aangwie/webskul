@@ -544,6 +544,7 @@
                     <i class="fas fa-home"></i> Dashboard
                 </a>
             </li>
+            @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
             <li>
                 <a href="{{ route('admin.school-profile.index') }}" class="{{ request()->routeIs('admin.school-profile.*') ? 'active' : '' }}">
                     <i class="fas fa-school"></i> Profil Sekolah
@@ -563,21 +564,35 @@
                 <a href="{{ route('admin.students.index') }}" class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
                     <i class="fas fa-user-graduate"></i> Siswa</a>
             </li>
+            @endif
             <li>
                 <a href="{{ route('admin.activities.index') }}" class="{{ request()->routeIs('admin.activities.*') ? 'active' : '' }}">
                     <i class="fas fa-newspaper"></i> Kegiatan
                 </a>
             </li>
             <li>
+                <a href="{{ route('admin.social-media.index') }}" class="{{ request()->routeIs('admin.social-media.*') ? 'active' : '' }}">
+                    <i class="fas fa-share-alt"></i> Media Sosial
+                </a>
+            </li>
+            @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
+            <li>
                 <a href="{{ route('admin.information.index') }}" class="{{ request()->routeIs('admin.information.*') ? 'active' : '' }}">
                     <i class="fas fa-bullhorn"></i> Informasi
                 </a>
             </li>
+            @endif
         </ul>
 
+        @if(auth()->user()->isAdmin())
         <div class="sidebar-divider"></div>
 
         <ul class="sidebar-menu">
+            <li>
+                <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i> Manajemen User
+                </a>
+            </li>
             <li>
                 <a href="{{ route('admin.profile.index') }}" class="{{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
                     <i class="fas fa-user-cog"></i> Profil Admin
@@ -594,6 +609,7 @@
                 </a>
             </li>
         </ul>
+        @endif
 
         <div class="sidebar-divider"></div>
 

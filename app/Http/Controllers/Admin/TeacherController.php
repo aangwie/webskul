@@ -24,13 +24,16 @@ class TeacherController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'nip' => 'nullable|string|max:50',
+            'nip' => 'nullable|string|max:18|regex:/^[0-9-]+$/',
             'position' => 'nullable|string|max:255',
             'education' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',
             'order' => 'nullable|integer',
+        ], [
+            'nip.regex' => 'NIP hanya boleh berisi angka dan tanda hubung (-).',
+            'nip.max' => 'NIP maksimal 18 karakter.',
         ]);
 
         $validated['is_active'] = $request->has('is_active');
@@ -56,13 +59,16 @@ class TeacherController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'nip' => 'nullable|string|max:50',
+            'nip' => 'nullable|string|max:18|regex:/^[0-9-]+$/',
             'position' => 'nullable|string|max:255',
             'education' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',
             'order' => 'nullable|integer',
+        ], [
+            'nip.regex' => 'NIP hanya boleh berisi angka dan tanda hubung (-).',
+            'nip.max' => 'NIP maksimal 18 karakter.',
         ]);
 
         $validated['is_active'] = $request->has('is_active');
