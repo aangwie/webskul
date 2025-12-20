@@ -222,10 +222,10 @@
             <a href="{{ route('activities.show', $related->slug) }}" class="related-card">
                 <div class="related-image">
                     @if($related->image)
-                    @if(Str::startsWith($activity->image, 'data:'))
-                    <img src="{{ $activity->image }}" alt="{{ $activity->title }}">
+                    @if(Str::startsWith($related->image, 'data:'))
+                    <img src="{{ $related->image }}" alt="{{ $related->title }}">
                     @else
-                    <img src="{{ asset('storage/' . $activity->image) }}" alt="{{ $activity->title }}">
+                    <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->title }}">
                     @endif
                     @else
                     <i class="fas fa-newspaper"></i>
