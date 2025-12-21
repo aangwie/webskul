@@ -444,6 +444,15 @@
                         <li><a href="{{ route('pmb.status') }}" class="dropdown-item">Cek Status</a></li>
                     </ul>
                 </li>
+                <li class="nav-item" onclick="toggleDropdown(this)">
+                    <a href="#" class="nav-link">
+                        Manajemen <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="https://simsiswa.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">SIM Siswa</a></li>
+                        <li><a href="https://my.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">SPPD</a></li>
+                    </ul>
+                </li>
                 <li class="nav-item">
                     <a href="{{ route('login') }}" class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">
                         <i class="fas fa-sign-in-alt"></i> Login

@@ -1,225 +1,193 @@
-# SMP Negeri 6 Sudimoro - School Website
+# 🏫 Webskul - Modern School Management System
 
-A modern, responsive school website built with Laravel 12 and MySQL. Features an elegant navy blue and white design with a complete admin panel for content management.
+A comprehensive, elegant, and responsive school website and management system built with **Laravel 12**, **MySQL**, and **Vite**. Designed specifically for SMP Negeri 6 Sudimoro, but flexible enough for any educational institution.
 
-![Laravel](https://img.shields.io/badge/Laravel-12.x-red?style=flat-square&logo=laravel)
-![PHP](https://img.shields.io/badge/PHP-8.2+-blue?style=flat-square&logo=php)
-![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange?style=flat-square&logo=mysql)
+![Laravel](https://img.shields.io/badge/Laravel-12.x-red?style=for-the-badge&logo=laravel)
+![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php)
+![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql)
+![Vite](https://img.shields.io/badge/Vite-6.x-646CFF?style=for-the-badge&logo=vite)
+
+---
+
+## ✨ Key Features
+
+### 🌐 Frontend (Public Portal)
+
+- **Modern UI/UX**: Elegant navy blue and white design with smooth animations.
+- **Dynamic Content**: Home page with hero sections, statistics, and floating announcements.
+- **School Identity**: Detailed profile including vision, mission, and history.
+- **Teacher Directory**: Visual gallery of teachers and staff.
+- **News & Activities**: Paginated news blog with high-quality image support.
+- **PMB (Penerimaan Murid Baru)**:
+    - Online student registration with unique registration numbers.
+    - Registration status check page.
+    - Downloadable PDF registration proof with QR codes.
+    - Session-based popup notifications for active registration periods.
+- **Responsive Branding**: Dynamic favicon and logos manageable via admin panel.
+
+### 🔐 Backend (Admin Panel)
+
+- **Advanced Dashboard**: Real-time statistics for students, teachers, and activities.
+- **Content Management**: Full CRUD for News, Information, and School Profile.
+- **Teacher & Student Management**: Detailed records including photo uploads and CSV/Excel exports.
+- **PMB Management**:
+    - Centralized registration list with advanced search (DataTables).
+    - Unique NISN/NIK validation to prevent duplicate entries.
+    - Exportable registrant data.
+- **System Settings**:
+    - **SMTP Configuration**: Integrated testing tool for email delivery.
+    - **System Updates**: One-click updates directly from GitHub.
+    - **Backup & Maintenance**: Tools for clearing cache and optimizing the application.
+- **Security**: Base64 image encoding for reliable storage, password hashing, and role-based access.
 
 ---
 
 ## 📋 System Requirements
 
-| Requirement | Version                   |
-| ----------- | ------------------------- |
-| PHP         | 8.2 or higher             |
-| Composer    | 2.0 or higher             |
-| MySQL       | 8.0 or higher             |
-| Node.js     | 18.x or higher (optional) |
+To run this project locally or on a server, ensure you meet the following requirements:
 
-### Required PHP Extensions
+| Component           | Minimum Version      |
+| ------------------- | -------------------- |
+| **PHP**             | 8.2 or higher        |
+| **Composer**        | 2.5 or higher        |
+| **MySQL / MariaDB** | 8.0 / 10.4 or higher |
+| **Node.js**         | 20.x or higher       |
+| **NPM**             | 10.x or higher       |
 
-- BCMath
-- Ctype
-- Fileinfo
-- JSON
-- Mbstring
-- OpenSSL
-- PDO
-- PDO_MySQL
-- Tokenizer
-- XML
+### Required PHP Extensions:
+
+`bcmath`, `ctype`, `fileinfo`, `gd`, `json`, `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, `zip`
 
 ---
 
-## 🚀 Installation
+## 🚀 Installation & Setup
 
-### 1. Clone or Download
+Follow these steps to get your development environment running:
+
+### 1. Clone the Repository
 
 ```bash
-cd c:\xampp\htdocs
-git clone <repository-url> webskul
+git clone https://github.com/aangwie/webskul.git
 cd webskul
 ```
 
-### 2. Install Dependencies
+### 2. Install Backend Dependencies
 
 ```bash
 composer install
 ```
 
-### 3. Environment Setup
+### 3. Install Frontend Dependencies
 
 ```bash
-# Copy environment file
-copy .env.example .env
+npm install
+npm run build
+```
 
-# Generate application key
+### 4. Configuration
+
+Copy the example environment file and generate a unique application key:
+
+```bash
+cp .env.example .env
 php artisan key:generate
 ```
 
-### 4. Database Configuration
+### 5. Database Setup
 
-Edit the `.env` file with your database credentials:
+1. Create a new database in MySQL (e.g., `webskul_db`).
+2. Update your `.env` file with your database credentials:
 
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=schooldb
+DB_DATABASE=webskul_db
 DB_USERNAME=root
-DB_PASSWORD=
-```
-
-### 5. Create Database
-
-Create a MySQL database named `schooldb` using phpMyAdmin or MySQL command:
-
-```sql
-CREATE DATABASE schooldb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DB_PASSWORD=your_password
 ```
 
 ### 6. Run Migrations & Seeders
 
-```bash
-# Run migrations
-php artisan migrate
+This will create the necessary tables and populate the default admin account:
 
-# Seed sample data (optional but recommended)
-php artisan db:seed
+```bash
+php artisan migrate --seed
 ```
 
-### 7. Storage Link
+### 7. Storage Initialization
+
+Create a symbolic link from `public/storage` to `storage/app/public`:
 
 ```bash
 php artisan storage:link
 ```
 
-### 8. Start Development Server
+### 8. Start the Application
 
 ```bash
 php artisan serve
 ```
 
-The website will be available at: **http://127.0.0.1:8000**
+Visit the application at: `http://127.0.0.1:8000`
 
 ---
 
-## 🔐 Default Admin Credentials
+## 🔑 Default Credentials
 
-| Field    | Value                       |
-| -------- | --------------------------- |
-| URL      | http://127.0.0.1:8000/login |
-| Email    | admin@smpn6sudimoro.sch.id  |
-| Password | password123                 |
+After seeding, you can log in to the admin panel:
 
-> ⚠️ **Important**: Change the default password after first login!
+- **Login URL**: `http://127.0.0.1:8000/login`
+- **Email**: `admin@smpn6sudimoro.sch.id`
+- **Password**: `password123`
 
----
-
-## 📁 Features
-
-### Frontend (Public)
-
-- ✅ Home page with hero section and statistics
-- ✅ School profile (vision, mission, history)
-- ✅ Teacher profiles with photos
-- ✅ Activities/News with pagination
-- ✅ Important information announcements
-- ✅ Responsive design (mobile, tablet, desktop)
-- ✅ Dynamic favicon from school logo
-
-### Backend (Admin Panel)
-
-- ✅ Dashboard with statistics
-- ✅ School profile management
-- ✅ Teacher CRUD with photo upload
-- ✅ Activities/News CRUD with image upload
-- ✅ Information/Announcements CRUD
-- ✅ Admin profile (change email/password)
-- ✅ SMTP settings configuration
-- ✅ Password reset via email
+> [!IMPORTANT]
+> Immediately change the default password in the **Profil Admin** section after your first login.
 
 ---
 
-## 📧 SMTP Configuration (Optional)
+## 🛠️ Configuration Guide
 
-To enable password reset via email:
+### SMTP (Email) Setup
 
-1. Login to admin panel
-2. Go to **Pengaturan SMTP**
-3. Enter your SMTP settings:
+To enable password resets and notifications:
 
-**Gmail Example:**
-| Setting | Value |
-|---------|-------|
-| Mail Driver | SMTP |
-| SMTP Host | smtp.gmail.com |
-| SMTP Port | 587 |
-| Encryption | TLS |
-| Username | your-email@gmail.com |
-| Password | [App Password](https://support.google.com/accounts/answer/185833) |
+1. Go to **Pengaturan SMTP** in the Admin Sidebar.
+2. Fill in your provider details (Gmail, Mailtrap, etc.).
+3. Click **Simpan & Test Koneksi** to ensure settings are correct.
 
-4. Click "Kirim Test Email" to verify settings
+### GitHub Updates
+
+To use the "Update dari Github" feature:
+
+1. Generate a **GitHub Personal Access Token** (Fine-grained or Classic).
+2. Add it to your `.env`: `GITHUB_TOKEN=your_token_here`.
+3. Ensure Git is installed and configured on your server path.
 
 ---
 
-## 🗂️ Project Structure
+## 📁 Project Structure
 
-```
+```text
 webskul/
-├── app/
-│   ├── Http/Controllers/
-│   │   ├── Admin/          # Admin panel controllers
-│   │   └── Frontend/       # Public website controllers
-│   └── Models/             # Eloquent models
-├── database/
-│   ├── migrations/         # Database migrations
-│   └── seeders/            # Sample data seeders
-├── resources/views/
-│   ├── admin/              # Admin panel views
-│   │   ├── layouts/        # Admin layout
-│   │   ├── activities/     # Activity CRUD views
-│   │   ├── information/    # Information CRUD views
-│   │   ├── profile/        # Admin profile views
-│   │   ├── school-profile/ # School profile views
-│   │   ├── settings/       # SMTP settings views
-│   │   └── teachers/       # Teacher CRUD views
-│   ├── emails/             # Email templates
-│   ├── layouts/            # Frontend layout
-│   └── pages/              # Frontend pages
-├── routes/
-│   └── web.php             # All routes
-└── public/
-    └── storage/            # Uploaded files (symlink)
-```
-
----
-
-## 🔧 Useful Commands
-
-```bash
-# Start development server
-php artisan serve
-
-# Clear all cache
-php artisan optimize:clear
-
-# Reset database with fresh data
-php artisan migrate:fresh --seed
-
-# List all routes
-php artisan route:list
+├── app/Http/Controllers/   # Logic for Frontend and Admin
+├── app/Models/             # Eloquent Database Models
+├── database/migrations/    # Database Schema Definitions
+├── public/                 # Assets (CSS/JS/Images)
+├── resources/views/        # Blade Templates (Admin & Frontend)
+├── routes/web.php          # Main URL routing
+└── storage/                # Logs and File Uploads
 ```
 
 ---
 
 ## 📝 License
 
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the [MIT License](LICENSE).
 
----
+## 👨‍💻 Author
 
-## 👨‍💻 Developed By
+**Aang Wirawan**
 
-Aang Wirawan - Built with ❤️ using Laravel 12
+- GitHub: [@aangwie](https://github.com/aangwie)
+- Built with ❤️ for Education.
