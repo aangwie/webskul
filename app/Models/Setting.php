@@ -54,4 +54,36 @@ class Setting extends Model
             static::set($key, $value);
         }
     }
+
+    /**
+     * Check if PMB registration is currently open based on status and dates
+     */
+    public static function isPmbOpen()
+    {
+        $pmbStatus = static::get('pmb_status', 'closed');
+        if ($pmbStatus !== 'open') {
+            return false;
+        }
+
+        $startDate = static::get('pmb_start_date', '');
+        $endDate = static::get('pmb_end_date', '');
+
+        $now = now()->startOfDay();
+
+        if ($startDate) {
+            $start = \Carbon\Carbon::parse($startDate)->startOfDay();
+            if ($now->lt($start)) {
+                return false;
+            }
+        }
+
+        if ($endDate) {
+            $end = \Carbon\Carbon::parse($endDate)->startOfDay();
+            if ($now->gt($end)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\Frontend\ProfileController;
 use App\Http\Controllers\Frontend\ActivityController;
 use App\Http\Controllers\Frontend\InformationController;
 use App\Http\Controllers\Frontend\AuthController;
+use App\Http\Controllers\Frontend\PmbController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Admin\TeacherController;
@@ -13,6 +14,8 @@ use App\Http\Controllers\Admin\InformationController as AdminInformationControll
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SocialMediaController;
+use App\Http\Controllers\Admin\AcademicYearController;
+use App\Http\Controllers\Admin\PmbRegistrationController as AdminPmbRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -22,6 +25,11 @@ Route::get('/profile/teachers', [ProfileController::class, 'teachers'])->name('p
 Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
 Route::get('/activities/{slug}', [ActivityController::class, 'show'])->name('activities.show');
 Route::get('/information', [InformationController::class, 'index'])->name('information.index');
+Route::get('/pmb', [PmbController::class, 'index'])->name('pmb.index');
+Route::post('/pmb', [PmbController::class, 'store'])->name('pmb.store');
+Route::get('/pmb/status', [PmbController::class, 'status'])->name('pmb.status');
+Route::get('/pmb/download-pdf/{registration_number}', [PmbController::class, 'downloadPdf'])->name('pmb.downloadPdf');
+Route::get('/pmb/print/{registration_number}', [PmbController::class, 'printCard'])->name('pmb.print');
 
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -82,6 +90,17 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/settings/smtp', [SettingsController::class, 'smtp'])->name('settings.smtp');
         Route::put('/settings/smtp', [SettingsController::class, 'updateSmtp'])->name('settings.smtp.update');
         Route::post('/settings/smtp/test', [SettingsController::class, 'testSmtp'])->name('settings.smtp.test');
+
+        Route::get('/settings/pmb', [SettingsController::class, 'pmb'])->name('settings.pmb');
+        Route::put('/settings/pmb', [SettingsController::class, 'updatePmb'])->name('settings.pmb.update');
+
+        // Academic Years
+        Route::resource('academic-years', AcademicYearController::class)->except(['create', 'show', 'edit']);
+
+        // PMB Registrations Management
+        Route::get('/pmb-registrations', [AdminPmbRegistrationController::class, 'index'])->name('pmb-registrations.index');
+        Route::get('/pmb-registrations/{pmbRegistration}', [AdminPmbRegistrationController::class, 'show'])->name('pmb-registrations.show');
+        Route::put('/pmb-registrations/{pmbRegistration}/status', [AdminPmbRegistrationController::class, 'updateStatus'])->name('pmb-registrations.status');
 
         // System Updates & Fixes
         Route::get('/system', [\App\Http\Controllers\Admin\SystemController::class, 'index'])->name('system.index');

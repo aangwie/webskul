@@ -12,6 +12,7 @@
     @endif
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @yield('styles')
     <style>
         :root {
             --primary: #1e3a5f;
@@ -111,6 +112,49 @@
             height: 1px;
             background: rgba(255, 255, 255, 0.1);
             margin: 20px 25px;
+        }
+
+        /* Submenu */
+        .has-submenu {
+            position: relative;
+        }
+
+        .submenu {
+            list-style: none;
+            padding-left: 15px;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .has-submenu.active .submenu {
+            display: block !important;
+        }
+
+        .submenu-toggle {
+            display: flex;
+            justify-content: space-between !important;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .submenu-toggle i:last-child {
+            font-size: 0.7rem;
+            transition: var(--transition);
+        }
+
+        .has-submenu.active .submenu-toggle i:last-child {
+            transform: rotate(90deg);
+        }
+
+        .submenu a {
+            padding: 10px 18px !important;
+            font-size: 0.85rem !important;
+            opacity: 0.8;
+        }
+
+        .submenu a:hover,
+        .submenu a.active {
+            opacity: 1;
         }
 
         /* Main Content */
@@ -545,26 +589,34 @@
                 </a>
             </li>
             @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
-            <li>
-                <a href="{{ route('admin.school-profile.index') }}" class="{{ request()->routeIs('admin.school-profile.*') ? 'active' : '' }}">
-                    <i class="fas fa-school"></i> Profil Sekolah
+            <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}" id="school-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('school-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-school"></i> Data Sekolah</span>
+                    <i class="fas fa-chevron-right"></i>
                 </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('admin.school-profile.index') }}" class="{{ request()->routeIs('admin.school-profile.*') ? 'active' : '' }}">
+                            <i class="fas fa-school"></i> Profil Sekolah
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.teachers.index') }}" class="{{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}">
+                            <i class="fas fa-chalkboard-teacher"></i> Guru
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.classes.index') }}" class="{{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
+                            <i class="fas fa-layer-group"></i> Kelas
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.students.index') }}" class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
+                            <i class="fas fa-user-graduate"></i> Siswa</a>
+                    </li>
+                    @endif
+                </ul>
             </li>
-            <li>
-                <a href="{{ route('admin.teachers.index') }}" class="{{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}">
-                    <i class="fas fa-chalkboard-teacher"></i> Guru
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('admin.classes.index') }}" class="{{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
-                    <i class="fas fa-layer-group"></i> Kelas
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('admin.students.index') }}" class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
-                    <i class="fas fa-user-graduate"></i> Siswa</a>
-            </li>
-            @endif
             <li>
                 <a href="{{ route('admin.activities.index') }}" class="{{ request()->routeIs('admin.activities.*') ? 'active' : '' }}">
                     <i class="fas fa-newspaper"></i> Kegiatan
@@ -580,6 +632,31 @@
                 <a href="{{ route('admin.information.index') }}" class="{{ request()->routeIs('admin.information.*') ? 'active' : '' }}">
                     <i class="fas fa-bullhorn"></i> Informasi
                 </a>
+            </li>
+            <div class="sidebar-divider"></div>
+            <p style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">Penerimaan Murid Baru</p>
+            <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}" id="pmb-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('pmb-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-graduation-cap"></i> PMB</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('admin.settings.pmb') }}" class="{{ request()->routeIs('admin.settings.pmb') ? 'active' : '' }}">
+                            <i class="fas fa-cog"></i> Pengaturan
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.academic-years.index') }}" class="{{ request()->routeIs('admin.academic-years.*') ? 'active' : '' }}">
+                            <i class="fas fa-calendar-alt"></i> Tahun Pelajaran
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.pmb-registrations.index') }}" class="{{ request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}">
+                            <i class="fas fa-user-plus"></i> Data Pendaftaran
+                        </a>
+                    </li>
+                </ul>
             </li>
             @endif
         </ul>
@@ -604,7 +681,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('admin.settings.smtp') }}" class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.settings.smtp') }}" class="{{ request()->routeIs('admin.settings.smtp') ? 'active' : '' }}">
                     <i class="fas fa-cog"></i> Pengaturan SMTP
                 </a>
             </li>
@@ -671,6 +748,11 @@
     <script>
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function toggleSubmenu(id) {
+            const menu = document.getElementById(id);
+            menu.classList.toggle('active');
         }
     </script>
     @yield('scripts')

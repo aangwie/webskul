@@ -43,7 +43,7 @@ class SettingsController extends Controller
         try {
             // Apply settings temporarily
             $settings = Setting::getSmtpSettings();
-            
+
             config([
                 'mail.default' => $settings['mail_mailer'],
                 'mail.mailers.smtp.host' => $settings['mail_host'],
@@ -62,10 +62,32 @@ class SettingsController extends Controller
 
             return redirect()->route('admin.settings.smtp')
                 ->with('success', 'Email test berhasil dikirim ke ' . $request->test_email);
-
         } catch (\Exception $e) {
             return redirect()->route('admin.settings.smtp')
                 ->with('error', 'Gagal mengirim email: ' . $e->getMessage());
         }
+    }
+    public function pmb()
+    {
+        $pmb_status = Setting::get('pmb_status', 'closed');
+        $pmb_start_date = Setting::get('pmb_start_date', '');
+        $pmb_end_date = Setting::get('pmb_end_date', '');
+        return view('admin.settings.pmb', compact('pmb_status', 'pmb_start_date', 'pmb_end_date'));
+    }
+
+    public function updatePmb(Request $request)
+    {
+        $validated = $request->validate([
+            'pmb_status' => 'required|in:open,closed',
+            'pmb_start_date' => 'nullable|date',
+            'pmb_end_date' => 'nullable|date|after_or_equal:pmb_start_date',
+        ]);
+
+        Setting::set('pmb_status', $validated['pmb_status']);
+        Setting::set('pmb_start_date', $validated['pmb_start_date'] ?? '');
+        Setting::set('pmb_end_date', $validated['pmb_end_date'] ?? '');
+
+        return redirect()->route('admin.settings.pmb')
+            ->with('success', 'Pengaturan PMB berhasil diperbarui!');
     }
 }
