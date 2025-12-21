@@ -42,7 +42,27 @@ A comprehensive, elegant, and responsive school website and management system bu
 
 ---
 
-## 📋 System Requirements
+## � Visual Previews
+
+### Public Portal (Frontend)
+
+|          Home Page          | Student Registration (PMB) |        News & Activities        |
+| :-------------------------: | :------------------------: | :-----------------------------: |
+| ![Home Page](raw/depan.png) |    ![PMB](raw/pmb.png)     | ![Activities](raw/kegiatan.png) |
+
+|           School Profile           |        Teacher Directory         |         Information Board         |
+| :--------------------------------: | :------------------------------: | :-------------------------------: |
+| ![Profile](raw/profil-sekolah.png) | ![Teachers](raw/profil-guru.png) | ![Information](raw/informasi.png) |
+
+### Administrative Panel (Backend)
+
+|       Dashboard Overview        |     Login Interface     |
+| :-----------------------------: | :---------------------: |
+| ![Dashboard](raw/dashboard.png) | ![Login](raw/login.png) |
+
+---
+
+## �📋 System Requirements
 
 To run this project locally or on a server, ensure you meet the following requirements:
 
