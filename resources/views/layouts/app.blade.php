@@ -449,6 +449,7 @@
                         Manajemen <i class="fas fa-chevron-down"></i>
                     </a>
                     <ul class="dropdown-menu">
+                        <li><a href="{{ route('komite.status') }}" class="dropdown-item">Cek Pembayaran Komite</a></li>
                         <li><a href="https://simsiswa.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">SIM Siswa</a></li>
                         <li><a href="https://my.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">SPPD</a></li>
                     </ul>

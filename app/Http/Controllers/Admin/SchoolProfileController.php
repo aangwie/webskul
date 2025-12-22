@@ -29,6 +29,7 @@ class SchoolProfileController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'nullable|string',
+            'city' => 'nullable|string|max:100',
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'vision' => 'nullable|string',

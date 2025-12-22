@@ -153,4 +153,337 @@ class CommitteeController extends Controller
 
         return view('admin.committee.payments.receipt', compact('committeePayment', 'isPaidFull'));
     }
+
+    public function editPayment(CommitteePayment $committeePayment)
+    {
+        $committeePayment->load(['student', 'committeeFee']);
+
+        // Calculate remaining amount (excluding current payment)
+        $totalPaidExcludingCurrent = CommitteePayment::where('student_id', $committeePayment->student_id)
+            ->where('committee_fee_id', $committeePayment->committee_fee_id)
+            ->where('id', '!=', $committeePayment->id)
+            ->sum('amount');
+
+        $maxAmount = $committeePayment->committeeFee->amount - $totalPaidExcludingCurrent;
+
+        return view('admin.committee.payments.edit', compact('committeePayment', 'maxAmount'));
+    }
+
+    public function updatePayment(Request $request, CommitteePayment $committeePayment)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'payment_date' => 'required|date',
+            'notes' => 'nullable|string',
+        ]);
+
+        // Calculate max allowed amount
+        $totalPaidExcludingCurrent = CommitteePayment::where('student_id', $committeePayment->student_id)
+            ->where('committee_fee_id', $committeePayment->committee_fee_id)
+            ->where('id', '!=', $committeePayment->id)
+            ->sum('amount');
+
+        $maxAmount = $committeePayment->committeeFee->amount - $totalPaidExcludingCurrent;
+
+        if ($request->amount > $maxAmount) {
+            return redirect()->back()->with('error', 'Jumlah pembayaran melebihi sisa tagihan.');
+        }
+
+        $committeePayment->update([
+            'amount' => $request->amount,
+            'payment_date' => $request->payment_date,
+            'notes' => $request->notes,
+        ]);
+
+        return redirect()->route('admin.committee.payments.record', $committeePayment->student_id)
+            ->with('success', 'Pembayaran berhasil diperbarui.');
+    }
+
+    public function destroyPayment(CommitteePayment $committeePayment)
+    {
+        $studentId = $committeePayment->student_id;
+        $committeePayment->delete();
+
+        return redirect()->route('admin.committee.payments.record', $studentId)
+            ->with('success', 'Pembayaran berhasil dihapus.');
+    }
+
+    public function reportIndex()
+    {
+        $academicYears = AcademicYear::orderBy('year', 'desc')->get();
+        $classes = SchoolClass::where('is_active', true)->ordered()->get();
+        $activeYear = AcademicYear::where('is_active', true)->first();
+
+        $classSummaries = [];
+        if ($activeYear) {
+            foreach ($classes as $class) {
+                $studentIds = \App\Models\Student::where('school_class_id', $class->id)->pluck('id');
+                $fee = \App\Models\CommitteeFee::where('academic_year_id', $activeYear->id)
+                    ->where('school_class_id', $class->id)
+                    ->first();
+
+                $totalPaid = \App\Models\CommitteePayment::whereIn('student_id', $studentIds)
+                    ->whereHas('committeeFee', function ($q) use ($activeYear) {
+                        $q->where('academic_year_id', $activeYear->id);
+                    })->sum('amount');
+
+                $totalStudents = $studentIds->count();
+                $totalTarget = $fee ? $fee->amount * $totalStudents : 0;
+
+                $classSummaries[] = [
+                    'class' => $class,
+                    'total_students' => $totalStudents,
+                    'total_target' => $totalTarget,
+                    'total_paid' => $totalPaid,
+                    'remaining' => max(0, $totalTarget - $totalPaid),
+                ];
+            }
+        }
+
+        return view('admin.committee.report.index', compact('academicYears', 'classes', 'classSummaries', 'activeYear'));
+    }
+
+    public function reportGenerate(Request $request)
+    {
+        $request->validate([
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'school_class_id' => 'required',
+            'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
+        ]);
+
+        $academicYear = AcademicYear::findOrFail($request->academic_year_id);
+        $reportType = $request->report_type;
+
+        // Handle case where specific class is selected but report type is for all classes
+        if (($reportType == 'class_summary' || $reportType == 'all_summary') && $request->school_class_id == 'all') {
+            $classes = SchoolClass::where('is_active', true)->ordered()->get();
+            $reportData = [];
+            $grandTotalTagihan = 0;
+            $grandTotalTerbayar = 0;
+            $grandTotalStudents = 0;
+
+            foreach ($classes as $class) {
+                $studentIds = \App\Models\Student::where('school_class_id', $class->id)->pluck('id');
+                $fee = CommitteeFee::where('academic_year_id', $academicYear->id)
+                    ->where('school_class_id', $class->id)
+                    ->first();
+
+                $totalPaid = CommitteePayment::whereIn('student_id', $studentIds)
+                    ->whereHas('committeeFee', function ($q) use ($academicYear) {
+                        $q->where('academic_year_id', $academicYear->id);
+                    })->sum('amount');
+
+                $totalStudents = $studentIds->count();
+                $totalTarget = $fee ? $fee->amount * $totalStudents : 0;
+
+                $reportData[] = [
+                    'class' => $class,
+                    'total_students' => $totalStudents,
+                    'total_target' => $totalTarget,
+                    'total_paid' => $totalPaid,
+                    'remaining' => max(0, $totalTarget - $totalPaid),
+                ];
+
+                $grandTotalTagihan += $totalTarget;
+                $grandTotalTerbayar += $totalPaid;
+                $grandTotalStudents += $totalStudents;
+            }
+
+            $summary = [
+                'total_students' => $grandTotalStudents,
+                'total_tagihan' => $grandTotalTagihan,
+                'total_terbayar' => $grandTotalTerbayar,
+                'total_sisa' => max(0, $grandTotalTagihan - $grandTotalTerbayar),
+            ];
+
+            $schoolClass = (object)['name' => 'Semua Kelas'];
+            $committeeFee = null;
+
+            return view('admin.committee.report.result', compact(
+                'academicYear',
+                'schoolClass',
+                'committeeFee',
+                'reportData',
+                'summary',
+                'reportType'
+            ));
+        }
+
+        // Existing logic for single class
+        $schoolClass = SchoolClass::findOrFail($request->school_class_id);
+        $committeeFee = CommitteeFee::where('academic_year_id', $academicYear->id)
+            ->where('school_class_id', $schoolClass->id)
+            ->first();
+
+        if (!$committeeFee) {
+            return redirect()->back()->with('error', 'Nominal dana komite belum diatur untuk kelas dan tahun ajaran yang dipilih.');
+        }
+
+        $students = Student::where('school_class_id', $schoolClass->id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $reportData = [];
+        $totalTagihan = 0;
+        $totalTerbayar = 0;
+
+        foreach ($students as $student) {
+            $payments = CommitteePayment::where('student_id', $student->id)
+                ->where('committee_fee_id', $committeeFee->id)
+                ->orderBy('payment_date', 'asc')
+                ->get();
+
+            $totalPaid = $payments->sum('amount');
+            $remaining = $committeeFee->amount - $totalPaid;
+
+            $reportData[] = [
+                'student' => $student,
+                'payments' => $payments,
+                'total_paid' => $totalPaid,
+                'remaining' => max(0, $remaining),
+                'is_paid_full' => $totalPaid >= $committeeFee->amount,
+            ];
+
+            $totalTagihan += $committeeFee->amount;
+            $totalTerbayar += $totalPaid;
+        }
+
+        $summary = [
+            'total_students' => count($students),
+            'total_tagihan' => $totalTagihan,
+            'total_terbayar' => $totalTerbayar,
+            'total_sisa' => max(0, $totalTagihan - $totalTerbayar),
+            'lunas_count' => collect($reportData)->where('is_paid_full', true)->count(),
+            'belum_lunas_count' => collect($reportData)->where('is_paid_full', false)->count(),
+        ];
+
+        return view('admin.committee.report.result', compact(
+            'academicYear',
+            'schoolClass',
+            'committeeFee',
+            'reportData',
+            'summary',
+            'reportType'
+        ));
+    }
+
+    public function reportPdf(Request $request)
+    {
+        $request->validate([
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'school_class_id' => 'required',
+            'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
+        ]);
+
+        $academicYear = AcademicYear::findOrFail($request->academic_year_id);
+        $reportType = $request->report_type;
+
+        if (($reportType == 'class_summary' || $reportType == 'all_summary') && $request->school_class_id == 'all') {
+            $classes = SchoolClass::where('is_active', true)->ordered()->get();
+            $reportData = [];
+            $grandTotalTagihan = 0;
+            $grandTotalTerbayar = 0;
+            $grandTotalStudents = 0;
+
+            foreach ($classes as $class) {
+                $studentIds = \App\Models\Student::where('school_class_id', $class->id)->pluck('id');
+                $fee = CommitteeFee::where('academic_year_id', $academicYear->id)
+                    ->where('school_class_id', $class->id)
+                    ->first();
+
+                $totalPaid = CommitteePayment::whereIn('student_id', $studentIds)
+                    ->whereHas('committeeFee', function ($q) use ($academicYear) {
+                        $q->where('academic_year_id', $academicYear->id);
+                    })->sum('amount');
+
+                $totalStudents = $studentIds->count();
+                $totalTarget = $fee ? $fee->amount * $totalStudents : 0;
+
+                $reportData[] = [
+                    'class' => $class,
+                    'total_students' => $totalStudents,
+                    'total_target' => $totalTarget,
+                    'total_paid' => $totalPaid,
+                    'remaining' => max(0, $totalTarget - $totalPaid),
+                ];
+
+                $grandTotalTagihan += $totalTarget;
+                $grandTotalTerbayar += $totalPaid;
+                $grandTotalStudents += $totalStudents;
+            }
+
+            $summary = [
+                'total_students' => $grandTotalStudents,
+                'total_tagihan' => $grandTotalTagihan,
+                'total_terbayar' => $grandTotalTerbayar,
+                'total_sisa' => max(0, $grandTotalTagihan - $grandTotalTerbayar),
+            ];
+
+            $schoolClass = (object)['name' => 'Semua Kelas'];
+            $committeeFee = null;
+        } else {
+            $schoolClass = SchoolClass::findOrFail($request->school_class_id);
+            $committeeFee = CommitteeFee::where('academic_year_id', $academicYear->id)
+                ->where('school_class_id', $schoolClass->id)
+                ->first();
+
+            if (!$committeeFee) {
+                return redirect()->back()->with('error', 'Nominal dana komite belum diatur.');
+            }
+
+            $students = Student::where('school_class_id', $schoolClass->id)
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get();
+
+            $reportData = [];
+            $totalTagihan = 0;
+            $totalTerbayar = 0;
+
+            foreach ($students as $student) {
+                $payments = CommitteePayment::where('student_id', $student->id)
+                    ->where('committee_fee_id', $committeeFee->id)
+                    ->orderBy('payment_date', 'asc')
+                    ->get();
+
+                $totalPaid = $payments->sum('amount');
+                $remaining = $committeeFee->amount - $totalPaid;
+
+                $reportData[] = [
+                    'student' => $student,
+                    'payments' => $payments,
+                    'total_paid' => $totalPaid,
+                    'remaining' => max(0, $remaining),
+                    'is_paid_full' => $totalPaid >= $committeeFee->amount,
+                ];
+
+                $totalTagihan += $committeeFee->amount;
+                $totalTerbayar += $totalPaid;
+            }
+
+            $summary = [
+                'total_students' => count($students),
+                'total_tagihan' => $totalTagihan,
+                'total_terbayar' => $totalTerbayar,
+                'total_sisa' => max(0, $totalTagihan - $totalTerbayar),
+                'lunas_count' => collect($reportData)->where('is_paid_full', true)->count(),
+                'belum_lunas_count' => collect($reportData)->where('is_paid_full', false)->count(),
+            ];
+        }
+
+        $school = \App\Models\SchoolProfile::first();
+        $signatory = auth()->user();
+
+        return view('admin.committee.report.print', compact(
+            'academicYear',
+            'schoolClass',
+            'committeeFee',
+            'reportData',
+            'summary',
+            'reportType',
+            'school',
+            'signatory'
+        ));
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Frontend\ActivityController;
 use App\Http\Controllers\Frontend\InformationController;
 use App\Http\Controllers\Frontend\AuthController;
 use App\Http\Controllers\Frontend\PmbController;
+use App\Http\Controllers\Frontend\KomiteStatusController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Admin\TeacherController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\PmbRegistrationController as AdminPmbRegistrationController;
 use App\Http\Controllers\Admin\CommitteeController;
+use App\Http\Controllers\Admin\CommitteeExpenditureController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -31,6 +33,7 @@ Route::post('/pmb', [PmbController::class, 'store'])->name('pmb.store');
 Route::get('/pmb/status', [PmbController::class, 'status'])->name('pmb.status');
 Route::get('/pmb/download-pdf/{registration_number}', [PmbController::class, 'downloadPdf'])->name('pmb.downloadPdf');
 Route::get('/pmb/print/{registration_number}', [PmbController::class, 'printCard'])->name('pmb.print');
+Route::get('/komite-status', [KomiteStatusController::class, 'index'])->name('komite.status');
 
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -80,6 +83,25 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             Route::get('/payments/student/{student}', [CommitteeController::class, 'recordPayment'])->name('payments.record');
             Route::post('/payments/student/{student}', [CommitteeController::class, 'storePayment'])->name('payments.store');
             Route::get('/payments/receipt/{committeePayment}', [CommitteeController::class, 'receipt'])->name('payments.receipt');
+            Route::get('/payments/{committeePayment}/edit', [CommitteeController::class, 'editPayment'])->name('payments.edit');
+            Route::put('/payments/{committeePayment}', [CommitteeController::class, 'updatePayment'])->name('payments.update');
+            Route::delete('/payments/{committeePayment}', [CommitteeController::class, 'destroyPayment'])->name('payments.destroy');
+
+            Route::get('/report', [CommitteeController::class, 'reportIndex'])->name('report.index');
+            Route::post('/report/generate', [CommitteeController::class, 'reportGenerate'])->name('report.generate');
+            Route::post('/report/pdf', [CommitteeController::class, 'reportPdf'])->name('report.pdf');
+
+            // Expenditures (Penggunaan)
+            Route::get('/expenditures/report', [CommitteeExpenditureController::class, 'report'])->name('expenditures.report');
+            Route::get('/expenditures/{expenditure}/print', [CommitteeExpenditureController::class, 'print'])->name('expenditures.print');
+            Route::resource('expenditures', CommitteeExpenditureController::class)->names([
+                'index' => 'expenditures.index',
+                'create' => 'expenditures.create',
+                'store' => 'expenditures.store',
+                'edit' => 'expenditures.edit',
+                'update' => 'expenditures.update',
+                'destroy' => 'expenditures.destroy',
+            ]);
         });
     });
 

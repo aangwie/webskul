@@ -24,6 +24,11 @@
                 <textarea name="address" class="form-textarea" rows="3">{{ old('address', $school->address) }}</textarea>
             </div>
 
+            <div class="form-group">
+                <label class="form-label">Kota</label>
+                <input type="text" name="city" class="form-input" value="{{ old('city', $school->city) }}" placeholder="Contoh: Sudimoro">
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label class="form-label">Telepon</label>
@@ -54,7 +59,7 @@
                 <label class="form-label">Logo Sekolah</label>
                 <input type="file" name="logo" class="form-input" accept="image/*">
                 @if($school->logo)
-                    <img src="{{ asset('storage/' . $school->logo) }}" alt="Current Logo" class="preview-image">
+                <img src="{{ asset('storage/' . $school->logo) }}" alt="Current Logo" class="preview-image">
                 @endif
             </div>
 

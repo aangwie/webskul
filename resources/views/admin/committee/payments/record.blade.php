@@ -28,9 +28,21 @@
                             <td><strong>Rp {{ number_format($payment->amount, 0, ',', '.') }}</strong></td>
                             <td>{{ $payment->notes ?? '-' }}</td>
                             <td>
-                                <a href="{{ route('admin.committee.payments.receipt', $payment->id) }}" class="btn btn-sm btn-success" target="_blank">
-                                    <i class="fas fa-print"></i> Kwitansi
-                                </a>
+                                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                    <a href="{{ route('admin.committee.payments.receipt', $payment->id) }}" class="btn btn-sm btn-success" target="_blank" title="Cetak Kwitansi">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                    <a href="{{ route('admin.committee.payments.edit', $payment->id) }}" class="btn btn-sm btn-warning" title="Edit Pembayaran">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('admin.committee.payments.destroy', $payment->id) }}" method="POST" id="delete-form-{{ $payment->id }}" style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-sm btn-danger" title="Hapus Pembayaran" onclick="confirmDelete({{ $payment->id }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         @empty
@@ -113,4 +125,25 @@
         @endif
     </div>
 </div>
+@section('scripts')
+<script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data pembayaran ini akan dihapus permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        });
+    }
+</script>
+@endsection
 @endsection

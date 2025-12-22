@@ -12,6 +12,7 @@
     @endif
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @yield('styles')
     <style>
         :root {
@@ -682,6 +683,16 @@
                     <li>
                         <a href="{{ route('admin.committee.payments.index') }}" class="{{ request()->routeIs('admin.committee.payments.*') ? 'active' : '' }}">
                             <i class="fas fa-receipt"></i> Pembayaran
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.committee.report.index') }}" class="{{ request()->routeIs('admin.committee.report.*') ? 'active' : '' }}">
+                            <i class="fas fa-file-alt"></i> Laporan
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.committee.expenditures.index') }}" class="{{ request()->routeIs('admin.committee.expenditures.*') ? 'active' : '' }}">
+                            <i class="fas fa-hand-holding-heart"></i> Penggunaan
                         </a>
                     </li>
                 </ul>
