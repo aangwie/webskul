@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\PmbRegistrationController as AdminPmbRegistrationController;
+use App\Http\Controllers\Admin\CommitteeController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -67,6 +68,21 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::resource('information', AdminInformationController::class)->except(['show']);
     });
 
+    // Committee (Admin, Teacher, Admin Komite)
+    Route::middleware(['role:admin,teacher,admin_komite'])->group(function () {
+        Route::prefix('committee')->name('committee.')->group(function () {
+            Route::get('/nominal', [CommitteeController::class, 'indexNominal'])->name('nominal.index');
+            Route::get('/nominal/{academicYear}/set', [CommitteeController::class, 'setNominal'])->name('nominal.set');
+            Route::post('/nominal/{academicYear}/store', [CommitteeController::class, 'storeNominal'])->name('nominal.store');
+
+            Route::get('/payments', [CommitteeController::class, 'indexPayments'])->name('payments.index');
+            Route::get('/payments/class/{schoolClass}', [CommitteeController::class, 'studentPayments'])->name('payments.students');
+            Route::get('/payments/student/{student}', [CommitteeController::class, 'recordPayment'])->name('payments.record');
+            Route::post('/payments/student/{student}', [CommitteeController::class, 'storePayment'])->name('payments.store');
+            Route::get('/payments/receipt/{committeePayment}', [CommitteeController::class, 'receipt'])->name('payments.receipt');
+        });
+    });
+
     // Routes accessible by Admin, Teacher, and Student
     Route::middleware(['role:admin,teacher,student'])->group(function () {
         // Activities
@@ -91,6 +107,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::put('/settings/smtp', [SettingsController::class, 'updateSmtp'])->name('settings.smtp.update');
         Route::post('/settings/smtp/test', [SettingsController::class, 'testSmtp'])->name('settings.smtp.test');
 
+        // System Updates & Fixes
+        Route::get('/system', [\App\Http\Controllers\Admin\SystemController::class, 'index'])->name('system.index');
+        Route::post('/system/storage-link', [\App\Http\Controllers\Admin\SystemController::class, 'storageLink'])->name('system.storage-link');
+        Route::post('/system/update', [\App\Http\Controllers\Admin\SystemController::class, 'updateApp'])->name('system.update');
+        Route::post('/system/cache-clear', [\App\Http\Controllers\Admin\SystemController::class, 'cacheClear'])->name('system.cache-clear');
+    });
+
+    // PMB Management (Admin, Admin Komite)
+    Route::middleware(['role:admin,admin_komite'])->group(function () {
         Route::get('/settings/pmb', [SettingsController::class, 'pmb'])->name('settings.pmb');
         Route::put('/settings/pmb', [SettingsController::class, 'updatePmb'])->name('settings.pmb.update');
 
@@ -101,11 +126,5 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/pmb-registrations', [AdminPmbRegistrationController::class, 'index'])->name('pmb-registrations.index');
         Route::get('/pmb-registrations/{pmbRegistration}', [AdminPmbRegistrationController::class, 'show'])->name('pmb-registrations.show');
         Route::put('/pmb-registrations/{pmbRegistration}/status', [AdminPmbRegistrationController::class, 'updateStatus'])->name('pmb-registrations.status');
-
-        // System Updates & Fixes
-        Route::get('/system', [\App\Http\Controllers\Admin\SystemController::class, 'index'])->name('system.index');
-        Route::post('/system/storage-link', [\App\Http\Controllers\Admin\SystemController::class, 'storageLink'])->name('system.storage-link');
-        Route::post('/system/update', [\App\Http\Controllers\Admin\SystemController::class, 'updateApp'])->name('system.update');
-        Route::post('/system/cache-clear', [\App\Http\Controllers\Admin\SystemController::class, 'cacheClear'])->name('system.cache-clear');
     });
 });

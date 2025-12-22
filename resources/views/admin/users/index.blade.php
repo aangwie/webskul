@@ -30,6 +30,8 @@
                         <td>
                             @if($user->isAdmin())
                             <span class="badge badge-success">Admin</span>
+                            @elseif($user->isAdminKomite())
+                            <span class="badge badge-primary" style="background: rgba(236, 204, 17, 0.1); color: var(--primary);">Admin Komite</span>
                             @elseif($user->isTeacher())
                             <span class="badge badge-primary" style="background: rgba(30, 58, 95, 0.1); color: var(--primary);">Guru</span>
                             @elseif($user->isStudent())

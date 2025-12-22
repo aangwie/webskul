@@ -612,11 +612,13 @@
                     </li>
                     <li>
                         <a href="{{ route('admin.students.index') }}" class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
-                            <i class="fas fa-user-graduate"></i> Siswa</a>
+                            <i class="fas fa-user-graduate"></i> Siswa
+                        </a>
                     </li>
-                    @endif
                 </ul>
             </li>
+            @endif
+
             <li>
                 <a href="{{ route('admin.activities.index') }}" class="{{ request()->routeIs('admin.activities.*') ? 'active' : '' }}">
                     <i class="fas fa-newspaper"></i> Kegiatan
@@ -633,6 +635,9 @@
                     <i class="fas fa-bullhorn"></i> Informasi
                 </a>
             </li>
+            @endif
+
+            @if(auth()->user()->isAdmin() || auth()->user()->isAdminKomite())
             <div class="sidebar-divider"></div>
             <p style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">Penerimaan Murid Baru</p>
             <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}" id="pmb-menu">
@@ -654,6 +659,29 @@
                     <li>
                         <a href="{{ route('admin.pmb-registrations.index') }}" class="{{ request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}">
                             <i class="fas fa-user-plus"></i> Data Pendaftaran
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            @endif
+
+            @if(auth()->user()->isAdmin() || auth()->user()->isTeacher() || auth()->user()->isAdminKomite())
+            <div class="sidebar-divider"></div>
+            <p style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">Komite Sekolah</p>
+            <li class="has-submenu {{ request()->routeIs('admin.committee.*') ? 'active' : '' }}" id="committee-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('committee-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-hand-holding-usd"></i> Komite</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('admin.committee.nominal.index') }}" class="{{ request()->routeIs('admin.committee.nominal.*') ? 'active' : '' }}">
+                            <i class="fas fa-money-bill-wave"></i> Set Nominal
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.committee.payments.index') }}" class="{{ request()->routeIs('admin.committee.payments.*') ? 'active' : '' }}">
+                            <i class="fas fa-receipt"></i> Pembayaran
                         </a>
                     </li>
                 </ul>

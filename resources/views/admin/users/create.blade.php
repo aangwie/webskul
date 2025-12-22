@@ -28,6 +28,7 @@
                 <label class="form-label">Role *</label>
                 <select name="role" class="form-select" required>
                     <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                    <option value="admin_komite" {{ old('role') == 'admin_komite' ? 'selected' : '' }}>Admin Komite</option>
                     <option value="teacher" {{ old('role') == 'teacher' ? 'selected' : '' }}>Guru (Teacher)</option>
                     <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Siswa (Student)</option>
                 </select>
