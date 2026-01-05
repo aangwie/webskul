@@ -254,9 +254,14 @@ class CommitteeController extends Controller
         $academicYear = AcademicYear::findOrFail($request->academic_year_id);
         $reportType = $request->report_type;
 
-        // Handle case where specific class is selected but report type is for all classes
-        if (($reportType == 'class_summary' || $reportType == 'all_summary') && $request->school_class_id == 'all') {
-            $classes = SchoolClass::where('is_active', true)->ordered()->get();
+        // Handle case where report type is summary (either per class or all classes)
+        if ($reportType == 'class_summary' || $reportType == 'all_summary') {
+            if ($request->school_class_id == 'all') {
+                $classes = SchoolClass::where('is_active', true)->ordered()->get();
+            } else {
+                $classes = SchoolClass::where('id', $request->school_class_id)->get();
+            }
+
             $reportData = [];
             $grandTotalTagihan = 0;
             $grandTotalTerbayar = 0;
@@ -296,7 +301,11 @@ class CommitteeController extends Controller
                 'total_sisa' => max(0, $grandTotalTagihan - $grandTotalTerbayar),
             ];
 
-            $schoolClass = (object)['name' => 'Semua Kelas'];
+            // If specific class selected, use its name, otherwise "Semua Kelas"
+            $schoolClass = ($request->school_class_id == 'all')
+                ? (object)['name' => 'Semua Kelas']
+                : $classes->first();
+
             $committeeFee = null;
 
             return view('admin.committee.report.result', compact(
@@ -379,8 +388,13 @@ class CommitteeController extends Controller
         $academicYear = AcademicYear::findOrFail($request->academic_year_id);
         $reportType = $request->report_type;
 
-        if (($reportType == 'class_summary' || $reportType == 'all_summary') && $request->school_class_id == 'all') {
-            $classes = SchoolClass::where('is_active', true)->ordered()->get();
+        if ($reportType == 'class_summary' || $reportType == 'all_summary') {
+            if ($request->school_class_id == 'all') {
+                $classes = SchoolClass::where('is_active', true)->ordered()->get();
+            } else {
+                $classes = SchoolClass::where('id', $request->school_class_id)->get();
+            }
+
             $reportData = [];
             $grandTotalTagihan = 0;
             $grandTotalTerbayar = 0;
@@ -420,7 +434,11 @@ class CommitteeController extends Controller
                 'total_sisa' => max(0, $grandTotalTagihan - $grandTotalTerbayar),
             ];
 
-            $schoolClass = (object)['name' => 'Semua Kelas'];
+            // If specific class selected, use its name, otherwise "Semua Kelas"
+            $schoolClass = ($request->school_class_id == 'all')
+                ? (object)['name' => 'Semua Kelas']
+                : $classes->first();
+
             $committeeFee = null;
         } else {
             $schoolClass = SchoolClass::findOrFail($request->school_class_id);
