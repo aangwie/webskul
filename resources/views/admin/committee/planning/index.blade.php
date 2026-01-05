@@ -187,7 +187,7 @@
             <select name="year_id" class="form-select" onchange="this.form.submit()">
                 @foreach($academicYears as $year)
                 <option value="{{ $year->id }}" {{ ($selectedYear && $selectedYear->id == $year->id) ? 'selected' : '' }}>
-                    {{ $year->year }} {{ $year->is_active ? '(Aktif)' : '' }}
+                    {{ $year->year }} {{ $year->is_active ? '' : '' }}
                 </option>
                 @endforeach
             </select>

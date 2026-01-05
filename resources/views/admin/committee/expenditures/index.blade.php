@@ -26,7 +26,7 @@
             <select name="academic_year_id" class="form-input" style="width: auto; flex-grow: 1;" onchange="this.form.submit()">
                 @foreach($academicYears as $year)
                 <option value="{{ $year->id }}" {{ ($selectedYear && $selectedYear->id == $year->id) ? 'selected' : '' }}>
-                    {{ $year->year }} {{ $year->is_active ? '(Aktif)' : '' }}
+                    {{ $year->year }} {{ $year->is_active ? '' : '' }}
                 </option>
                 @endforeach
             </select>
