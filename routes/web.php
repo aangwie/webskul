@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\PmbRegistrationController as AdminPmbRegistrationController;
 use App\Http\Controllers\Admin\CommitteeController;
 use App\Http\Controllers\Admin\CommitteeExpenditureController;
+use App\Http\Controllers\Admin\CommitteePlanningController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -91,8 +92,20 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             Route::post('/report/generate', [CommitteeController::class, 'reportGenerate'])->name('report.generate');
             Route::post('/report/pdf', [CommitteeController::class, 'reportPdf'])->name('report.pdf');
 
+            // Planning (Perencanaan)
+            Route::get('/planning', [CommitteePlanningController::class, 'index'])->name('planning.index');
+            Route::post('/planning', [CommitteePlanningController::class, 'store'])->name('planning.store');
+            Route::put('/planning/{program}', [CommitteePlanningController::class, 'update'])->name('planning.update');
+            Route::delete('/planning/{program}', [CommitteePlanningController::class, 'destroy'])->name('planning.destroy');
+            Route::get('/planning/{program}/activities', [CommitteePlanningController::class, 'showActivities'])->name('planning.activities');
+            Route::post('/planning/{program}/activities', [CommitteePlanningController::class, 'storeActivity'])->name('planning.activities.store');
+            Route::put('/planning/activities/{activity}', [CommitteePlanningController::class, 'updateActivity'])->name('planning.activities.update');
+            Route::delete('/planning/activities/{activity}', [CommitteePlanningController::class, 'destroyActivity'])->name('planning.activities.destroy');
+
             // Expenditures (Penggunaan)
             Route::get('/expenditures/report', [CommitteeExpenditureController::class, 'report'])->name('expenditures.report');
+            Route::get('/expenditures/get-programs', [CommitteeExpenditureController::class, 'getPrograms'])->name('expenditures.programs');
+            Route::get('/expenditures/get-activities', [CommitteeExpenditureController::class, 'getActivities'])->name('expenditures.activities');
             Route::get('/expenditures/{expenditure}/print', [CommitteeExpenditureController::class, 'print'])->name('expenditures.print');
             Route::resource('expenditures', CommitteeExpenditureController::class)->names([
                 'index' => 'expenditures.index',

@@ -681,6 +681,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('admin.committee.planning.index') }}" class="{{ request()->routeIs('admin.committee.planning.*') ? 'active' : '' }}">
+                            <i class="fas fa-tasks"></i> Perencanaan
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('admin.committee.payments.index') }}" class="{{ request()->routeIs('admin.committee.payments.*') ? 'active' : '' }}">
                             <i class="fas fa-receipt"></i> Pembayaran
                         </a>
