@@ -13,13 +13,13 @@
             </div>
             <div class="card-body">
                 <p>Fitur ini digunakan untuk menghubungkan folder penyimpanan public dengan folder storage. Jika gambar tidak muncul di website, silakan tekan tombol di bawah ini.</p>
-                
+
                 <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px; border-left: 4px solid var(--primary);">
                     <strong>Status: </strong>
                     @if($hasStorageLink)
-                        <span class="badge badge-success">Terhubung</span>
+                    <span class="badge badge-success">Terhubung</span>
                     @else
-                        <span class="badge badge-danger">Tidak Terhubung</span>
+                    <span class="badge badge-danger">Tidak Terhubung</span>
                     @endif
                 </div>
 
@@ -29,9 +29,9 @@
                         <i class="fas fa-hammer"></i> Perbaiki Storage Link
                     </button>
                     @if($hasStorageLink)
-                         <button type="submit" class="btn btn-warning" onclick="return confirm('Paksa buat ulang link?')">
-                            <i class="fas fa-sync"></i> Re-Create Link (Paksa)
-                        </button>
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Paksa buat ulang link?')">
+                        <i class="fas fa-sync"></i> Re-Create Link (Paksa)
+                    </button>
                     @endif
                 </form>
             </div>
@@ -69,12 +69,38 @@
                     <i class="fas fa-info-circle"></i> Tombol ini akan mengambil kode terbaru dari <strong>GitHub</strong> dan menjalankan migrasi database secara otomatis.
                 </div>
 
-                <form action="{{ route('admin.system.update') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin melakukan update sistem? Website mungkin tidak bisa diakses selama beberapa detik.')">
+                <form action="{{ route('admin.system.update') }}" method="POST" id="update-form">
                     @csrf
-                    <button type="submit" class="btn btn-success btn-lg">
+                    <button type="button" class="btn btn-success btn-lg" onclick="confirmUpdate(this)">
                         <i class="fab fa-github"></i> Update dari GitHub
                     </button>
                 </form>
+
+                <script>
+                    function confirmUpdate(btn) {
+                        Swal.fire({
+                            title: 'Update Sistem?',
+                            text: "Website mungkin tidak bisa diakses selama beberapa detik saat proses update berlangsung.",
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Ya, Lakukan Update!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Change button state
+                                btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sedang Memproses...';
+                                btn.disabled = true;
+                                btn.style.opacity = '0.7';
+                                btn.style.cursor = 'not-allowed';
+
+                                // Submit form
+                                document.getElementById('update-form').submit();
+                            }
+                        });
+                    }
+                </script>
 
                 @if(session('update_log'))
                 <div style="margin-top: 20px;">
