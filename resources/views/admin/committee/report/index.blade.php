@@ -4,7 +4,7 @@
 @section('page-title', 'Laporan Dana Komite')
 
 @section('content')
-<div class="card" style="max-width: 700px;">
+<div class="card" style="max-width: 900px;">
     <div class="card-header">
         <h2><i class="fas fa-file-alt"></i> Generate Laporan</h2>
     </div>

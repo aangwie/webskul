@@ -22,7 +22,7 @@
                     <p>Kelas {{ $class->grade }}</p>
                 </div>
                 <div style="position: absolute; right: 20px; color: var(--text-light); opacity: 0.5;">
-                    <i class="fas fa-arrow-right"></i>
+                    <i class="fas fa-arrow-down"></i>
                 </div>
             </div>
             @endforeach
