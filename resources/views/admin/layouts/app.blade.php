@@ -666,7 +666,7 @@
             </li>
             @endif
 
-            @if(auth()->user()->isAdmin() || auth()->user()->isTeacher() || auth()->user()->isAdminKomite())
+            @if(auth()->user()->isAdmin() || auth()->user()->isAdminKomite())
             <div class="sidebar-divider"></div>
             <p style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">Komite Sekolah</p>
             <li class="has-submenu {{ request()->routeIs('admin.committee.*') ? 'active' : '' }}" id="committee-menu">

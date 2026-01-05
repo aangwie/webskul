@@ -71,8 +71,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::resource('information', AdminInformationController::class)->except(['show']);
     });
 
-    // Committee (Admin, Teacher, Admin Komite)
-    Route::middleware(['role:admin,teacher,admin_komite'])->group(function () {
+    // Committee (Admin, Admin Komite)
+    Route::middleware(['role:admin,admin_komite'])->group(function () {
         Route::prefix('committee')->name('committee.')->group(function () {
             Route::get('/nominal', [CommitteeController::class, 'indexNominal'])->name('nominal.index');
             Route::get('/nominal/{academicYear}/set', [CommitteeController::class, 'setNominal'])->name('nominal.set');
