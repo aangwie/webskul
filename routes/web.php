@@ -35,6 +35,7 @@ Route::get('/pmb/status', [PmbController::class, 'status'])->name('pmb.status');
 Route::get('/pmb/download-pdf/{registration_number}', [PmbController::class, 'downloadPdf'])->name('pmb.downloadPdf');
 Route::get('/pmb/print/{registration_number}', [PmbController::class, 'printCard'])->name('pmb.print');
 Route::get('/komite-status', [KomiteStatusController::class, 'index'])->name('komite.status');
+Route::get('/modules', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'index'])->name('modules.index');
 
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -161,5 +162,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/pmb-registrations', [AdminPmbRegistrationController::class, 'index'])->name('pmb-registrations.index');
         Route::get('/pmb-registrations/{pmbRegistration}', [AdminPmbRegistrationController::class, 'show'])->name('pmb-registrations.show');
         Route::put('/pmb-registrations/{pmbRegistration}/status', [AdminPmbRegistrationController::class, 'updateStatus'])->name('pmb-registrations.status');
+    });
+
+    // Data Sekolah Sub-menus (Admin Only)
+    Route::middleware(['role:admin,teacher'])->group(function () {
+        Route::resource('subjects', \App\Http\Controllers\Admin\SubjectController::class)->except(['create', 'show', 'edit']);
+        Route::resource('teaching-modules', \App\Http\Controllers\Admin\TeachingModuleController::class)->except(['create', 'show', 'edit']);
     });
 });

@@ -590,7 +590,7 @@
                 </a>
             </li>
             @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
-            <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}" id="school-menu">
+            <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') || request()->routeIs('admin.subjects.*') ? 'active' : '' }}" id="school-menu">
                 <a href="javascript:void(0)" onclick="toggleSubmenu('school-menu')" class="submenu-toggle">
                     <span><i class="fas fa-school"></i> Data Sekolah</span>
                     <i class="fas fa-chevron-right"></i>
@@ -616,7 +616,17 @@
                             <i class="fas fa-user-graduate"></i> Siswa
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('admin.subjects.index') }}" class="{{ request()->routeIs('admin.subjects.*') ? 'active' : '' }}">
+                            <i class="fas fa-book"></i> Mata Pelajaran
+                        </a>
+                    </li>
                 </ul>
+            </li>
+            <li>
+                <a href="{{ route('admin.teaching-modules.index') }}" class="{{ request()->routeIs('admin.teaching-modules.*') ? 'active' : '' }}">
+                    <i class="fas fa-book-reader"></i> Modul Ajar
+                </a>
             </li>
             @endif
 

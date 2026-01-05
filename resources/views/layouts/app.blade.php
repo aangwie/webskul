@@ -433,6 +433,9 @@
                     <a href="{{ route('activities.index') }}" class="nav-link {{ request()->routeIs('activities.*') ? 'active' : '' }}">Kegiatan</a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('modules.index') }}" class="nav-link {{ request()->routeIs('modules.*') ? 'active' : '' }}">Modul Ajar</a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ route('information.index') }}" class="nav-link {{ request()->routeIs('information.*') ? 'active' : '' }}">Informasi</a>
                 </li>
                 <li class="nav-item" onclick="toggleDropdown(this)">
