@@ -36,6 +36,8 @@ Route::get('/pmb/download-pdf/{registration_number}', [PmbController::class, 'do
 Route::get('/pmb/print/{registration_number}', [PmbController::class, 'printCard'])->name('pmb.print');
 Route::get('/komite-status', [KomiteStatusController::class, 'index'])->name('komite.status');
 Route::get('/modules', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'index'])->name('modules.index');
+Route::get('/modules/{teachingModule}/view', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'showPdf'])->name('modules.view');
+Route::get('/modules/{teachingModule}/download', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'downloadPdf'])->name('modules.download');
 
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
