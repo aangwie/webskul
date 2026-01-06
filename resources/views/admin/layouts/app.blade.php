@@ -14,25 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @yield('styles')
+    @include('partials.theme')
     <style>
-        :root {
-            --primary: #1e3a5f;
-            --primary-light: #2c4f7c;
-            --primary-dark: #0f2340;
-            --secondary: #ffffff;
-            --accent: #f8f9fa;
-            --accent-gold: #d4af37;
-            --text: #333333;
-            --text-light: #6c757d;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --shadow: 0 4px 20px rgba(30, 58, 95, 0.1);
-            --shadow-lg: 0 10px 40px rgba(30, 58, 95, 0.15);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --sidebar-width: 260px;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -41,7 +24,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--accent);
+            background: var(--body-bg);
             color: var(--text);
             min-height: 100vh;
         }
@@ -53,7 +36,7 @@
             left: 0;
             width: var(--sidebar-width);
             height: 100vh;
-            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: var(--nav-bg);
             color: var(--secondary);
             padding: 20px 0;
             z-index: 1000;
@@ -167,14 +150,22 @@
         /* Top Bar */
         .topbar {
             background: var(--secondary);
-            padding: 15px 30px;
+            border-bottom: 2px solid var(--primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 15px 30px;
             box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: var(--transition);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .topbar-left h1 {
@@ -228,6 +219,23 @@
         .btn-logout:hover {
             background: var(--danger);
             color: var(--secondary);
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
         }
 
         /* Content Area */
@@ -536,17 +544,24 @@
         /* Mobile Toggle */
         .sidebar-toggle {
             display: none;
+            background: rgba(30, 58, 95, 0.1);
+            color: var(--primary);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: var(--transition);
+        }
+
+        .sidebar-toggle:hover {
             background: var(--primary);
             color: var(--secondary);
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.2rem;
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
             }
@@ -560,14 +575,48 @@
             }
 
             .sidebar-toggle {
-                display: block;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
+            .topbar {
+                padding: 15px 20px;
+            }
+
+            .topbar-right .user-name {
+                display: none;
+            }
+
+            .btn-logout span {
+                display: none;
+            }
+
+            .btn-logout {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+            }
+
+            .topbar-left h1 {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .topbar-left h1 {
+                display: none;
             }
 
             .content {
+                padding: 15px;
+            }
+
+            .stat-card {
                 padding: 20px;
             }
         }
@@ -576,6 +625,9 @@
 </head>
 
 <body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
@@ -773,7 +825,7 @@
                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                     @csrf
                     <button type="submit" class="btn-logout">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                        <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                     </button>
                 </form>
             </div>
@@ -802,6 +854,16 @@
     <script>
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+
+            // Prevent scrolling when sidebar is open on mobile
+            if (window.innerWidth <= 992) {
+                if (document.getElementById('sidebar').classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
         }
 
         function toggleSubmenu(id) {

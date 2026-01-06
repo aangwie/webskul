@@ -14,21 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @include('partials.theme')
     <style>
-        :root {
-            --primary: #1e3a5f;
-            --primary-light: #2c4f7c;
-            --primary-dark: #0f2340;
-            --secondary: #ffffff;
-            --accent: #f8f9fa;
-            --accent-gold: #d4af37;
-            --text: #333333;
-            --text-light: #6c757d;
-            --shadow: 0 4px 20px rgba(30, 58, 95, 0.15);
-            --shadow-lg: 0 10px 40px rgba(30, 58, 95, 0.2);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -39,12 +26,12 @@
             font-family: 'Inter', sans-serif;
             color: var(--text);
             line-height: 1.6;
-            background: var(--accent);
+            background: var(--body-bg);
         }
 
         /* Navigation */
         .navbar {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: var(--nav-bg);
             padding: 0;
             position: fixed;
             top: 0;
@@ -55,12 +42,17 @@
         }
 
         .nav-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            height: 90px;
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled .nav-container {
             height: 70px;
         }
 
@@ -73,8 +65,13 @@
         }
 
         .nav-brand img {
-            height: 45px;
+            height: 60px;
             width: auto;
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled .nav-brand img {
+            height: 45px;
         }
 
         .nav-brand-text {
@@ -83,9 +80,10 @@
         }
 
         .nav-brand-name {
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 1.3rem;
+            font-weight: 800;
             letter-spacing: 0.5px;
+            line-height: 1.2;
         }
 
         .nav-brand-sub {
@@ -106,13 +104,14 @@
 
         .nav-link {
             display: block;
-            padding: 12px 18px;
+            padding: 10px 20px;
             color: var(--secondary);
             text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
+            font-weight: 600;
+            font-size: 1rem;
             border-radius: 8px;
             transition: var(--transition);
+            white-space: nowrap;
         }
 
         .nav-link:hover,
@@ -175,13 +174,13 @@
 
         /* Main Content */
         main {
-            margin-top: 70px;
-            min-height: calc(100vh - 70px - 300px);
+            margin-top: 90px;
+            min-height: calc(100vh - 90px - 300px);
         }
 
         /* Footer */
         .footer {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            background: var(--nav-bg);
             color: var(--secondary);
             padding: 60px 20px 30px;
         }
@@ -248,26 +247,41 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .nav-toggle {
-                display: block;
-            }
-
+        @media (max-width: 1100px) {
             .nav-menu {
                 position: fixed;
-                top: 70px;
-                left: 0;
-                right: 0;
-                background: var(--primary);
+                top: 0;
+                right: -100%;
+                bottom: 0;
+                width: 300px;
+                background: var(--nav-bg);
                 flex-direction: column;
-                padding: 20px;
-                gap: 5px;
-                transform: translateX(-100%);
-                transition: var(--transition);
+                padding: 100px 30px;
+                transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+                z-index: 1001;
+                gap: 15px;
             }
 
             .nav-menu.active {
-                transform: translateX(0);
+                right: 0;
+            }
+
+            .nav-toggle {
+                display: block;
+                z-index: 1002;
+            }
+
+            .nav-container {
+                height: 80px;
+            }
+
+            .nav-brand img {
+                height: 50px;
+            }
+
+            .nav-brand-name {
+                font-size: 1.1rem;
             }
 
             .dropdown-menu {
@@ -275,15 +289,15 @@
                 opacity: 1;
                 visibility: visible;
                 transform: none;
-                box-shadow: none;
                 background: rgba(255, 255, 255, 0.1);
-                border-radius: 8px;
-                margin-top: 5px;
-                display: none;
+                box-shadow: none;
+                max-height: 0;
+                padding: 0;
             }
 
             .nav-item.active .dropdown-menu {
-                display: block;
+                max-height: 500px;
+                padding: 10px 0;
             }
 
             .dropdown-item {
@@ -651,21 +665,34 @@
 
     <script>
         function toggleMenu() {
-            document.getElementById('navMenu').classList.toggle('active');
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('active');
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
         }
 
         function toggleDropdown(item) {
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= 1100) {
                 item.classList.toggle('active');
             }
         }
 
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
         // Close mobile menu when clicking outside
         document.addEventListener('click', function(e) {
-            const nav = document.querySelector('.navbar');
+            const menu = document.getElementById('navMenu');
             const toggle = document.querySelector('.nav-toggle');
-            if (nav && toggle && !nav.contains(e.target) && !toggle.contains(e.target)) {
-                document.getElementById('navMenu').classList.remove('active');
+            if (menu.classList.contains('active') && !menu.contains(e.target) && !toggle.contains(e.target)) {
+                menu.classList.remove('active');
+                document.body.style.overflow = '';
             }
         });
     </script>

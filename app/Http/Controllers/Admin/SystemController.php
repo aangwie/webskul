@@ -195,4 +195,19 @@ class SystemController extends Controller
         Artisan::call('optimize:clear');
         return back()->with('success', 'Cache sistem berhasil dibersihkan.');
     }
+
+    public function updateTheme(Request $request)
+    {
+        try {
+            $request->validate([
+                'theme' => 'required|in:default,maroon,emerald',
+            ]);
+
+            \App\Models\Setting::set('system_theme', $request->theme);
+
+            return back()->with('success', 'Tema berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal update tema: ' . $e->getMessage());
+        }
+    }
 }

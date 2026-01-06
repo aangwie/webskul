@@ -150,6 +150,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/system/storage-link', [\App\Http\Controllers\Admin\SystemController::class, 'storageLink'])->name('system.storage-link');
         Route::post('/system/update', [\App\Http\Controllers\Admin\SystemController::class, 'updateApp'])->name('system.update');
         Route::post('/system/cache-clear', [\App\Http\Controllers\Admin\SystemController::class, 'cacheClear'])->name('system.cache-clear');
+        Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
     });
 
     // PMB Management (Admin, Admin Komite)

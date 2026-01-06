@@ -58,6 +58,164 @@
 </div>
 
 <div class="row">
+    <!-- Theme Selection -->
+    <div class="col-12" style="margin-bottom: 30px;">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="m-0 font-weight-bold" style="color: var(--primary);"><i class="fas fa-palette mr-2"></i>Pengaturan Tema</h5>
+            </div>
+            <div class="card-body px-0">
+                <p class="text-muted small mb-4 px-4">Pilih tema warna untuk seluruh tampilan website (Public & Admin).</p>
+
+                <form action="{{ route('admin.system.theme') }}" method="POST">
+                    @csrf
+                    <div class="theme-toggle-container">
+                        <div class="theme-toggle-group">
+                            <label class="theme-toggle-item">
+                                <input type="radio" name="theme" value="default" {{ $theme_name == 'default' ? 'checked' : '' }} onchange="this.form.submit()">
+                                <div class="theme-toggle-btn">
+                                    <div class="theme-color-dot" style="background: #1e3a5f;"></div>
+                                    <span>Navy Blue</span>
+                                </div>
+                            </label>
+                            <label class="theme-toggle-item">
+                                <input type="radio" name="theme" value="maroon" {{ $theme_name == 'maroon' ? 'checked' : '' }} onchange="this.form.submit()">
+                                <div class="theme-toggle-btn">
+                                    <div class="theme-color-dot" style="background: #800000;"></div>
+                                    <span>Red Maroon</span>
+                                </div>
+                            </label>
+                            <label class="theme-toggle-item">
+                                <input type="radio" name="theme" value="emerald" {{ $theme_name == 'emerald' ? 'checked' : '' }} onchange="this.form.submit()">
+                                <div class="theme-toggle-btn">
+                                    <div class="theme-color-dot" style="background: #10b981;"></div>
+                                    <span>Green Emerald</span>
+                                </div>
+                            </label>
+                            <div class="theme-toggle-glider"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .theme-toggle-container {
+        padding: 0 20px;
+    }
+
+    .theme-toggle-group {
+        position: relative;
+        display: flex;
+        background-color: #f1f3f5;
+        padding: 6px;
+        border-radius: 12px;
+        max-width: 800px;
+        margin: 0 auto;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .theme-toggle-item {
+        flex: 1;
+        margin-bottom: 0;
+        cursor: pointer;
+        z-index: 2;
+        position: relative;
+    }
+
+    .theme-toggle-item input {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .theme-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 50px;
+        transition: var(--transition);
+        border-radius: 8px;
+        gap: 12px;
+    }
+
+    .theme-color-dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    }
+
+    .theme-toggle-btn span {
+        font-weight: 700;
+        font-size: 15px;
+        color: #495057;
+        transition: var(--transition);
+    }
+
+    /* Checked state text color */
+    .theme-toggle-item input:checked+.theme-toggle-btn span {
+        color: #fff;
+    }
+
+    .theme-toggle-glider {
+        position: absolute;
+        height: 50px;
+        width: calc((100% - 12px) / 3);
+        background: var(--primary);
+        border-radius: 8px;
+        z-index: 1;
+        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), background 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Glider Animation and Colors */
+    .theme-toggle-group:has(.theme-toggle-item:nth-child(1) input:checked) .theme-toggle-glider {
+        transform: translateX(0);
+        background: #1e3a5f;
+    }
+
+    .theme-toggle-group:has(.theme-toggle-item:nth-child(2) input:checked) .theme-toggle-glider {
+        transform: translateX(100%);
+        background: #800000;
+    }
+
+    .theme-toggle-group:has(.theme-toggle-item:nth-child(3) input:checked) .theme-toggle-glider {
+        transform: translateX(200%);
+        background: #10b981;
+    }
+
+    @media (max-width: 768px) {
+        .theme-toggle-group {
+            flex-direction: column;
+            max-width: 100%;
+        }
+
+        .theme-toggle-glider {
+            display: none;
+        }
+
+        .theme-toggle-item input:checked+.theme-toggle-btn {
+            background: var(--primary);
+        }
+
+        .theme-toggle-item input:checked+.theme-toggle-btn span {
+            color: #fff;
+        }
+
+        .theme-toggle-btn {
+            margin-bottom: 8px;
+        }
+
+        .theme-toggle-item:last-child .theme-toggle-btn {
+            margin-bottom: 0;
+        }
+    }
+</style>
+
+<div class="row">
     <!-- Git Update -->
     <div class="col-12">
         <div class="card">
