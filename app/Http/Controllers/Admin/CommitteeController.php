@@ -460,17 +460,19 @@ class CommitteeController extends Controller
                 : $classes->first();
 
             $committeeFee = null;
+        }
+
         // Handle Detail / Recapitulation for One OR All Classes
         if ($reportType != 'class_summary' && $reportType != 'all_summary') {
             if ($request->school_class_id == 'all') {
                 $classes = SchoolClass::where('is_active', true)->ordered()->get();
-                $schoolClass = (object)['name' => 'Semua Kelas'];
+                $schoolClass = (object) ['name' => 'Semua Kelas'];
                 $committeeFee = null;
             } else {
                 $class = SchoolClass::findOrFail($request->school_class_id);
                 $classes = collect([$class]);
                 $schoolClass = $class;
-                
+
                 $committeeFee = CommitteeFee::where('academic_year_id', $academicYear->id)
                     ->where('school_class_id', $class->id)
                     ->first();
@@ -486,7 +488,8 @@ class CommitteeController extends Controller
                     ->where('school_class_id', $class->id)
                     ->first();
 
-                if (!$fee) continue;
+                if (!$fee)
+                    continue;
 
                 $students = Student::where('school_class_id', $class->id)
                     ->where('is_active', true)
