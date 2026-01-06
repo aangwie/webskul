@@ -7,8 +7,8 @@
 <div class="card">
     <div class="card-header">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2><i class="fas fa-book-reader"></i> Daftar Modul Ajar</h2><br>
-            <button type="button" class="btn btn-primary" onclick="openAddModal()">
+            <h2><i class="fas fa-book-reader"></i> Daftar Modul Ajar</h2>
+            <button type="button" class="btn btn-primary" onclick="openAddModal()" style="align-self: flex-end;">
                 <i class="fas fa-upload"></i> Upload Modul
             </button>
         </div>
