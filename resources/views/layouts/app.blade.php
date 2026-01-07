@@ -449,8 +449,15 @@
                 <li class="nav-item">
                     <a href="{{ route('modules.index') }}" class="nav-link {{ request()->routeIs('modules.*') ? 'active' : '' }}">Modul Ajar</a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('information.index') }}" class="nav-link {{ request()->routeIs('information.*') ? 'active' : '' }}">Informasi</a>
+                <li class="nav-item" onclick="toggleDropdown(this)">
+                    <a href="#" class="nav-link {{ request()->routeIs('information.*') || request()->routeIs('public-complaints.*') ? 'active' : '' }}">
+                        Informasi <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ route('information.index') }}" class="dropdown-item">Informasi Sekolah</a></li>
+                        <li><a href="{{ route('public-complaints.create') }}" class="dropdown-item">Aduan Masyarakat</a></li>
+                        <li><a href="{{ route('public-complaints.status') }}" class="dropdown-item">Respon Aduan</a></li>
+                    </ul>
                 </li>
                 <li class="nav-item" onclick="toggleDropdown(this)">
                     <a href="#" class="nav-link {{ request()->routeIs('pmb.*') ? 'active' : '' }}">

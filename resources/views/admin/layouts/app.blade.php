@@ -698,6 +698,11 @@
                     <i class="fas fa-bullhorn"></i> Informasi
                 </a>
             </li>
+            <li>
+                <a href="{{ route('admin.public-complaints.index') }}" class="{{ request()->routeIs('admin.public-complaints.*') ? 'active' : '' }}">
+                    <i class="fas fa-comments"></i> Aduan Masyarakat
+                </a>
+            </li>
             @endif
 
             @if(auth()->user()->isAdmin() || auth()->user()->isAdminKomite())
@@ -771,25 +776,33 @@
         <div class="sidebar-divider"></div>
 
         <ul class="sidebar-menu">
-            <li>
-                <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                    <i class="fas fa-users"></i> Manajemen User
+            <li class="has-submenu {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.profile.*') || request()->routeIs('admin.system.*') || request()->routeIs('admin.settings.smtp') ? 'active' : '' }}" id="admin-management-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('admin-management-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-user-shield"></i> Manajemen Admin</span>
+                    <i class="fas fa-chevron-right"></i>
                 </a>
-            </li>
-            <li>
-                <a href="{{ route('admin.profile.index') }}" class="{{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
-                    <i class="fas fa-user-cog"></i> Profil Admin
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('admin.system.index') }}" class="{{ request()->routeIs('admin.system.*') ? 'active' : '' }}">
-                    <i class="fas fa-tools"></i> Pengaturan Sistem
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('admin.settings.smtp') }}" class="{{ request()->routeIs('admin.settings.smtp') ? 'active' : '' }}">
-                    <i class="fas fa-cog"></i> Pengaturan SMTP
-                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            <i class="fas fa-users"></i> Manajemen User
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.profile.index') }}" class="{{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
+                            <i class="fas fa-user-cog"></i> Profil Admin
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.system.index') }}" class="{{ request()->routeIs('admin.system.*') ? 'active' : '' }}">
+                            <i class="fas fa-tools"></i> Pengaturan Sistem
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.settings.smtp') }}" class="{{ request()->routeIs('admin.settings.smtp') ? 'active' : '' }}">
+                            <i class="fas fa-cog"></i> Pengaturan SMTP
+                        </a>
+                    </li>
+                </ul>
             </li>
         </ul>
         @endif

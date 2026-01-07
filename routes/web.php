@@ -39,6 +39,12 @@ Route::get('/modules', [\App\Http\Controllers\Frontend\TeachingModuleController:
 Route::get('/modules/{teachingModule}/view', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'showPdf'])->name('modules.view');
 Route::get('/modules/{teachingModule}/download', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'downloadPdf'])->name('modules.download');
 
+// Public Complaints
+Route::get('/public-complaints', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'create'])->name('public-complaints.create');
+Route::post('/public-complaints', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'store'])->name('public-complaints.store');
+Route::get('/public-complaints/status', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'status'])->name('public-complaints.status');
+Route::post('/public-complaints/check', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'check'])->name('public-complaints.check');
+
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -73,6 +79,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
         // Information
         Route::resource('information', AdminInformationController::class)->except(['show']);
+
+        // Public Complaints
+        Route::get('/public-complaints', [\App\Http\Controllers\Admin\PublicComplaintController::class, 'index'])->name('public-complaints.index');
+        Route::post('/public-complaints/{publicComplaint}/respond', [\App\Http\Controllers\Admin\PublicComplaintController::class, 'respond'])->name('public-complaints.respond');
+        Route::delete('/public-complaints/{publicComplaint}', [\App\Http\Controllers\Admin\PublicComplaintController::class, 'destroy'])->name('public-complaints.destroy');
     });
 
     // Committee (Admin, Admin Komite)
