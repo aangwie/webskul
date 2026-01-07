@@ -62,5 +62,24 @@ class AppServiceProvider extends ServiceProvider
 
         \Illuminate\Support\Facades\View::share('active_theme', $activeTheme);
         \Illuminate\Support\Facades\View::share('theme_name', $themeName);
+
+        // Global SMTP Configuration Override
+        try {
+            $smtp = \App\Models\Setting::getSmtpSettings();
+            if ($smtp['mail_mailer'] && $smtp['mail_mailer'] !== 'log') {
+                config([
+                    'mail.default' => $smtp['mail_mailer'],
+                    'mail.mailers.smtp.host' => $smtp['mail_host'],
+                    'mail.mailers.smtp.port' => $smtp['mail_port'],
+                    'mail.mailers.smtp.username' => $smtp['mail_username'],
+                    'mail.mailers.smtp.password' => $smtp['mail_password'],
+                    'mail.mailers.smtp.encryption' => $smtp['mail_encryption'] === 'null' ? null : $smtp['mail_encryption'],
+                    'mail.from.address' => $smtp['mail_from_address'],
+                    'mail.from.name' => $smtp['mail_from_name'],
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Silently fail if database is not ready or settings table missing
+        }
     }
 }
