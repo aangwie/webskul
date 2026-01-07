@@ -81,5 +81,16 @@ class AppServiceProvider extends ServiceProvider
         } catch (\Exception $e) {
             // Silently fail if database is not ready or settings table missing
         }
+
+        // View Composer for Admin Layout - Complaint Badge
+        \Illuminate\Support\Facades\View::composer('admin.layouts.app', function ($view) {
+            $unrespondedComplaintsCount = 0;
+            try {
+                $unrespondedComplaintsCount = \App\Models\PublicComplaint::where('status', 'pending')->count();
+            } catch (\Exception $e) {
+                // Ignore if table doesn't exist yet
+            }
+            $view->with('unrespondedComplaintsCount', $unrespondedComplaintsCount);
+        });
     }
 }
