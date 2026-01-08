@@ -39,10 +39,14 @@
                         <td>{{ $archive->created_at->format('d/m/Y') }}</td>
                         <td>
                             <div style="display: flex; gap: 5px;">
-                                <button type="button" class="btn btn-success btn-sm" title="Lihat" onclick="previewFile('{{ asset('storage/' . $archive->file_path) }}', '{{ addslashes($archive->title) }}')">
+                                @php
+                                $isBase64 = str_starts_with($archive->file_path, 'data:');
+                                $fileUrl = $isBase64 ? $archive->file_path : asset('storage/' . $archive->file_path);
+                                @endphp
+                                <button type="button" class="btn btn-success btn-sm" title="Lihat" onclick="previewFile('{{ $fileUrl }}', '{{ addslashes($archive->title) }}')">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <a href="{{ asset('storage/' . $archive->file_path) }}" download class="btn btn-info btn-sm" title="Download">
+                                <a href="{{ $fileUrl }}" download="{{ $archive->title }}" class="btn btn-info btn-sm" title="Download">
                                     <i class="fas fa-download"></i>
                                 </a>
                                 <button class="btn btn-warning btn-sm" onclick='showEditModal(@json($archive))' title="Edit">
@@ -181,9 +185,9 @@
         });
 
         // Backend Validation Error Handler
-        @if($errors -> any())
+        @if($errors - > any())
         let errorMsg = 'Terjadi kesalahan saat menyimpan data.';
-        @if($errors -> has('file'))
+        @if($errors - > has('file'))
         errorMsg = 'Gagal simpan karena ukuran file terlalu besar! Maksimal 500KB.';
         @endif
 
@@ -217,7 +221,14 @@
     }
 
     function previewFile(url, title) {
-        const extension = url.split('.').pop().toLowerCase();
+        let extension = '';
+        if (url.startsWith('data:')) {
+            const mime = url.split(';')[0].split(':')[1];
+            if (mime === 'application/pdf') extension = 'pdf';
+            else if (mime.startsWith('image/')) extension = 'jpg';
+        } else {
+            extension = url.split('.').pop().toLowerCase();
+        }
         let content = '';
 
         if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {

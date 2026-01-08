@@ -33,20 +33,13 @@ class ArchiveController extends Controller
         ]);
 
         $file = $request->file('file');
-
-        // Convert to Base64 as requested/used in other parts of the system if needed, 
-        // but typically files are stored. The user mentioned Base64 in previous conversations.
-        // Let's check how other controllers handle it.
-        // For now, I'll use standard storage to be safe, unless I see Base64 is the standard.
-        // Check TeacherController or ActivityController.
-
-        $path = $file->store('archives', 'public');
+        $base64 = 'data:' . $file->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
 
         Archive::create([
             'user_id' => auth()->id(),
             'archive_type_id' => $request->archive_type_id,
             'title' => $request->title,
-            'file_path' => $path,
+            'file_path' => $base64,
             'description' => $request->description,
         ]);
 
@@ -74,11 +67,8 @@ class ArchiveController extends Controller
         ];
 
         if ($request->hasFile('file')) {
-            // Delete old file
-            if ($archive->file_path) {
-                Storage::disk('public')->delete($archive->file_path);
-            }
-            $data['file_path'] = $request->file('file')->store('archives', 'public');
+            $file = $request->file('file');
+            $data['file_path'] = 'data:' . $file->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
         }
 
         $archive->update($data);
@@ -91,10 +81,6 @@ class ArchiveController extends Controller
         // Security check
         if (!auth()->user()->isAdmin() && $archive->user_id !== auth()->id()) {
             abort(403);
-        }
-
-        if ($archive->file_path) {
-            Storage::disk('public')->delete($archive->file_path);
         }
 
         $archive->delete();
