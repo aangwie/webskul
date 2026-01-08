@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\PmbRegistrationController as AdminPmbRegistration
 use App\Http\Controllers\Admin\CommitteeController;
 use App\Http\Controllers\Admin\CommitteeExpenditureController;
 use App\Http\Controllers\Admin\CommitteePlanningController;
+use App\Http\Controllers\Admin\ArchiveController;
+use App\Http\Controllers\Admin\ArchiveTypeController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -182,5 +184,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::middleware(['role:admin,teacher'])->group(function () {
         Route::resource('subjects', \App\Http\Controllers\Admin\SubjectController::class)->except(['create', 'show', 'edit']);
         Route::resource('teaching-modules', \App\Http\Controllers\Admin\TeachingModuleController::class)->except(['create', 'show', 'edit']);
+
+        // Archive Management
+        Route::resource('archives', ArchiveController::class)->except(['show', 'create', 'edit']);
+
+        // Archive Types (Admin Only inside the controller logic or route group)
+        Route::middleware(['role:admin'])->group(function () {
+            Route::resource('archive-types', ArchiveTypeController::class)->except(['show', 'create', 'edit']);
+        });
     });
 });

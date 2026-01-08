@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Panel') - {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</title>
     @if(isset($school) && $school && $school->logo)
-        <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
+    <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
     @else
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -644,53 +644,78 @@
                 </a>
             </li>
             @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
-                <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') || request()->routeIs('admin.subjects.*') ? 'active' : '' }}"
-                    id="school-menu">
-                    <a href="javascript:void(0)" onclick="toggleSubmenu('school-menu')" class="submenu-toggle">
-                        <span><i class="fas fa-school"></i> Data Sekolah</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                    <ul class="submenu">
-                        <li>
-                            <a href="{{ route('admin.school-profile.index') }}"
-                                class="{{ request()->routeIs('admin.school-profile.*') ? 'active' : '' }}">
-                                <i class="fas fa-school"></i> Profil Sekolah
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.teachers.index') }}"
-                                class="{{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}">
-                                <i class="fas fa-chalkboard-teacher"></i> Guru
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.classes.index') }}"
-                                class="{{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
-                                <i class="fas fa-layer-group"></i> Kelas
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.students.index') }}"
-                                class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
-                                <i class="fas fa-user-graduate"></i> Siswa
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.subjects.index') }}"
-                                class="{{ request()->routeIs('admin.subjects.*') ? 'active' : '' }}">
-                                <i class="fas fa-book"></i> Mata Pelajaran
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="{{ route('admin.teaching-modules.index') }}"
-                        class="{{ request()->routeIs('admin.teaching-modules.*') ? 'active' : '' }}">
-                        <i class="fas fa-book-reader"></i> Modul Ajar
-                    </a>
-                </li>
-            @endif
+            <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') || request()->routeIs('admin.subjects.*') ? 'active' : '' }}"
+                id="school-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('school-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-school"></i> Data Sekolah</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('admin.school-profile.index') }}"
+                            class="{{ request()->routeIs('admin.school-profile.*') ? 'active' : '' }}">
+                            <i class="fas fa-school"></i> Profil Sekolah
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.classes.index') }}"
+                            class="{{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
+                            <i class="fas fa-layer-group"></i> Kelas
+                        </a>
+                    </li>
 
+                    <li>
+                        <a href="{{ route('admin.teachers.index') }}"
+                            class="{{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}">
+                            <i class="fas fa-chalkboard-teacher"></i> Guru
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.students.index') }}"
+                            class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
+                            <i class="fas fa-user-graduate"></i> Siswa
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.subjects.index') }}"
+                            class="{{ request()->routeIs('admin.subjects.*') ? 'active' : '' }}">
+                            <i class="fas fa-book"></i> Mata Pelajaran
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.teaching-modules.index') }}"
+                            class="{{ request()->routeIs('admin.teaching-modules.*') ? 'active' : '' }}">
+                            <i class="fas fa-book-reader"></i> Modul Ajar
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+
+            @endif
+            <li class="has-submenu {{ request()->routeIs('admin.archives.*') || request()->routeIs('admin.archive-types.*') ? 'active' : '' }}"
+                id="archive-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('archive-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-archive"></i> Arsip PTK</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('admin.archives.index') }}"
+                            class="{{ request()->routeIs('admin.archives.*') ? 'active' : '' }}">
+                            <i class="fas fa-file-archive"></i> Daftar Arsip
+                        </a>
+                    </li>
+                    @if(auth()->user()->isAdmin())
+                    <li>
+                        <a href="{{ route('admin.archive-types.index') }}"
+                            class="{{ request()->routeIs('admin.archive-types.*') ? 'active' : '' }}">
+                            <i class="fas fa-tags"></i> Jenis Arsip
+                        </a>
+                    </li>
+                    @endif
+                </ul>
+            </li>
             <li>
                 <a href="{{ route('admin.activities.index') }}"
                     class="{{ request()->routeIs('admin.activities.*') ? 'active' : '' }}">
@@ -704,142 +729,142 @@
                 </a>
             </li>
             @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
-                <li>
-                    <a href="{{ route('admin.information.index') }}"
-                        class="{{ request()->routeIs('admin.information.*') ? 'active' : '' }}">
-                        <i class="fas fa-bullhorn"></i> Informasi
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.public-complaints.index') }}"
-                        class="{{ request()->routeIs('admin.public-complaints.*') ? 'active' : '' }}">
-                        <i class="fas fa-comments"></i> Aduan Masyarakat
-                        @if(auth()->user()->isAdmin() && isset($unrespondedComplaintsCount) && $unrespondedComplaintsCount > 0)
-                            <span class="badge"
-                                style="margin-left: auto; background: var(--danger); color: white;">{{ $unrespondedComplaintsCount }}</span>
-                        @endif
-                    </a>
-                </li>
+            <li>
+                <a href="{{ route('admin.information.index') }}"
+                    class="{{ request()->routeIs('admin.information.*') ? 'active' : '' }}">
+                    <i class="fas fa-bullhorn"></i> Informasi
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.public-complaints.index') }}"
+                    class="{{ request()->routeIs('admin.public-complaints.*') ? 'active' : '' }}">
+                    <i class="fas fa-comments"></i> Aduan Masyarakat
+                    @if(auth()->user()->isAdmin() && isset($unrespondedComplaintsCount) && $unrespondedComplaintsCount > 0)
+                    <span class="badge"
+                        style="margin-left: auto; background: var(--danger); color: white;">{{ $unrespondedComplaintsCount }}</span>
+                    @endif
+                </a>
+            </li>
             @endif
 
             @if(auth()->user()->isAdmin() || auth()->user()->isAdminKomite())
-                <div class="sidebar-divider"></div>
-                <p
-                    style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">
-                    Penerimaan Murid Baru</p>
-                <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}"
-                    id="pmb-menu">
-                    <a href="javascript:void(0)" onclick="toggleSubmenu('pmb-menu')" class="submenu-toggle">
-                        <span><i class="fas fa-graduation-cap"></i> PMB</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                    <ul class="submenu">
-                        <li>
-                            <a href="{{ route('admin.settings.pmb') }}"
-                                class="{{ request()->routeIs('admin.settings.pmb') ? 'active' : '' }}">
-                                <i class="fas fa-cog"></i> Pengaturan
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.academic-years.index') }}"
-                                class="{{ request()->routeIs('admin.academic-years.*') ? 'active' : '' }}">
-                                <i class="fas fa-calendar-alt"></i> Tahun Pelajaran
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.pmb-registrations.index') }}"
-                                class="{{ request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}">
-                                <i class="fas fa-user-plus"></i> Data Pendaftaran
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+            <div class="sidebar-divider"></div>
+            <p
+                style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">
+                Penerimaan Murid Baru</p>
+            <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}"
+                id="pmb-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('pmb-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-graduation-cap"></i> PMB</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('admin.settings.pmb') }}"
+                            class="{{ request()->routeIs('admin.settings.pmb') ? 'active' : '' }}">
+                            <i class="fas fa-cog"></i> Pengaturan
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.academic-years.index') }}"
+                            class="{{ request()->routeIs('admin.academic-years.*') ? 'active' : '' }}">
+                            <i class="fas fa-calendar-alt"></i> Tahun Pelajaran
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.pmb-registrations.index') }}"
+                            class="{{ request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}">
+                            <i class="fas fa-user-plus"></i> Data Pendaftaran
+                        </a>
+                    </li>
+                </ul>
+            </li>
             @endif
 
             @if(auth()->user()->isAdmin() || auth()->user()->isAdminKomite())
-                <div class="sidebar-divider"></div>
-                <p
-                    style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">
-                    Komite Sekolah</p>
-                <li class="has-submenu {{ request()->routeIs('admin.committee.*') ? 'active' : '' }}" id="committee-menu">
-                    <a href="javascript:void(0)" onclick="toggleSubmenu('committee-menu')" class="submenu-toggle">
-                        <span><i class="fas fa-hand-holding-usd"></i> Komite</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                    <ul class="submenu">
-                        <li>
-                            <a href="{{ route('admin.committee.nominal.index') }}"
-                                class="{{ request()->routeIs('admin.committee.nominal.*') ? 'active' : '' }}">
-                                <i class="fas fa-money-bill-wave"></i> Set Nominal
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.committee.planning.index') }}"
-                                class="{{ request()->routeIs('admin.committee.planning.*') ? 'active' : '' }}">
-                                <i class="fas fa-tasks"></i> Perencanaan
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.committee.payments.index') }}"
-                                class="{{ request()->routeIs('admin.committee.payments.*') ? 'active' : '' }}">
-                                <i class="fas fa-receipt"></i> Pembayaran
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.committee.report.index') }}"
-                                class="{{ request()->routeIs('admin.committee.report.*') ? 'active' : '' }}">
-                                <i class="fas fa-file-alt"></i> Laporan
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.committee.expenditures.index') }}"
-                                class="{{ request()->routeIs('admin.committee.expenditures.*') ? 'active' : '' }}">
-                                <i class="fas fa-hand-holding-heart"></i> Penggunaan
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+            <div class="sidebar-divider"></div>
+            <p
+                style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">
+                Komite Sekolah</p>
+            <li class="has-submenu {{ request()->routeIs('admin.committee.*') ? 'active' : '' }}" id="committee-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('committee-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-hand-holding-usd"></i> Komite</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('admin.committee.nominal.index') }}"
+                            class="{{ request()->routeIs('admin.committee.nominal.*') ? 'active' : '' }}">
+                            <i class="fas fa-money-bill-wave"></i> Set Nominal
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.committee.planning.index') }}"
+                            class="{{ request()->routeIs('admin.committee.planning.*') ? 'active' : '' }}">
+                            <i class="fas fa-tasks"></i> Perencanaan
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.committee.payments.index') }}"
+                            class="{{ request()->routeIs('admin.committee.payments.*') ? 'active' : '' }}">
+                            <i class="fas fa-receipt"></i> Pembayaran
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.committee.report.index') }}"
+                            class="{{ request()->routeIs('admin.committee.report.*') ? 'active' : '' }}">
+                            <i class="fas fa-file-alt"></i> Laporan
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.committee.expenditures.index') }}"
+                            class="{{ request()->routeIs('admin.committee.expenditures.*') ? 'active' : '' }}">
+                            <i class="fas fa-hand-holding-heart"></i> Penggunaan
+                        </a>
+                    </li>
+                </ul>
+            </li>
             @endif
         </ul>
 
         @if(auth()->user()->isAdmin())
-            <div class="sidebar-divider"></div>
+        <div class="sidebar-divider"></div>
 
-            <ul class="sidebar-menu">
-                <li class="has-submenu {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.profile.*') || request()->routeIs('admin.system.*') || request()->routeIs('admin.settings.smtp') ? 'active' : '' }}"
-                    id="admin-management-menu">
-                    <a href="javascript:void(0)" onclick="toggleSubmenu('admin-management-menu')" class="submenu-toggle">
-                        <span><i class="fas fa-user-shield"></i> Manajemen Admin</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                    <ul class="submenu">
-                        <li>
-                            <a href="{{ route('admin.users.index') }}"
-                                class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                                <i class="fas fa-users"></i> Manajemen User
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.profile.index') }}"
-                                class="{{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
-                                <i class="fas fa-user-cog"></i> Profil Admin
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.system.index') }}"
-                                class="{{ request()->routeIs('admin.system.*') ? 'active' : '' }}">
-                                <i class="fas fa-tools"></i> Pengaturan Sistem
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.settings.smtp') }}"
-                                class="{{ request()->routeIs('admin.settings.smtp') ? 'active' : '' }}">
-                                <i class="fas fa-cog"></i> Pengaturan SMTP
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+        <ul class="sidebar-menu">
+            <li class="has-submenu {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.profile.*') || request()->routeIs('admin.system.*') || request()->routeIs('admin.settings.smtp') ? 'active' : '' }}"
+                id="admin-management-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('admin-management-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-user-shield"></i> Manajemen Admin</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('admin.users.index') }}"
+                            class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            <i class="fas fa-users"></i> Manajemen User
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.profile.index') }}"
+                            class="{{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
+                            <i class="fas fa-user-cog"></i> Profil Admin
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.system.index') }}"
+                            class="{{ request()->routeIs('admin.system.*') ? 'active' : '' }}">
+                            <i class="fas fa-tools"></i> Pengaturan Sistem
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.settings.smtp') }}"
+                            class="{{ request()->routeIs('admin.settings.smtp') ? 'active' : '' }}">
+                            <i class="fas fa-cog"></i> Pengaturan SMTP
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
         @endif
 
         <div class="sidebar-divider"></div>
@@ -882,17 +907,17 @@
         <!-- Content -->
         <div class="content">
             @if(session('success'))
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    {{ session('success') }}
-                </div>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                {{ session('success') }}
+            </div>
             @endif
 
             @if(session('error'))
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle"></i>
-                    {{ session('error') }}
-                </div>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ session('error') }}
+            </div>
             @endif
 
             @yield('content')
