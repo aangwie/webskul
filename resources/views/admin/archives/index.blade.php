@@ -113,21 +113,37 @@
 @endsection
 
 @section('styles')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
 <style>
+    .dataTables_wrapper .dataTables_filter input {
+        padding: 8px 12px;
+        border: 2px solid var(--accent);
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .dataTables_wrapper .dataTables_length select {
+        padding: 6px 30px 6px 10px;
+        border-radius: 8px;
+        border: 1px solid var(--accent);
+    }
+
     .card-footer {
         background: transparent;
     }
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0;
-        margin-left: 0;
-        border: none;
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+        background: var(--primary) !important;
+        color: white !important;
+        border: 1px solid var(--primary) !important;
+        border-radius: 8px;
+        padding: 6px 12px;
     }
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background: none;
-        border: none;
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border-radius: 8px;
+        margin-left: 5px;
     }
 
     table.dataTable thead th {
@@ -143,14 +159,24 @@
 @endsection
 
 @section('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script>
     $(document).ready(function() {
         $('#archivesTable').DataTable({
             "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
+                "search": "Cari Arsip:",
+                "lengthMenu": "Tampilkan _MENU_ data",
+                "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                "infoEmpty": "Tidak ada data",
+                "infoFiltered": "(disaring dari _MAX_ total data)",
+                "zeroRecords": "Data tidak ditemukan",
+                "paginate": {
+                    "first": "Pertama",
+                    "last": "Terakhir",
+                    "next": "Selanjutnya",
+                    "previous": "Sebelumnya"
+                }
             }
         });
 
