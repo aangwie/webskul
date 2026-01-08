@@ -185,9 +185,9 @@
         });
 
         // Backend Validation Error Handler
-        @if($errors - > any())
+        @if($errors -> any())
         let errorMsg = 'Terjadi kesalahan saat menyimpan data.';
-        @if($errors - > has('file'))
+        @if($errors -> has('file'))
         errorMsg = 'Gagal simpan karena ukuran file terlalu besar! Maksimal 500KB.';
         @endif
 
