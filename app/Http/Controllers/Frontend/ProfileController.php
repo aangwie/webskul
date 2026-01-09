@@ -17,15 +17,10 @@ class ProfileController extends Controller
     public function teachers()
     {
         $teachers = Teacher::active()->ordered()->get();
-        
-        foreach ($teachers as $teacher) {
-            if ($teacher->photo && file_exists(storage_path('app/public/' . $teacher->photo))) {
-                $path = storage_path('app/public/' . $teacher->photo);
-                $data = file_get_contents($path);
-                $teacher->photo = base64_encode($data);
-            }
-        }
-        
+
+        // Deprecated: No need to manually base64 encode anymore
+        // We handle file serving via proxy route now.
+
         $school = SchoolProfile::first();
         return view('pages.teacher-profile', compact('teachers', 'school'));
     }

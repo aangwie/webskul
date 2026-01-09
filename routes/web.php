@@ -166,11 +166,21 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
         Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
 
-        // Storage Proxy Route (Fallback for Shared Hosting)
+    });
+
+        Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
+        
+        // Admin Storage Proxy (Restored for Admin Views)
         Route::get('/storage-view/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
             ->where('path', '.*')
-            ->name('storage.view');
+            ->name('storage.view'); // Name it admin.storage.view via prefix
     });
+
+    // Public Storage Proxy (For Frontend)
+    // Different URL to allow distinct route names/caching
+    Route::get('/public-storage/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
+        ->where('path', '.*')
+        ->name('public.storage.view');
 
     // PMB Management (Admin, Admin Komite)
     Route::middleware(['role:admin,admin_komite'])->group(function () {
