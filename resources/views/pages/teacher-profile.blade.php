@@ -215,7 +215,6 @@
                                         $imgSrc = Str::startsWith($teacher->photo, 'data:') ? $teacher->photo : route('public.storage.view', ['path' => $teacher->photo]);
                                     @endphp
                                     <img src="{{ $imgSrc }}" alt="{{ $teacher->name }}" onclick="openModal(this.src)">
-                                @endif
                             @else
                                 <i class="fas fa-user"></i>
                             @endif
