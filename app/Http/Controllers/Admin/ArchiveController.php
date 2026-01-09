@@ -33,13 +33,13 @@ class ArchiveController extends Controller
         ]);
 
         $file = $request->file('file');
-        $base64 = 'data:' . $file->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+        $path = $file->store('archives', 'public');
 
         Archive::create([
             'user_id' => auth()->id(),
             'archive_type_id' => $request->archive_type_id,
             'title' => $request->title,
-            'file_path' => $base64,
+            'file_path' => $path,
             'description' => $request->description,
         ]);
 
@@ -67,8 +67,13 @@ class ArchiveController extends Controller
         ];
 
         if ($request->hasFile('file')) {
+            // Delete old file if exists and not base64 (for legacy compatibility)
+            if ($archive->file_path && !str_starts_with($archive->file_path, 'data:')) {
+                Storage::disk('public')->delete($archive->file_path);
+            }
+
             $file = $request->file('file');
-            $data['file_path'] = 'data:' . $file->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+            $data['file_path'] = $file->store('archives', 'public');
         }
 
         $archive->update($data);
@@ -81,6 +86,10 @@ class ArchiveController extends Controller
         // Security check
         if (!auth()->user()->isAdmin() && $archive->user_id !== auth()->id()) {
             abort(403);
+        }
+
+        if ($archive->file_path && !str_starts_with($archive->file_path, 'data:')) {
+            Storage::disk('public')->delete($archive->file_path);
         }
 
         $archive->delete();
