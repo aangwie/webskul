@@ -4,21 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('committee_activities', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('committee_program_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->decimal('cost', 15, 2);
-            $table->text('description')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('committee_activities')) {
+            Schema::create('committee_activities', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('committee_program_id')->constrained()->cascadeOnDelete();
+                $table->string('name');
+                $table->decimal('cost', 15, 2);
+                $table->text('description')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

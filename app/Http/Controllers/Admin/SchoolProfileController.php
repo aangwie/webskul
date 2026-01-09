@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SchoolProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class SchoolProfileController extends Controller
 {
@@ -44,9 +45,13 @@ class SchoolProfileController extends Controller
         }
 
         if ($request->hasFile('logo')) {
-            $image = $request->file('logo');
-            $base64 = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
-            $validated['logo'] = $base64;
+            // Delete old logo if it exists and is not base64
+            if ($school->logo && !Str::startsWith($school->logo, 'data:')) {
+                Storage::disk('public')->delete($school->logo);
+            }
+
+            $path = $request->file('logo')->store('school', 'public');
+            $validated['logo'] = $path;
         }
 
         $school->fill($validated);

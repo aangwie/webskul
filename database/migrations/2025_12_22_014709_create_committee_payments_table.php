@@ -4,22 +4,23 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('committee_payments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('student_id')->constrained()->onDelete('cascade');
-            $table->foreignId('committee_fee_id')->constrained()->onDelete('cascade');
-            $table->decimal('amount', 15, 2);
-            $table->date('payment_date');
-            $table->text('notes')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('committee_payments')) {
+            Schema::create('committee_payments', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('student_id')->constrained()->onDelete('cascade');
+                $table->foreignId('committee_fee_id')->constrained()->onDelete('cascade');
+                $table->decimal('amount', 15, 2);
+                $table->date('payment_date');
+                $table->text('notes')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

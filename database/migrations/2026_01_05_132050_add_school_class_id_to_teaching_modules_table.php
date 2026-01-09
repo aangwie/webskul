@@ -4,16 +4,17 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::table('teaching_modules', function (Blueprint $table) {
-            $table->foreignId('school_class_id')->nullable()->constrained('school_classes')->onDelete('set null');
-        });
+        if (!Schema::hasColumn('teaching_modules', 'school_class_id')) {
+            Schema::table('teaching_modules', function (Blueprint $table) {
+                $table->foreignId('school_class_id')->nullable()->constrained('school_classes')->onDelete('set null');
+            });
+        }
     }
 
     /**
