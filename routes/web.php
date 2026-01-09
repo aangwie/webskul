@@ -41,6 +41,11 @@ Route::get('/modules', [\App\Http\Controllers\Frontend\TeachingModuleController:
 Route::get('/modules/{teachingModule}/view', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'showPdf'])->name('modules.view');
 Route::get('/modules/{teachingModule}/download', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'downloadPdf'])->name('modules.download');
 
+// Public Storage Proxy (Fallback for Shared Hosting)
+Route::get('/public-storage/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
+    ->where('path', '.*')
+    ->name('public.storage.view');
+
 // Public Complaints
 Route::get('/public-complaints', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'create'])->name('public-complaints.create');
 Route::post('/public-complaints', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'store'])->name('public-complaints.store');
@@ -164,23 +169,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/system/update', [\App\Http\Controllers\Admin\SystemController::class, 'updateApp'])->name('system.update');
         Route::post('/system/cache-clear', [\App\Http\Controllers\Admin\SystemController::class, 'cacheClear'])->name('system.cache-clear');
         Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
-        Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
 
-    });
-
-        Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
-        
         // Admin Storage Proxy (Restored for Admin Views)
         Route::get('/storage-view/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
             ->where('path', '.*')
-            ->name('storage.view'); // Name it admin.storage.view via prefix
+            ->name('storage.view');
     });
-
-    // Public Storage Proxy (For Frontend)
-    // Different URL to allow distinct route names/caching
-    Route::get('/public-storage/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
-        ->where('path', '.*')
-        ->name('public.storage.view');
 
     // PMB Management (Admin, Admin Komite)
     Route::middleware(['role:admin,admin_komite'])->group(function () {
