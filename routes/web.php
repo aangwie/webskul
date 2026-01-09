@@ -164,6 +164,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/system/update', [\App\Http\Controllers\Admin\SystemController::class, 'updateApp'])->name('system.update');
         Route::post('/system/cache-clear', [\App\Http\Controllers\Admin\SystemController::class, 'cacheClear'])->name('system.cache-clear');
         Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
+        Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
+
+        // Storage Proxy Route (Fallback for Shared Hosting)
+        Route::get('/storage-view/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
+            ->where('path', '.*')
+            ->name('storage.view');
     });
 
     // PMB Management (Admin, Admin Komite)
