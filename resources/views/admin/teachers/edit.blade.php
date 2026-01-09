@@ -59,7 +59,10 @@
                         @if(Str::startsWith($teacher->photo, 'data:'))
                             <img src="{{ $teacher->photo }}" alt="Current Photo" class="preview-image">
                         @else
-                            <img src="{{ asset('storage/' . $teacher->photo) }}" alt="Current Photo" class="preview-image">
+                            @php
+                                $photoUrl = route('admin.storage.view', ['path' => $teacher->photo]);
+                            @endphp
+                            <img src="{{ $photoUrl }}" alt="Current Photo" class="preview-image">
                         @endif
                     @endif
                 </div>

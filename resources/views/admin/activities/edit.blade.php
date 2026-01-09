@@ -44,8 +44,10 @@
                         @if(Str::startsWith($activity->image, 'data:'))
                             <img src="{{ $activity->image }}" alt="Current Image" class="preview-image" style="max-width: 200px;">
                         @else
-                            <img src="{{ asset('storage/' . $activity->image) }}" alt="Current Image" class="preview-image"
-                                style="max-width: 200px;">
+                            @php
+                                $imageUrl = route('admin.storage.view', ['path' => $activity->image]);
+                            @endphp
+                            <img src="{{ $imageUrl }}" alt="Current Image" class="preview-image" style="max-width: 200px;">
                         @endif
                     @endif
                 </div>
