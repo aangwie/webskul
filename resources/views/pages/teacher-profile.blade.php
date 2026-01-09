@@ -132,6 +132,64 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Image Modal Styles */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+            animation: zoom 0.6s;
+        }
+
+        @keyframes zoom {
+            from {transform:scale(0)}
+            to {transform:scale(1)}
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Make images clickable */
+        .teacher-photo img {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .teacher-photo img:hover {
+            transform: scale(1.05);
+        }
     </style>
 @endsection
 
@@ -153,10 +211,10 @@
                     <div class="teacher-card">
                         <div class="teacher-photo">
                             @if($teacher->photo)
-                                @if(Str::startsWith($teacher->photo, 'data:'))
-                                    <img src="{{ $teacher->photo }}" alt="{{ $teacher->name }}">
-                                @else
-                                    <img src="{{ route('public.storage.view', ['path' => $teacher->photo]) }}" alt="{{ $teacher->name }}">
+                                    @php
+                                        $imgSrc = Str::startsWith($teacher->photo, 'data:') ? $teacher->photo : route('public.storage.view', ['path' => $teacher->photo]);
+                                    @endphp
+                                    <img src="{{ $imgSrc }}" alt="{{ $teacher->name }}" onclick="openModal(this.src)">
                                 @endif
                             @else
                                 <i class="fas fa-user"></i>
@@ -191,4 +249,32 @@
             </div>
         @endif
     </div>
+
+    <!-- The Modal -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img class="image-modal-content" id="modalImage">
+    </div>
+
+    <script>
+        function openModal(src) {
+            var modal = document.getElementById("imageModal");
+            var modalImg = document.getElementById("modalImage");
+            modal.style.display = "flex";
+            modalImg.src = src;
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("imageModal");
+            modal.style.display = "none";
+        }
+
+        // Close modal when clicking outside the image
+        window.onclick = function(event) {
+            var modal = document.getElementById("imageModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 @endsection
