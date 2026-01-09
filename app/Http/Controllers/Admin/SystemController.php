@@ -20,9 +20,23 @@ class SystemController extends Controller
     {
         try {
             Artisan::call('storage:link');
-            return back()->with('success', 'Symlink storage berhasil dibuat! Gambar seharusnya sudah muncul.');
+            return back()->with('success', 'Symlink storage berhasil dibuat (Artisan)!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal membuat symlink: ' . $e->getMessage());
+            // Fallback for Shared Hosting (Manual Symlink)
+            try {
+                $target = storage_path('app/public');
+                $link = public_path('storage');
+
+                if (file_exists($link)) {
+                    // Try to unlink if exists (might be broken)
+                    @unlink($link);
+                }
+
+                symlink($target, $link);
+                return back()->with('success', 'Symlink storage berhasil dibuat (Manual PHP)!');
+            } catch (\Exception $ex) {
+                return back()->with('error', 'Gagal membuat symlink: ' . $e->getMessage() . ' | Manual: ' . $ex->getMessage());
+            }
         }
     }
 
@@ -154,7 +168,8 @@ class SystemController extends Controller
                     $fetchUrl = "origin";
                     if ($token && $repo) {
                         $fetchUrl = "https://{$token}@github.com/{$repo}.git";
-                        if ($username) $fetchUrl = "https://{$username}:{$token}@github.com/{$repo}.git";
+                        if ($username)
+                            $fetchUrl = "https://{$username}:{$token}@github.com/{$repo}.git";
                     }
 
                     exec("cd {$rootPath} && git fetch {$fetchUrl} 2>&1", $fetchOutput);

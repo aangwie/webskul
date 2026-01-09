@@ -11,7 +11,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Helper for Shared Hosting
+        // If public_html exists (sibling to base_path), use it as public path
+        $sharedPublic = base_path('../public_html');
+        if (file_exists($sharedPublic) && is_dir($sharedPublic)) {
+            $this->app->bind('path.public', function () use ($sharedPublic) {
+                return $sharedPublic;
+            });
+        }
     }
 
     /**
