@@ -21,7 +21,11 @@
                     </h3>
                     <div style="display: flex; gap: 30px; flex-wrap: wrap; color: var(--text-light);">
                         <span><i class="fas fa-graduation-cap"></i> {{ $schoolClass->name }}</span>
-                        <span><i class="fas fa-calendar"></i> Tahun Ajaran {{ $academicYear->year }}</span>
+                        @if($filterType === 'academic_year' && $academicYear)
+                            <span><i class="fas fa-calendar"></i> Tahun Ajaran {{ $academicYear->year }}</span>
+                        @else
+                            <span><i class="fas fa-calendar-alt"></i> Periode: {{ \Carbon\Carbon::parse($dateFrom)->format('d M Y') }} - {{ \Carbon\Carbon::parse($dateTo)->format('d M Y') }}</span>
+                        @endif
                         @if($committeeFee)
                             <span><i class="fas fa-money-bill-wave"></i> Nominal: Rp
                                 {{ number_format($committeeFee->amount, 0, ',', '.') }}</span>
@@ -32,7 +36,13 @@
                     <form action="{{ route('admin.committee.report.pdf') }}" method="POST" target="_blank"
                         style="display: inline;">
                         @csrf
-                        <input type="hidden" name="academic_year_id" value="{{ $academicYear->id }}">
+                        <input type="hidden" name="filter_type" value="{{ $filterType }}">
+                        @if($filterType === 'academic_year' && $academicYear)
+                            <input type="hidden" name="academic_year_id" value="{{ $academicYear->id }}">
+                        @else
+                            <input type="hidden" name="date_from" value="{{ $dateFrom }}">
+                            <input type="hidden" name="date_to" value="{{ $dateTo }}">
+                        @endif
                         <input type="hidden" name="school_class_id" value="{{ request('school_class_id') }}">
                         <input type="hidden" name="report_type" value="{{ $reportType }}">
                         <button type="submit" class="btn btn-primary">

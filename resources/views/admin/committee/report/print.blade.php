@@ -288,15 +288,24 @@
         <div class="report-title">
             <h3>LAPORAN
                 {{ strtoupper($reportType == 'detail' ? 'Detail' : ($reportType == 'class_summary' ? 'Rekap Per Kelas' : ($reportType == 'all_summary' ? 'Rekap Semua Kelas' : 'Rekapitulasi'))) }}
-                PEMBAYARAN DANA KOMITE</h3>
+                PEMBAYARAN DANA KOMITE
+            </h3>
         </div>
 
         {{-- Info Box --}}
         <div class="info-box">
-            <div class="info-item">
-                <span class="info-label">Tahun Ajaran</span>
-                <span class="info-value">: {{ $academicYear->year }}</span>
-            </div>
+            @if($filterType === 'academic_year' && $academicYear)
+                <div class="info-item">
+                    <span class="info-label">Tahun Ajaran</span>
+                    <span class="info-value">: {{ $academicYear->year }}</span>
+                </div>
+            @else
+                <div class="info-item">
+                    <span class="info-label">Periode Laporan</span>
+                    <span class="info-value">: {{ \Carbon\Carbon::parse($dateFrom)->format('d F Y') }} -
+                        {{ \Carbon\Carbon::parse($dateTo)->format('d F Y') }}</span>
+                </div>
+            @endif
             <div class="info-item">
                 <span class="info-label">Kelas</span>
                 <span class="info-value">: {{ $schoolClass->name }}</span>
@@ -376,12 +385,15 @@
             <div style="margin: 30px auto; max-width: 450px; border: 2px solid #333; padding: 25px; border-radius: 10px;">
                 <h3
                     style="text-align: center; margin-top: 0; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px;">
-                    RINGKASAN GLOBAL TA {{ $academicYear->year }}</h3>
+                    RINGKASAN GLOBAL @if($filterType === 'academic_year' && $academicYear) TA {{ $academicYear->year }}
+                    @else Periode {{ \Carbon\Carbon::parse($dateFrom)->format('d/m/Y') }} -
+                    {{ \Carbon\Carbon::parse($dateTo)->format('d/m/Y') }} @endif</h3>
                 <table style="width: 100%; border: none;">
                     <tr style="border: none;">
                         <td style="border: none; padding: 10px 0;">Total Siswa (Semua Kelas)</td>
                         <td style="border: none; padding: 10px 0;" class="text-right">
-                            <strong>{{ $summary['total_students'] }} Siswa</strong></td>
+                            <strong>{{ $summary['total_students'] }} Siswa</strong>
+                        </td>
                     </tr>
                     <tr style="border: none;">
                         <td style="border: none; padding: 10px 0;">Total Target Tagihan</td>
@@ -456,53 +468,59 @@
                 </tfoot>
             </table>
         @else
-            {{-- Detail Report --}}
-            @foreach($reportData as $index => $data)
-                <div class="student-section">
-                    <div class="student-header">
-                        <div>
-                            <strong>{{ $index + 1 }}. {{ $data['student']->name }}</strong>
-                            <span style="color: #666;">(NIS: {{ $data['student']->nis ?? '-' }})</span>
-                        </div>
-                        @if($data['is_paid_full'])
-                            <span class="badge badge-success">LUNAS</span>
-                        @else
-                            <span class="badge badge-warning">BELUM LUNAS</span>
-                        @endif
-                    </div>
-
-                    @if($data['payments']->count() > 0)
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 30px;">No</th>
-                                    <th style="width: 100px;">Tanggal</th>
-                                    <th class="text-right" style="width: 120px;">Nominal</th>
-                                    <th>Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($data['payments'] as $pIndex => $payment)
-                                    <tr>
-                                        <td class="text-center">{{ $pIndex + 1 }}</td>
-                                        <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
-                                        <td class="text-right text-success">Rp {{ number_format($payment->amount, 0, ',', '.') }}</td>
-                                        <td>{{ $payment->notes ?? '-' }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @else
-                        <p style="color: #666; font-style: italic; padding: 10px;">Belum ada pembayaran.</p>
-                    @endif
-
-                    <p style="font-size: 9pt; color: #666;">
-                Tagihan: <strong>Rp {{ number_format($data['fee_amount'], 0, ',', '.') }}</strong> |
-                Terbayar: <strong class="text-success">Rp {{ number_format($data['total_paid'], 0, ',', '.') }}</strong> |
-                Sisa: <strong class="text-danger">Rp {{ number_format($data['remaining'], 0, ',', '.') }}</strong>
-            </p>        </p>
-                </div>
-            @endforeach
+            {{-- Detail Report - Excel-like Table Format --}}
+            <table style="border: 1px solid #333;">
+                <thead>
+                    <tr>
+                        <th style="width: 30px; border: 1px solid #333;">No</th>
+                        <th style="width: 70px; border: 1px solid #333;">NIS</th>
+                        <th style="border: 1px solid #333;">Nama</th>
+                        <th style="width: 70px; border: 1px solid #333;">Kelas</th>
+                        <th style="width: 130px; border: 1px solid #333;">Tgl Bayar</th>
+                        <th class="text-right" style="width: 90px; border: 1px solid #333;">Total Bayar</th>
+                        <th class="text-right" style="width: 90px; border: 1px solid #333;">Sisa Bayar</th>
+                        <th class="text-center" style="width: 70px; border: 1px solid #333;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($reportData as $index => $data)
+                        <tr>
+                            <td class="text-center" style="border: 1px solid #ddd;">{{ $index + 1 }}</td>
+                            <td style="border: 1px solid #ddd;">{{ $data['student']->nis ?? '-' }}</td>
+                            <td style="border: 1px solid #ddd;">{{ $data['student']->name }}</td>
+                            <td style="border: 1px solid #ddd;">{{ $data['class_name'] ?? '-' }}</td>
+                            <td style="border: 1px solid #ddd; font-size: 8pt;">
+                                @if($data['payments']->count() > 0)
+                                    {{ $data['payments']->pluck('payment_date')->map(fn($d) => $d->format('d/m/Y'))->implode(', ') }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td class="text-right text-success" style="border: 1px solid #ddd;">Rp
+                                {{ number_format($data['total_paid'], 0, ',', '.') }}</td>
+                            <td class="text-right text-danger" style="border: 1px solid #ddd;">Rp
+                                {{ number_format($data['remaining'], 0, ',', '.') }}</td>
+                            <td class="text-center" style="border: 1px solid #ddd;">
+                                @if($data['is_paid_full'])
+                                    <span class="badge badge-success">LUNAS</span>
+                                @else
+                                    <span class="badge badge-warning">BELUM</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="text-right" style="border: 1px solid #333;"><strong>TOTAL</strong></td>
+                        <td class="text-right text-success" style="border: 1px solid #333;"><strong>Rp
+                                {{ number_format($summary['total_terbayar'], 0, ',', '.') }}</strong></td>
+                        <td class="text-right text-danger" style="border: 1px solid #333;"><strong>Rp
+                                {{ number_format($summary['total_sisa'], 0, ',', '.') }}</strong></td>
+                        <td style="border: 1px solid #333;"></td>
+                    </tr>
+                </tfoot>
+            </table>
         @endif
 
         {{-- Footer with Signature --}}
