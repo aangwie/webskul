@@ -134,13 +134,13 @@
                             {{-- Date Period Filter (Hidden by default) --}}
                             <div class="form-group" id="date-from-group" style="display: none;">
                                 <label class="form-label">Dari Tanggal <span style="color: var(--danger);">*</span></label>
-                                <input type="date" name="date_from" id="date_from" class="form-control"
+                                <input type="date" name="date_from" id="date_from" class="form-select"
                                     value="{{ date('Y-01-01') }}">
                             </div>
                             <div class="form-group" id="date-to-group" style="display: none;">
                                 <label class="form-label">Sampai Tanggal <span
                                         style="color: var(--danger);">*</span></label>
-                                <input type="date" name="date_to" id="date_to" class="form-control"
+                                <input type="date" name="date_to" id="date_to" class="form-select"
                                     value="{{ date('Y-12-31') }}">
                             </div>
 
