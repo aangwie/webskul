@@ -46,7 +46,22 @@
                         <input type="hidden" name="school_class_id" value="{{ request('school_class_id') }}">
                         <input type="hidden" name="report_type" value="{{ $reportType }}">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-print"></i> Cetak
+                            <i class="fas fa-print"></i> Cetak PDF
+                        </button>
+                    </form>
+                    <form action="{{ route('admin.committee.report.excel') }}" method="POST" style="display: inline;">
+                        @csrf
+                        <input type="hidden" name="filter_type" value="{{ $filterType }}">
+                        @if($filterType === 'academic_year' && $academicYear)
+                            <input type="hidden" name="academic_year_id" value="{{ $academicYear->id }}">
+                        @else
+                            <input type="hidden" name="date_from" value="{{ $dateFrom }}">
+                            <input type="hidden" name="date_to" value="{{ $dateTo }}">
+                        @endif
+                        <input type="hidden" name="school_class_id" value="{{ request('school_class_id') }}">
+                        <input type="hidden" name="report_type" value="{{ $reportType }}">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-file-excel"></i> Download Excel
                         </button>
                     </form>
                     <a href="{{ route('admin.committee.report.index') }}" class="btn btn-secondary">
@@ -198,8 +213,13 @@
                 @elseif($reportType == 'all_summary')
                     {{-- Grand Total Summary Card View --}}
                     <div style="padding: 30px; text-align: center; background: var(--accent); border-radius: 15px;">
-                        <h3 style="margin-bottom: 25px; color: var(--primary);">Ringkasan Dana Komite TA
-                            {{ $academicYear->year }}</h3>
+                        <h3 style="margin-bottom: 25px; color: var(--primary);">Ringkasan Dana Komite
+                            @if($filterType === 'academic_year' && $academicYear)
+                                TA {{ $academicYear->year }}
+                            @else
+                                Periode {{ \Carbon\Carbon::parse($dateFrom)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($dateTo)->format('d/m/Y') }}
+                            @endif
+                        </h3>
                         <div
                             style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 600px; margin: 0 auto; text-align: left;">
                             <div style="background: white; padding: 15px; border-radius: 10px;">

@@ -112,6 +112,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             Route::get('/report', [CommitteeController::class, 'reportIndex'])->name('report.index');
             Route::post('/report/generate', [CommitteeController::class, 'reportGenerate'])->name('report.generate');
             Route::post('/report/pdf', [CommitteeController::class, 'reportPdf'])->name('report.pdf');
+            Route::post('/report/excel', [CommitteeController::class, 'reportExcel'])->name('report.excel');
 
             // Planning (Perencanaan)
             Route::get('/planning', [CommitteePlanningController::class, 'index'])->name('planning.index');

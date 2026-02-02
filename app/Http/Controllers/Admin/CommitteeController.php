@@ -650,4 +650,47 @@ class CommitteeController extends Controller
             'dateTo'
         ));
     }
+
+    public function reportExcel(Request $request)
+    {
+        $filterType = $request->input('filter_type', 'academic_year');
+
+        // Validate based on filter type
+        if ($filterType === 'academic_year') {
+            $request->validate([
+                'academic_year_id' => 'required|exists:academic_years,id',
+                'school_class_id' => 'required',
+                'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
+            ]);
+            $academicYear = AcademicYear::findOrFail($request->academic_year_id);
+            $dateFrom = null;
+            $dateTo = null;
+        } else {
+            $request->validate([
+                'date_from' => 'required|date',
+                'date_to' => 'required|date|after_or_equal:date_from',
+                'school_class_id' => 'required',
+                'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
+            ]);
+            $academicYear = null;
+            $dateFrom = $request->date_from;
+            $dateTo = $request->date_to;
+        }
+
+        $params = [
+            'filter_type' => $filterType,
+            'academic_year' => $academicYear,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'school_class_id' => $request->school_class_id,
+            'report_type' => $request->report_type,
+        ];
+
+        $filename = 'laporan_komite_' . date('Y-m-d_His') . '.xlsx';
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\CommitteeReportExport($params),
+            $filename
+        );
+    }
 }
