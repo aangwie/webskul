@@ -225,4 +225,50 @@ class SystemController extends Controller
             return back()->with('error', 'Gagal update tema: ' . $e->getMessage());
         }
     }
+
+    public function composerDumpAutoload()
+    {
+        try {
+            set_time_limit(300);
+            $output = [];
+            $rootPath = base_path();
+
+            $output[] = "--- Running Composer Dump-Autoload ---";
+
+            // Try composer dump-autoload
+            $command = "cd {$rootPath} && composer dump-autoload 2>&1";
+            exec($command, $composerOutput, $returnVar);
+            $output = array_merge($output, $composerOutput);
+
+            if ($returnVar !== 0) {
+                // Try using PHP directly with composer.phar if exists
+                if (file_exists($rootPath . '/composer.phar')) {
+                    $output[] = "\nTrying with composer.phar...";
+                    exec("cd {$rootPath} && php composer.phar dump-autoload 2>&1", $pharOutput, $pharReturn);
+                    $output = array_merge($output, $pharOutput);
+
+                    if ($pharReturn !== 0) {
+                        throw new \Exception("Composer dump-autoload failed. Please run manually via SSH.");
+                    }
+                } else {
+                    throw new \Exception("Composer command failed and composer.phar not found.");
+                }
+            }
+
+            // Also run package:discover
+            $output[] = "\n--- Running Package Discovery ---";
+            Artisan::call('package:discover');
+            $output[] = Artisan::output();
+
+            // Clear caches
+            $output[] = "\n--- Clearing Caches ---";
+            Artisan::call('optimize:clear');
+            $output[] = Artisan::output();
+
+            $outputString = implode("\n", $output);
+            return back()->with('success', 'Composer autoload berhasil di-regenerasi!')->with('composer_log', $outputString);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Composer gagal: ' . $e->getMessage());
+        }
+    }
 }
