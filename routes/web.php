@@ -82,6 +82,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/students/import', [\App\Http\Controllers\Admin\StudentController::class, 'import'])->name('students.import');
         Route::post('/students/import', [\App\Http\Controllers\Admin\StudentController::class, 'storeImport'])->name('students.import.store');
         Route::get('/students/import/template', [\App\Http\Controllers\Admin\StudentController::class, 'downloadTemplate'])->name('students.import.template');
+        Route::post('/students/bulk-status', [\App\Http\Controllers\Admin\StudentController::class, 'bulkStatusUpdate'])->name('students.bulk-status');
         Route::resource('students', \App\Http\Controllers\Admin\StudentController::class)->except(['show']);
 
         // Information

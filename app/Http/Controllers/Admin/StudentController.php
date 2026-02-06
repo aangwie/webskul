@@ -14,7 +14,22 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Student::with('schoolClass')->active();
+        $query = Student::with('schoolClass');
+
+        // Filter by status
+        if ($request->filled('status')) {
+            if ($request->status == 'active') {
+                $query->active();
+            } elseif ($request->status == 'inactive') {
+                $query->where('is_active', false);
+            }
+        } else {
+            // Default to active only if no filter is applied? 
+            // The previous code had .active() by default. 
+            // But usually we want to see active students. 
+            // I'll keep it active by default unless 'all' is requested.
+            $query->active();
+        }
 
         // Filter by class
         if ($request->filled('class_id')) {
@@ -198,5 +213,35 @@ class StudentController extends Controller
             public function __construct(array $data) { $this->data = $data; }
             public function array(): array { return $this->data; }
         }, $fileName);
+    }
+
+    /**
+     * Bulk update student status.
+     */
+    public function bulkStatusUpdate(Request $request)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya administrator yang dapat mengakses fitur ini.'
+            ], 403);
+        }
+
+        $request->validate([
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:students,id',
+            'status' => 'required|in:active,inactive'
+        ]);
+
+        $status = $request->status === 'active';
+        
+        Student::whereIn('id', $request->student_ids)->update([
+            'is_active' => $status
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status siswa berhasil diperbarui.'
+        ]);
     }
 }
