@@ -291,9 +291,17 @@ class SystemController extends Controller
                     $output[] = "✓ composer.phar downloaded successfully!";
                 }
 
-                // Step 3: Run composer.phar
+                // Step 3: Run composer.phar with COMPOSER_HOME set
                 $output[] = "\n--- Running composer.phar dump-autoload ---";
-                $pharCmd = "cd {$rootPath} && php composer.phar dump-autoload -o 2>&1";
+                $composerHome = $rootPath . '/storage/composer';
+
+                // Create composer home directory if not exists
+                if (!is_dir($composerHome)) {
+                    mkdir($composerHome, 0755, true);
+                }
+
+                // Set environment variables and run composer
+                $pharCmd = "cd {$rootPath} && COMPOSER_HOME={$composerHome} HOME={$composerHome} php composer.phar dump-autoload -o 2>&1";
                 exec($pharCmd, $pharOutput, $pharReturn);
                 $output = array_merge($output, $pharOutput);
 
