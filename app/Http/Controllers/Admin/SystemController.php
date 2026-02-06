@@ -232,43 +232,92 @@ class SystemController extends Controller
             set_time_limit(300);
             $output = [];
             $rootPath = base_path();
+            $composerPhar = $rootPath . '/composer.phar';
 
-            $output[] = "--- Running Composer Dump-Autoload ---";
+            $output[] = "--- Fixing Package Autoload ---";
 
-            // Try composer dump-autoload
-            $command = "cd {$rootPath} && composer dump-autoload 2>&1";
+            // Step 1: Try global composer first
+            $command = "cd {$rootPath} && composer dump-autoload -o 2>&1";
             exec($command, $composerOutput, $returnVar);
-            $output = array_merge($output, $composerOutput);
 
-            if ($returnVar !== 0) {
-                // Try using PHP directly with composer.phar if exists
-                if (file_exists($rootPath . '/composer.phar')) {
-                    $output[] = "\nTrying with composer.phar...";
-                    exec("cd {$rootPath} && php composer.phar dump-autoload 2>&1", $pharOutput, $pharReturn);
-                    $output = array_merge($output, $pharOutput);
+            if ($returnVar === 0) {
+                $output[] = "✓ Global composer found and executed.";
+                $output = array_merge($output, $composerOutput);
+            } else {
+                $output[] = "✗ Global composer not available.";
 
-                    if ($pharReturn !== 0) {
-                        throw new \Exception("Composer dump-autoload failed. Please run manually via SSH.");
+                // Step 2: Check if composer.phar exists, if not download it
+                if (!file_exists($composerPhar)) {
+                    $output[] = "\n--- Downloading composer.phar ---";
+
+                    // Download composer installer
+                    $installerUrl = 'https://getcomposer.org/composer-stable.phar';
+                    $downloaded = @file_get_contents($installerUrl);
+
+                    if ($downloaded === false) {
+                        // Try with curl if file_get_contents fails
+                        $output[] = "Trying with cURL...";
+                        $ch = curl_init();
+                        curl_setopt($ch, CURLOPT_URL, $installerUrl);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                        curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+                        $downloaded = curl_exec($ch);
+                        $curlError = curl_error($ch);
+                        curl_close($ch);
+
+                        if ($downloaded === false || empty($downloaded)) {
+                            $output[] = "✗ Failed to download composer.phar: " . $curlError;
+                            $output[] = "\n--- Fallback: Running Package Discovery Only ---";
+
+                            // Fallback to just running package:discover
+                            Artisan::call('package:discover');
+                            $output[] = Artisan::output();
+
+                            Artisan::call('optimize:clear');
+                            $output[] = Artisan::output();
+
+                            $outputString = implode("\n", $output);
+                            return back()->with('warning', 'Composer tidak tersedia. Hanya package discovery yang dijalankan.')->with('composer_log', $outputString);
+                        }
                     }
-                } else {
-                    throw new \Exception("Composer command failed and composer.phar not found.");
+
+                    // Save composer.phar
+                    if (file_put_contents($composerPhar, $downloaded) === false) {
+                        throw new \Exception("Failed to save composer.phar to disk.");
+                    }
+
+                    $output[] = "✓ composer.phar downloaded successfully!";
+                }
+
+                // Step 3: Run composer.phar
+                $output[] = "\n--- Running composer.phar dump-autoload ---";
+                $pharCmd = "cd {$rootPath} && php composer.phar dump-autoload -o 2>&1";
+                exec($pharCmd, $pharOutput, $pharReturn);
+                $output = array_merge($output, $pharOutput);
+
+                if ($pharReturn !== 0) {
+                    $output[] = "✗ composer.phar failed. Trying artisan package:discover...";
                 }
             }
 
-            // Also run package:discover
+            // Step 4: Always run package:discover
             $output[] = "\n--- Running Package Discovery ---";
             Artisan::call('package:discover');
             $output[] = Artisan::output();
 
-            // Clear caches
+            // Step 5: Clear all caches
             $output[] = "\n--- Clearing Caches ---";
             Artisan::call('optimize:clear');
             $output[] = Artisan::output();
 
+            $output[] = "\n✓ Proses selesai! Silakan coba akses halaman yang error lagi.";
+
             $outputString = implode("\n", $output);
-            return back()->with('success', 'Composer autoload berhasil di-regenerasi!')->with('composer_log', $outputString);
+            return back()->with('success', 'Package autoload berhasil diperbaiki!')->with('composer_log', $outputString);
         } catch (\Exception $e) {
-            return back()->with('error', 'Composer gagal: ' . $e->getMessage());
+            return back()->with('error', 'Gagal: ' . $e->getMessage());
         }
     }
 }
