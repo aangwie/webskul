@@ -192,7 +192,11 @@
         <table class="signature-table">
             <tr>
                 <td style="width: 60%;">
-                    <img src="data:image/svg+xml;base64,{{ base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(80)->generate('Nama: ' . $registration->nama . ' | No. Pendaftaran: ' . $registration->registration_number)) }}">
+                    @php
+                        $qrData = urlencode('Nama: ' . $registration->nama . ' | No. Pendaftaran: ' . $registration->registration_number);
+                    @endphp
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={{ $qrData }}" alt="QR Code"
+                        width="80" height="80">
                 </td>
                 <td style="text-align: center;">
                     Sudimoro, {{ now()->translatedFormat('d F Y') }}<br>

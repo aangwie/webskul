@@ -8,7 +8,6 @@ use App\Models\Setting;
 use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\SchoolProfile;
 
 class PmbController extends Controller
@@ -105,7 +104,8 @@ class PmbController extends Controller
         $registration = PmbRegistration::where('registration_number', $registration_number)->firstOrFail();
         $school = SchoolProfile::first();
 
-        $pdf = Pdf::loadView('pdf.registration-pdf', compact('registration', 'school'));
+        // Use app container to resolve DomPDF to avoid facade issues on some hosting
+        $pdf = app('dompdf.wrapper')->loadView('pdf.registration-pdf', compact('registration', 'school'));
 
         return $pdf->download('Bukti_Pendaftaran_' . $registration->registration_number . '.pdf');
     }
