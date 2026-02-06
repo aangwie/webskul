@@ -104,8 +104,8 @@ class PmbController extends Controller
         $registration = PmbRegistration::where('registration_number', $registration_number)->firstOrFail();
         $school = SchoolProfile::first();
 
-        // Use app container to resolve DomPDF to avoid facade issues on some hosting
-        $pdf = app('dompdf.wrapper')->loadView('pdf.registration-pdf', compact('registration', 'school'));
+        // Use the full facade class directly
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.registration-pdf', compact('registration', 'school'));
 
         return $pdf->download('Bukti_Pendaftaran_' . $registration->registration_number . '.pdf');
     }
