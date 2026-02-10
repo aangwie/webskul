@@ -22,6 +22,11 @@ use App\Http\Controllers\Admin\CommitteeExpenditureController;
 use App\Http\Controllers\Admin\CommitteePlanningController;
 use App\Http\Controllers\Admin\ArchiveController;
 use App\Http\Controllers\Admin\ArchiveTypeController;
+use App\Http\Controllers\Admin\BookTypeController;
+use App\Http\Controllers\Admin\BookController;
+use App\Http\Controllers\Admin\BookConditionController;
+use App\Http\Controllers\Admin\BookBorrowingController;
+use App\Http\Controllers\Admin\LibraryReportController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -139,6 +144,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
                 'destroy' => 'expenditures.destroy',
             ]);
         });
+    });
+
+    // Library (Perpustakaan)
+    Route::middleware(['role:admin,admin_komite,library_staff'])->prefix('library')->name('library.')->group(function () {
+        Route::resource('book-types', BookTypeController::class)->except(['show', 'create', 'edit']);
+        Route::resource('books', BookController::class)->except(['show']);
+        Route::resource('conditions', BookConditionController::class)->except(['show', 'create', 'edit']);
+        Route::resource('borrowings', BookBorrowingController::class)->except(['show']);
+        Route::put('/borrowings/{borrowing}/return', [BookBorrowingController::class, 'markReturned'])->name('borrowings.return');
+        Route::get('/reports', [LibraryReportController::class, 'index'])->name('reports.index');
     });
 
     // Routes accessible by Admin, Teacher, and Student

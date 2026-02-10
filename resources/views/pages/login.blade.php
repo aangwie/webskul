@@ -7,11 +7,12 @@
     <title>Login - {{$school->name}}</title>
     @php $schoolFavicon = \App\Models\SchoolProfile::first(); @endphp
     @if($schoolFavicon && $schoolFavicon->logo)
-    <link rel="icon" type="image/png" href="{{ asset('storage/' . $schoolFavicon->logo) }}">
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $schoolFavicon->logo) }}">
     @else
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -193,16 +194,17 @@
             <p class="login-subtitle">Masuk ke panel administrasi sekolah</p>
 
             @if(session('success'))
-            <div style="background: #e8f5e9; color: #28a745; padding: 12px 18px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 20px; text-align: left;">
-                <i class="fas fa-check-circle"></i> {{ session('success') }}
-            </div>
+                <div
+                    style="background: #e8f5e9; color: #28a745; padding: 12px 18px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 20px; text-align: left;">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
+                </div>
             @endif
 
             @if($errors->any())
-            <div class="error-message">
-                <i class="fas fa-exclamation-circle"></i>
-                {{ $errors->first() }}
-            </div>
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ $errors->first() }}
+                </div>
             @endif
 
             <form method="POST" action="{{ route('login') }}">
@@ -215,8 +217,12 @@
 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-input @error('password') error @enderror"
-                        placeholder="••••••••" required>
+                    <div style="position: relative;">
+                        <input type="password" name="password" id="password"
+                            class="form-input @error('password') error @enderror" placeholder="••••••••" required>
+                        <i class="fas fa-eye" id="togglePassword"
+                            style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);"></i>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -227,7 +233,8 @@
                 </div>
 
                 <div style="text-align: right; margin-bottom: 15px;">
-                    <a href="{{ route('password.request') }}" style="color: var(--primary); font-size: 0.85rem; text-decoration: none;">Lupa password?</a>
+                    <a href="{{ route('password.request') }}"
+                        style="color: var(--primary); font-size: 0.85rem; text-decoration: none;">Lupa password?</a>
                 </div>
 
                 <button type="submit" class="btn-login">
@@ -240,6 +247,14 @@
             </a>
         </div>
     </div>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const password = document.getElementById('password');
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
 
 </html>
