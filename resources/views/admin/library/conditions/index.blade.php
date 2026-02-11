@@ -6,11 +6,9 @@
     <div class="card">
         <div class="card-header">
             <h2><i class="fas fa-clipboard-check"></i> Jumlah & Kondisi Buku</h2>
-            @if($books->count() > 0)
-                <button class="btn btn-primary" onclick="showAddModal()">
-                    <i class="fas fa-plus"></i> Tambah Data
-                </button>
-            @endif
+            <button class="btn btn-primary" onclick="showAddModal()">
+                <i class="fas fa-plus"></i> Tambah Data
+            </button>
         </div>
         <div class="card-body">
             @if($books->count() == 0 && $conditions->count() == 0)

@@ -66,7 +66,8 @@
                         <option value="">Semua Jenis</option>
                         @foreach($bookTypes as $type)
                             <option value="{{ $type->id }}" {{ request('book_type_id') == $type->id ? 'selected' : '' }}>
-                                {{ $type->name }}</option>
+                                {{ $type->name }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -109,9 +110,11 @@
                             <th>Pengarang</th>
                             <th>Tahun</th>
                             <th>Asal-Usul</th>
-                            <th>Jumlah</th>
+                            <th>Total Aset</th>
                             <th>Kondisi</th>
                             <th>Dipinjam</th>
+                            <th>Jumlah Buku</th>
+                        </tr>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,19 +127,29 @@
                                 <td>{{ $book->pengarang }}</td>
                                 <td>{{ $book->tahun_perolehan }}</td>
                                 <td>{{ $book->asal_usul }}</td>
-                                <td>{{ $book->condition->jumlah_buku ?? 0 }}</td>
+                                @php
+                                    $total_asset = $book->conditions->sum('jumlah_buku');
+                                    $borrowed = $book->borrowings->where('is_returned', false)->sum('jumlah_pinjam');
+                                    $available = $total_asset - $borrowed;
+                                @endphp
+                                <td><strong>{{ $total_asset }}</strong></td>
                                 <td>
-                                    @if($book->condition)
-                                        @if($book->condition->kondisi == 'laik')
-                                            <span class="badge badge-success">Laik</span>
-                                        @else
-                                            <span class="badge badge-danger">Tidak Laik</span>
-                                        @endif
+                                    @if($book->conditions->count() > 0)
+                                        @foreach($book->conditions as $cond)
+                                            <div>
+                                                @if($cond->kondisi == 'laik')
+                                                    <span class="badge badge-success">Laik: {{ $cond->jumlah_buku }}</span>
+                                                @else
+                                                    <span class="badge badge-danger">Tidak Laik: {{ $cond->jumlah_buku }}</span>
+                                                @endif
+                                            </div>
+                                        @endforeach
                                     @else
                                         <span class="badge badge-warning">Belum Didata</span>
                                     @endif
                                 </td>
-                                <td>{{ $book->borrowings->where('is_returned', false)->sum('jumlah_pinjam') }}</td>
+                                <td>{{ $borrowed }}</td>
+                                <td>{{ $available }}</td>
                             </tr>
                         @empty
                             <tr>

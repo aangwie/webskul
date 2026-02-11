@@ -14,7 +14,7 @@ class LibraryReportController extends Controller
     public function index(Request $request)
     {
         $bookTypes = BookType::all();
-        $query = Book::with(['bookType', 'condition', 'borrowings']);
+        $query = Book::with(['bookType', 'conditions', 'borrowings']);
 
         // Filter by book type
         if ($request->filled('book_type_id')) {
@@ -28,7 +28,7 @@ class LibraryReportController extends Controller
 
         // Filter by condition
         if ($request->filled('kondisi')) {
-            $query->whereHas('condition', function ($q) use ($request) {
+            $query->whereHas('conditions', function ($q) use ($request) {
                 $q->where('kondisi', $request->kondisi);
             });
         }

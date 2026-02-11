@@ -28,6 +28,11 @@ class Book extends Model
         return $this->hasOne(BookCondition::class);
     }
 
+    public function conditions()
+    {
+        return $this->hasMany(BookCondition::class);
+    }
+
     public function borrowings()
     {
         return $this->hasMany(BookBorrowing::class);

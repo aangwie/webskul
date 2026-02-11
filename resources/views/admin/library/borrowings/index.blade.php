@@ -92,6 +92,7 @@
                             <tr>
                                 <th>No</th>
                                 <th>Judul Buku</th>
+                                <th>No Buku</th>
                                 <th>Nama Siswa</th>
                                 <th>NIS</th>
                                 <th>Kelas</th>
@@ -106,6 +107,7 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $borrowing->book->judul_buku }}</td>
+                                    <td>{{ $borrowing->nomor_buku ?? '-' }}</td>
                                     <td><strong>{{ $borrowing->peminjam }}</strong></td>
                                     <td>{{ $borrowing->identitas_peminjam ?? '-' }}</td>
                                     <td>{{ $borrowing->kelas_peminjam ?? '-' }}</td>
@@ -136,6 +138,7 @@
                             <tr>
                                 <th>No</th>
                                 <th>Judul Buku</th>
+                                <th>No Buku</th>
                                 <th>Nama Guru</th>
                                 <th>NIP</th>
                                 <th>Tgl Pinjam</th>
@@ -149,6 +152,7 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $borrowing->book->judul_buku }}</td>
+                                    <td>{{ $borrowing->nomor_buku ?? '-' }}</td>
                                     <td><strong>{{ $borrowing->peminjam }}</strong></td>
                                     <td>{{ $borrowing->identitas_peminjam ?? '-' }}</td>
                                     <td>{{ $borrowing->tanggal_pinjam->format('d/m/Y') }}</td>
@@ -179,6 +183,7 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Judul Buku</th>
+                                    <th>No Buku</th>
                                     <th>Peminjam</th>
                                     <th>Tgl Pinjam</th>
                                     <th>Jml</th>
@@ -191,6 +196,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $borrowing->book->judul_buku }}</td>
+                                        <td>{{ $borrowing->nomor_buku ?? '-' }}</td>
                                         <td><strong>{{ $borrowing->peminjam }}</strong></td>
                                         <td>{{ $borrowing->tanggal_pinjam->format('d/m/Y') }}</td>
                                         <td>{{ $borrowing->jumlah_pinjam }}</td>
@@ -244,6 +250,12 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nomor Buku</label>
+                        <input type="text" name="nomor_buku" id="nomorBuku" class="form-input"
+                            placeholder="Masukkan nomor/kode buku (jika ada)">
                     </div>
 
                     <div class="form-group">
@@ -389,6 +401,7 @@
             $('#borrowingForm').attr('action', "{{ route('admin.library.borrowings.store') }}");
             $('#methodField').empty();
             $('#bookId').val('');
+            $('#nomorBuku').val('');
             $('#typeStudent').prop('checked', true);
             $('#studentId').val('');
             $('#teacherId').val('');
@@ -404,6 +417,7 @@
             $('#borrowingForm').attr('action', `/admin/library/borrowings/${borrowing.id}`);
             $('#methodField').html('@method("PUT")');
             $('#bookId').val(borrowing.book_id);
+            $('#nomorBuku').val(borrowing.nomor_buku || '');
 
             if (borrowing.borrower_type === 'teacher') {
                 $('#typeTeacher').prop('checked', true);

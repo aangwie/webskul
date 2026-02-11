@@ -9,6 +9,9 @@
             <button class="btn btn-primary" onclick="showAddModal()">
                 <i class="fas fa-plus"></i> Tambah Buku
             </button>
+            <button class="btn btn-success" onclick="showImportModal()" style="margin-left: 10px;">
+                <i class="fas fa-file-excel"></i> Import Excel
+            </button>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -114,6 +117,40 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal Import -->
+    <div id="importModal" class="sidebar-overlay"
+        style="display: none; align-items: center; justify-content: center; z-index: 1050;">
+        <div class="card" style="width: 100%; max-width: 500px; margin: 20px;">
+            <div class="card-header">
+                <h2>Import Data Buku</h2>
+                <button class="btn btn-sm" onclick="hideImportModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form action="{{ route('admin.library.books.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Gunakan template yang telah disediakan agar format data
+                        sesuai.
+                        <br>
+                        <a href="{{ route('admin.library.books.template') }}" class="btn btn-sm btn-info"
+                            style="margin-top: 10px; text-decoration: none; color: white;">
+                            <i class="fas fa-download"></i> Download Template
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">File Excel (.xlsx, .xls)</label>
+                        <input type="file" name="file" class="form-input" accept=".xlsx, .xls" required>
+                    </div>
+                </div>
+                <div class="card-footer"
+                    style="padding: 20px; border-top: 1px solid var(--accent); display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="hideImportModal()">Batal</button>
+                    <button type="submit" class="btn btn-success">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
@@ -152,6 +189,17 @@
             if (event.target == document.getElementById('bookModal')) {
                 hideModal();
             }
+            if (event.target == document.getElementById('importModal')) {
+                hideImportModal();
+            }
+        }
+
+        function showImportModal() {
+            document.getElementById('importModal').style.display = 'flex';
+        }
+
+        function hideImportModal() {
+            document.getElementById('importModal').style.display = 'none';
         }
     </script>
 @endsection

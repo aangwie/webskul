@@ -12,7 +12,14 @@ class BookConditionController extends Controller
     public function index()
     {
         $conditions = BookCondition::with(['book.bookType'])->latest()->get();
-        $books = Book::with('bookType')->doesntHave('condition')->get();
+        // Get books that don't have both 'laik' and 'tidak_laik' conditions
+        $books = Book::with('bookType')->where(function ($query) {
+            $query->whereDoesntHave('conditions', function ($q) {
+                $q->where('kondisi', 'laik');
+            })->orWhereDoesntHave('conditions', function ($q) {
+                $q->where('kondisi', 'tidak_laik');
+            });
+        })->get();
         $allBooks = Book::with('bookType')->get();
         return view('admin.library.conditions.index', compact('conditions', 'books', 'allBooks'));
     }
@@ -20,9 +27,11 @@ class BookConditionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'book_id' => 'required|exists:books,id|unique:book_conditions,book_id',
+            'book_id' => 'required|exists:books,id|unique:book_conditions,book_id,NULL,id,kondisi,' . $request->kondisi,
             'jumlah_buku' => 'required|integer|min:0',
             'kondisi' => 'required|in:laik,tidak_laik',
+        ], [
+            'book_id.unique' => 'Buku ini sudah memiliki data untuk kondisi yang dipilih.'
         ]);
 
         BookCondition::create($request->all());
@@ -33,9 +42,11 @@ class BookConditionController extends Controller
     public function update(Request $request, BookCondition $condition)
     {
         $request->validate([
-            'book_id' => 'required|exists:books,id|unique:book_conditions,book_id,' . $condition->id,
+            'book_id' => 'required|exists:books,id|unique:book_conditions,book_id,' . $condition->id . ',id,kondisi,' . $request->kondisi,
             'jumlah_buku' => 'required|integer|min:0',
             'kondisi' => 'required|in:laik,tidak_laik',
+        ], [
+            'book_id.unique' => 'Buku ini sudah memiliki data untuk kondisi yang dipilih.'
         ]);
 
         $condition->update($request->all());

@@ -149,6 +149,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Library (Perpustakaan)
     Route::middleware(['role:admin,admin_komite,library_staff'])->prefix('library')->name('library.')->group(function () {
         Route::resource('book-types', BookTypeController::class)->except(['show', 'create', 'edit']);
+        Route::get('/books/template', [BookController::class, 'downloadTemplate'])->name('books.template');
+        Route::post('/books/import', [BookController::class, 'import'])->name('books.import');
         Route::resource('books', BookController::class)->except(['show']);
         Route::resource('conditions', BookConditionController::class)->except(['show', 'create', 'edit']);
         Route::resource('borrowings', BookBorrowingController::class)->except(['show']);
@@ -205,7 +207,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         // PMB Registrations Management
         Route::get('/pmb-registrations', [AdminPmbRegistrationController::class, 'index'])->name('pmb-registrations.index');
         Route::get('/pmb-registrations/{pmbRegistration}', [AdminPmbRegistrationController::class, 'show'])->name('pmb-registrations.show');
+        Route::get('/pmb-registrations/{pmbRegistration}/edit', [AdminPmbRegistrationController::class, 'edit'])->name('pmb-registrations.edit');
+        Route::put('/pmb-registrations/{pmbRegistration}', [AdminPmbRegistrationController::class, 'update'])->name('pmb-registrations.update');
         Route::put('/pmb-registrations/{pmbRegistration}/status', [AdminPmbRegistrationController::class, 'updateStatus'])->name('pmb-registrations.status');
+        Route::delete('/pmb-registrations/{pmbRegistration}', [AdminPmbRegistrationController::class, 'destroy'])->name('pmb-registrations.destroy');
     });
 
     // Data Sekolah Sub-menus (Admin Only)

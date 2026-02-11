@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\BookType;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\BooksImport;
+use App\Exports\BooksTemplateExport;
 
 class BookController extends Controller
 {
@@ -58,5 +61,21 @@ class BookController extends Controller
     {
         $book->delete();
         return redirect()->back()->with('success', 'Buku berhasil dihapus');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new BooksTemplateExport, 'template_buku.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new BooksImport, $request->file('file'));
+
+        return redirect()->back()->with('success', 'Data buku berhasil diimport');
     }
 }
