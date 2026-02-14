@@ -7,11 +7,12 @@
     <meta name="description" content="{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }} - Sekolah Menengah Pertama Negeri">
     <title>@yield('title', $school->name ?? 'SMP Negeri 6 Sudimoro')</title>
     @if(isset($school) && $school && $school->logo)
-    <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
+        <link rel="icon" type="image/png" href="{{ route('public.storage.view', ['path' => $school->logo]) }}">
     @else
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @include('partials.theme')
@@ -416,9 +417,9 @@
         <div class="nav-container">
             <a href="{{ route('home') }}" class="nav-brand">
                 @if(isset($school) && $school && $school->logo)
-                <img src="{{ asset('storage/' . $school->logo) }}" alt="Logo">
+                    <img src="{{ route('public.storage.view', ['path' => $school->logo]) }}" alt="Logo">
                 @else
-                <i class="fas fa-school" style="font-size: 2rem;"></i>
+                    <i class="fas fa-school" style="font-size: 2rem;"></i>
                 @endif
                 <div class="nav-brand-text">
                     <span class="nav-brand-name">{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</span>
@@ -432,7 +433,8 @@
 
             <ul class="nav-menu" id="navMenu">
                 <li class="nav-item">
-                    <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Beranda</a>
+                    <a href="{{ route('home') }}"
+                        class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Beranda</a>
                 </li>
                 <li class="nav-item" onclick="toggleDropdown(this)">
                     <a href="#" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
@@ -444,19 +446,24 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('activities.index') }}" class="nav-link {{ request()->routeIs('activities.*') ? 'active' : '' }}">Kegiatan</a>
+                    <a href="{{ route('activities.index') }}"
+                        class="nav-link {{ request()->routeIs('activities.*') ? 'active' : '' }}">Kegiatan</a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('modules.index') }}" class="nav-link {{ request()->routeIs('modules.*') ? 'active' : '' }}">Modul Ajar</a>
+                    <a href="{{ route('modules.index') }}"
+                        class="nav-link {{ request()->routeIs('modules.*') ? 'active' : '' }}">Modul Ajar</a>
                 </li>
                 <li class="nav-item" onclick="toggleDropdown(this)">
-                    <a href="#" class="nav-link {{ request()->routeIs('information.*') || request()->routeIs('public-complaints.*') ? 'active' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('information.*') || request()->routeIs('public-complaints.*') ? 'active' : '' }}">
                         Informasi <i class="fas fa-chevron-down"></i>
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ route('information.index') }}" class="dropdown-item">Informasi Sekolah</a></li>
-                        <li><a href="{{ route('public-complaints.create') }}" class="dropdown-item">Aduan Masyarakat</a></li>
-                        <li><a href="{{ route('public-complaints.status') }}" class="dropdown-item">Respon Aduan</a></li>
+                        <li><a href="{{ route('public-complaints.create') }}" class="dropdown-item">Aduan Masyarakat</a>
+                        </li>
+                        <li><a href="{{ route('public-complaints.status') }}" class="dropdown-item">Respon Aduan</a>
+                        </li>
                     </ul>
                 </li>
                 <li class="nav-item" onclick="toggleDropdown(this)">
@@ -474,8 +481,10 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ route('komite.status') }}" class="dropdown-item">Cek Pembayaran Komite</a></li>
-                        <li><a href="https://simsiswa.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">SIM Siswa</a></li>
-                        <li><a href="https://my.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">SPPD</a></li>
+                        <li><a href="https://simsiswa.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">SIM
+                                Siswa</a></li>
+                        <li><a href="https://my.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">SPPD</a>
+                        </li>
                     </ul>
                 </li>
                 <li class="nav-item">
@@ -497,7 +506,8 @@
         <div class="footer-container">
             <div class="footer-section">
                 <h3>Tentang Kami</h3>
-                <p>{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }} adalah sekolah menengah pertama yang berkomitmen memberikan pendidikan berkualitas untuk generasi masa depan.</p>
+                <p>{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }} adalah sekolah menengah pertama yang berkomitmen
+                    memberikan pendidikan berkualitas untuk generasi masa depan.</p>
             </div>
             <div class="footer-section">
                 <h3>Link Cepat</h3>
@@ -519,155 +529,157 @@
     </footer>
 
     @if(isset($is_pmb_open) && $is_pmb_open)
-    <!-- PMB Announcement Modal -->
-    <div id="pmbModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content animate-fade-in">
-            <button class="modal-close" onclick="closePmbModal()">&times;</button>
-            <div class="modal-header">
-                <div class="modal-icon">
-                    <i class="fas fa-bullhorn"></i>
-                </div>
-                <h3>Pendaftaran Dibuka!</h3>
-            </div>
-            <div class="modal-body">
-                <p>Kabar gembira! Penerimaan Murid Baru (PMB) tahun pelajaran ini telah resmi dibuka. Jangan lewatkan kesempatan untuk bergabung dengan {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}.</p>
-                <div class="modal-features">
-                    <div class="feature-item">
-                        <i class="fas fa-check"></i>
-                        <span>Proses Cepat & Mudah</span>
+        <!-- PMB Announcement Modal -->
+        <div id="pmbModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content animate-fade-in">
+                <button class="modal-close" onclick="closePmbModal()">&times;</button>
+                <div class="modal-header">
+                    <div class="modal-icon">
+                        <i class="fas fa-bullhorn"></i>
                     </div>
-                    <div class="feature-item">
-                        <i class="fas fa-check"></i>
-                        <span>Pendaftaran Online 24 Jam</span>
+                    <h3>Pendaftaran Dibuka!</h3>
+                </div>
+                <div class="modal-body">
+                    <p>Kabar gembira! Penerimaan Murid Baru (PMB) tahun pelajaran ini telah resmi dibuka. Jangan lewatkan
+                        kesempatan untuk bergabung dengan {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}.</p>
+                    <div class="modal-features">
+                        <div class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>Proses Cepat & Mudah</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>Pendaftaran Online 24 Jam</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <a href="{{ route('pmb.index') }}" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 15px;">
-                    Daftar Sekarang <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
-                </a>
+                <div class="modal-footer">
+                    <a href="{{ route('pmb.index') }}" class="btn btn-primary"
+                        style="width: 100%; justify-content: center; padding: 15px;">
+                        Daftar Sekarang <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <style>
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .modal-content {
-            background: white;
-            width: 90%;
-            max-width: 450px;
-            border-radius: 20px;
-            padding: 40px;
-            position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #ccc;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .modal-close:hover {
-            color: var(--primary);
-        }
-
-        .modal-header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .modal-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            margin: 0 auto 15px;
-            box-shadow: 0 10px 20px rgba(30, 58, 95, 0.2);
-        }
-
-        .modal-header h3 {
-            color: var(--primary);
-            font-size: 1.5rem;
-            margin: 0;
-        }
-
-        .modal-body p {
-            color: var(--text-light);
-            line-height: 1.6;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .modal-features {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text);
-            font-size: 0.9rem;
-            background: #f8fafc;
-            padding: 10px 15px;
-            border-radius: 8px;
-        }
-
-        .feature-item i {
-            color: #10b981;
-        }
-    </style>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Only show once per session
-            if (!sessionStorage.getItem('pmb_modal_shown')) {
-                setTimeout(() => {
-                    document.getElementById('pmbModal').style.display = 'flex';
-                }, 1500);
+        <style>
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(5px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
             }
-        });
 
-        function closePmbModal() {
-            document.getElementById('pmbModal').style.display = 'none';
-            sessionStorage.setItem('pmb_modal_shown', 'true');
-        }
-
-        // Close when clicking overlay
-        document.getElementById('pmbModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closePmbModal();
+            .modal-content {
+                background: white;
+                width: 90%;
+                max-width: 450px;
+                border-radius: 20px;
+                padding: 40px;
+                position: relative;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             }
-        });
-    </script>
+
+            .modal-close {
+                position: absolute;
+                top: 15px;
+                right: 20px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #ccc;
+                cursor: pointer;
+                transition: color 0.3s;
+            }
+
+            .modal-close:hover {
+                color: var(--primary);
+            }
+
+            .modal-header {
+                text-align: center;
+                margin-bottom: 25px;
+            }
+
+            .modal-icon {
+                width: 70px;
+                height: 70px;
+                background: var(--primary);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 30px;
+                margin: 0 auto 15px;
+                box-shadow: 0 10px 20px rgba(30, 58, 95, 0.2);
+            }
+
+            .modal-header h3 {
+                color: var(--primary);
+                font-size: 1.5rem;
+                margin: 0;
+            }
+
+            .modal-body p {
+                color: var(--text-light);
+                line-height: 1.6;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+
+            .modal-features {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 25px;
+            }
+
+            .feature-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: var(--text);
+                font-size: 0.9rem;
+                background: #f8fafc;
+                padding: 10px 15px;
+                border-radius: 8px;
+            }
+
+            .feature-item i {
+                color: #10b981;
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Only show once per session
+                if (!sessionStorage.getItem('pmb_modal_shown')) {
+                    setTimeout(() => {
+                        document.getElementById('pmbModal').style.display = 'flex';
+                    }, 1500);
+                }
+            });
+
+            function closePmbModal() {
+                document.getElementById('pmbModal').style.display = 'none';
+                sessionStorage.setItem('pmb_modal_shown', 'true');
+            }
+
+            // Close when clicking overlay
+            document.getElementById('pmbModal').addEventListener('click', function (e) {
+                if (e.target === this) {
+                    closePmbModal();
+                }
+            });
+        </script>
     @endif
 
     <script>
@@ -684,7 +696,7 @@
         }
 
         // Navbar scroll effect
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             const navbar = document.querySelector('.navbar');
             if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
@@ -694,7 +706,7 @@
         });
 
         // Close mobile menu when clicking outside
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             const menu = document.getElementById('navMenu');
             const toggle = document.querySelector('.nav-toggle');
             if (menu.classList.contains('active') && !menu.contains(e.target) && !toggle.contains(e.target)) {

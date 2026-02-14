@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kartu Pendaftaran - {{ $registration->registration_number }}</title>
     @if(isset($school) && $school && $school->logo)
-        <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
+        <link rel="icon" type="image/png" href="{{ route('public.storage.view', ['path' => $school->logo]) }}">
     @else
         <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
@@ -159,7 +159,7 @@
                 @if(Str::startsWith($school->logo, 'data:'))
                     <img src="{{ $school->logo }}" style="width: 10%; height: 10%;">
                 @else
-                    <img src="{{ asset('storage/' . $school->logo) }}" style="width: 10%; height: 10%;">
+                    <img src="{{ route('public.storage.view', ['path' => $school->logo]) }}" style="width: 10%; height: 10%;">
                 @endif
             @endif
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -200,7 +200,8 @@
                 <div class="info-group">
                     <div class="label">Tempat, Tanggal Lahir</div>
                     <div class="value">{{ $registration->birth_place }},
-                        {{ $registration->birth_date->translatedFormat('d F Y') }}</div>
+                        {{ $registration->birth_date->translatedFormat('d F Y') }}
+                    </div>
                 </div>
                 <div class="info-group">
                     <div class="label">Jenis Pendaftaran</div>

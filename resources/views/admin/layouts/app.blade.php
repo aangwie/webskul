@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Panel') - {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</title>
     @if(isset($school) && $school && $school->logo)
-        <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
+        <link rel="icon" type="image/png" href="{{ route('public.storage.view', ['path' => $school->logo]) }}">
     @else
         <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif

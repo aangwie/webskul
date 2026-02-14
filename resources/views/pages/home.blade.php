@@ -3,586 +3,589 @@
 @section('title', 'Beranda - ' . ($school->name ?? 'SMP Negeri 6 Sudimoro'))
 
 @section('styles')
-<style>
-    /* Hero Section */
-    .hero {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: var(--secondary);
-        padding: 120px 20px 100px;
-        position: relative;
-        overflow: hidden;
-    }
+    <style>
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--secondary);
+            padding: 120px 20px 100px;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .hero::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -20%;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-        border-radius: 50%;
-    }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
 
-    .hero-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 60px;
-        align-items: center;
-    }
-
-    .hero-content h1 {
-        font-size: 3rem;
-        font-weight: 800;
-        line-height: 1.2;
-        margin-bottom: 20px;
-    }
-
-    .hero-content p {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        margin-bottom: 35px;
-        line-height: 1.8;
-    }
-
-    .hero-buttons {
-        display: flex;
-        gap: 15px;
-    }
-
-    .btn-hero {
-        padding: 15px 35px;
-        border-radius: 50px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .btn-hero-primary {
-        background: var(--secondary);
-        color: var(--primary);
-    }
-
-    .btn-hero-primary:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-hero-outline {
-        border: 2px solid var(--secondary);
-        color: var(--secondary);
-        background: transparent;
-    }
-
-    .btn-hero-outline:hover {
-        background: var(--secondary);
-        color: var(--primary);
-    }
-
-    .hero-image {
-        text-align: center;
-    }
-
-    .hero-image i {
-        font-size: 15rem;
-        opacity: 0.3;
-    }
-
-    /* Stats Section */
-    .stats {
-        background: var(--secondary);
-        padding: 40px 20px;
-        margin-top: -50px;
-        position: relative;
-        z-index: 10;
-        max-width: 1000px;
-        margin-left: auto;
-        margin-right: auto;
-        border-radius: 20px;
-        box-shadow: var(--shadow-lg);
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 30px;
-        text-align: center;
-    }
-
-    .stat-item {
-        padding: 20px;
-    }
-
-    .stat-number {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: var(--primary);
-        display: block;
-    }
-
-    .stat-label {
-        color: var(--text-light);
-        font-size: 0.9rem;
-        margin-top: 5px;
-    }
-
-    /* Latest News Section */
-    .news-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 30px;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .news-card {
-        background: var(--secondary);
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: var(--shadow);
-        transition: var(--transition);
-    }
-
-    .news-card:hover {
-        transform: translateY(-10px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .news-image {
-        height: 200px;
-        background: linear-gradient(135deg, var(--primary-light), var(--primary));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--secondary);
-        font-size: 3rem;
-        overflow: hidden;
-    }
-
-    .news-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .news-content {
-        padding: 25px;
-    }
-
-    .news-category {
-        display: inline-block;
-        padding: 5px 15px;
-        background: rgba(30, 58, 95, 0.1);
-        color: var(--primary);
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        margin-bottom: 15px;
-    }
-
-    .news-title {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: var(--text);
-        margin-bottom: 10px;
-        line-height: 1.4;
-    }
-
-    .news-date {
-        color: var(--text-light);
-        font-size: 0.85rem;
-    }
-
-    /* Info Section */
-    .info-section {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: var(--secondary);
-    }
-
-    .info-section .section-title {
-        color: var(--secondary);
-    }
-
-    .info-section .section-subtitle {
-        color: rgba(255, 255, 255, 0.8);
-    }
-
-    .info-list {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .info-item {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 12px;
-        padding: 20px 25px;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        transition: var(--transition);
-    }
-
-    .info-item:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateX(10px);
-    }
-
-    .info-icon {
-        width: 50px;
-        height: 50px;
-        background: var(--accent-gold);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--primary);
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
-
-    .info-text h4 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 5px;
-    }
-
-    .info-text p {
-        font-size: 0.9rem;
-        opacity: 0.8;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
         .hero-container {
-            grid-template-columns: 1fr;
-            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
         }
 
         .hero-content h1 {
-            font-size: 2rem;
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 35px;
+            line-height: 1.8;
         }
 
         .hero-buttons {
-            justify-content: center;
-            flex-wrap: wrap;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-hero {
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-hero-primary {
+            background: var(--secondary);
+            color: var(--primary);
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-hero-outline {
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+            background: transparent;
+        }
+
+        .btn-hero-outline:hover {
+            background: var(--secondary);
+            color: var(--primary);
         }
 
         .hero-image {
-            display: none;
+            text-align: center;
+        }
+
+        .hero-image i {
+            font-size: 15rem;
+            opacity: 0.3;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: var(--secondary);
+            padding: 40px 20px;
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
         }
 
         .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            text-align: center;
         }
 
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Latest News Section */
         .news-grid {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-    }
 
-    /* Social Media Section */
-    .social-section {
-        padding: 60px 20px;
-        background: var(--secondary);
-        text-align: center;
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
-    }
+        .news-card {
+            background: var(--secondary);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
 
-    .social-links {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin-top: 30px;
-        flex-wrap: wrap;
-    }
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
 
-    .social-link {
-        width: 60px;
-        height: 60px;
-        background: var(--primary);
-        color: var(--secondary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        font-size: 1.5rem;
-        transition: var(--transition);
-        text-decoration: none;
-    }
+        .news-image {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-size: 3rem;
+            overflow: hidden;
+        }
 
-    .social-link:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-lg);
-        background: var(--accent-gold);
-        color: var(--primary);
-    }
-</style>
+        .news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .news-content {
+            padding: 25px;
+        }
+
+        .news-category {
+            display: inline-block;
+            padding: 5px 15px;
+            background: rgba(30, 58, 95, 0.1);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .news-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .news-date {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        /* Info Section */
+        .info-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--secondary);
+        }
+
+        .info-section .section-title {
+            color: var(--secondary);
+        }
+
+        .info-section .section-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .info-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: var(--transition);
+        }
+
+        .info-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(10px);
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-gold);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .info-text h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .info-text p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .hero-image {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Social Media Section */
+        .social-section {
+            padding: 60px 20px;
+            background: var(--secondary);
+            text-align: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            background: var(--accent-gold);
+            color: var(--primary);
+        }
+    </style>
 @endsection
 
 @section('content')
-<!-- Hero Section -->
-<section class="hero">
-    <div class="hero-container">
-        <div class="hero-content animate-fade-in">
-            <h1>Selamat Datang di<br>{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</h1>
-            <p>Mewujudkan generasi muda yang berilmu, berakhlak mulia, dan siap menghadapi tantangan masa depan dengan pendidikan berkualitas.</p>
-            <div class="hero-buttons">
-                <a href="{{ route('profile.school') }}" class="btn-hero btn-hero-primary">
-                    <i class="fas fa-arrow-right"></i> Profil Sekolah
-                </a>
-                <a href="{{ route('activities.index') }}" class="btn-hero btn-hero-outline">
-                    Lihat Kegiatan
-                </a>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content animate-fade-in">
+                <h1>Selamat Datang di<br>{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</h1>
+                <p>Mewujudkan generasi muda yang berilmu, berakhlak mulia, dan siap menghadapi tantangan masa depan dengan
+                    pendidikan berkualitas.</p>
+                <div class="hero-buttons">
+                    <a href="{{ route('profile.school') }}" class="btn-hero btn-hero-primary">
+                        <i class="fas fa-arrow-right"></i> Profil Sekolah
+                    </a>
+                    <a href="{{ route('activities.index') }}" class="btn-hero btn-hero-outline">
+                        Lihat Kegiatan
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <i class="fas fa-graduation-cap"></i>
             </div>
         </div>
-        <div class="hero-image">
-            <i class="fas fa-graduation-cap"></i>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- Stats Section -->
-<section class="stats">
-    <div class="stats-grid">
-        <div class="stat-item">
-            <span class="stat-number">{{ $featuredTeachers }}+</span>
-            <span class="stat-label">Guru Berpengalaman</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">{{ $studentStats['total_students'] }}+</span>
-            <span class="stat-label">Siswa Aktif</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">{{ $studentStats['total_classes'] }}</span>
-            <span class="stat-label">Rombongan Belajar</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">{{ $latestActivities->count() }}+</span>
-            <span class="stat-label">Kegiatan Sekolah</span>
-        </div>
-    </div>
-</section>
-
-<!-- Student Statistics Details -->
-<section class="section" style="background: var(--secondary);">
-    <div class="container">
-        <h2 class="section-title">Data Statistik Siswa</h2>
-        <p class="section-subtitle">Komposisi siswa berdasarkan kelas dan gender</p>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
-            <!-- Chart -->
-            <div>
-                <canvas id="enrollmentChart"
-                    data-years='@json($enrollmentData->pluck("enrollment_year")??[])'
-                    data-counts='@json($enrollmentData->pluck("total")??[])'
-                    style="width: 100%; height: 300px;"></canvas>
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number">{{ $featuredTeachers }}+</span>
+                <span class="stat-label">Guru Berpengalaman</span>
             </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ $studentStats['total_students'] }}+</span>
+                <span class="stat-label">Siswa Aktif</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ $studentStats['total_classes'] }}</span>
+                <span class="stat-label">Rombongan Belajar</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ $latestActivities->count() }}+</span>
+                <span class="stat-label">Kegiatan Sekolah</span>
+            </div>
+        </div>
+    </section>
 
-            <!-- Class Breakdown -->
-            <div style="background: var(--accent); padding: 25px; border-radius: 16px;">
-                <h3 style="margin-bottom: 20px; color: var(--primary);">Detail Sisiwa Per Kelas</h3>
-                <div style="max-height: 400px; overflow-y: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid rgba(0,0,0,0.1);">
-                                <th style="text-align: left; padding: 10px; color: var(--text-light);">Kelas</th>
-                                <th style="text-align: center; padding: 10px; color: var(--primary);"><i class="fas fa-male"></i></th>
-                                <th style="text-align: center; padding: 10px; color: #e83e8c;"><i class="fas fa-female"></i></th>
-                                <th style="text-align: center; padding: 10px; font-weight: bold;">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($classStats as $class)
-                            <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
-                                <td style="padding: 12px 10px; font-weight: 600;">{{ $class->name }}</td>
-                                <td style="text-align: center;">{{ $class->male }}</td>
-                                <td style="text-align: center;">{{ $class->female }}</td>
-                                <td style="text-align: center; font-weight: bold;">{{ $class->total }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+    <!-- Student Statistics Details -->
+    <section class="section" style="background: var(--secondary);">
+        <div class="container">
+            <h2 class="section-title">Data Statistik Siswa</h2>
+            <p class="section-subtitle">Komposisi siswa berdasarkan kelas dan gender</p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
+                <!-- Chart -->
+                <div>
+                    <canvas id="enrollmentChart" data-years='@json($enrollmentData->pluck("enrollment_year") ?? [])'
+                        data-counts='@json($enrollmentData->pluck("total") ?? [])'
+                        style="width: 100%; height: 300px;"></canvas>
+                </div>
+
+                <!-- Class Breakdown -->
+                <div style="background: var(--accent); padding: 25px; border-radius: 16px;">
+                    <h3 style="margin-bottom: 20px; color: var(--primary);">Detail Sisiwa Per Kelas</h3>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid rgba(0,0,0,0.1);">
+                                    <th style="text-align: left; padding: 10px; color: var(--text-light);">Kelas</th>
+                                    <th style="text-align: center; padding: 10px; color: var(--primary);"><i
+                                            class="fas fa-male"></i></th>
+                                    <th style="text-align: center; padding: 10px; color: #e83e8c;"><i
+                                            class="fas fa-female"></i></th>
+                                    <th style="text-align: center; padding: 10px; font-weight: bold;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($classStats as $class)
+                                    <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                        <td style="padding: 12px 10px; font-weight: 600;">{{ $class->name }}</td>
+                                        <td style="text-align: center;">{{ $class->male }}</td>
+                                        <td style="text-align: center;">{{ $class->female }}</td>
+                                        <td style="text-align: center; font-weight: bold;">{{ $class->total }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-@section('scripts')
-<script>
-    (function() {
-        const initChart = function() {
-            const canvas = document.getElementById('enrollmentChart');
-            if (!canvas) {
-                console.error('Canvas enrollmentChart not found');
-                return;
-            }
-
-            const ctx = canvas.getContext('2d');
-
-            // Data from data-attributes
-            let years = JSON.parse(canvas.dataset.years || '[]');
-            let counts = JSON.parse(canvas.dataset.counts || '[]');
-
-            // Fallback for demo/testing if data is empty
-            if (!years || years.length === 0) {
-                years = ['2020', '2021', '2022', '2023', '2024'];
-                counts = [100, 150, 200, 180, 220];
-            }
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: years,
-                    datasets: [{
-                        label: 'Jumlah Siswa Masuk per Tahun',
-                        data: counts,
-                        backgroundColor: 'rgba(30, 58, 95, 0.7)',
-                        borderColor: 'rgba(30, 58, 95, 1)',
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Grafik Enrollment Siswa',
-                            font: {
-                                size: 16,
-                                family: 'Inter',
-                                weight: '600'
-                            }
-                        },
-                        legend: {
-                            position: 'bottom'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0,0,0,0.05)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
+    @section('scripts')
+        <script>
+            (function () {
+                const initChart = function () {
+                    const canvas = document.getElementById('enrollmentChart');
+                    if (!canvas) {
+                        console.error('Canvas enrollmentChart not found');
+                        return;
                     }
+
+                    const ctx = canvas.getContext('2d');
+
+                    // Data from data-attributes
+                    let years = JSON.parse(canvas.dataset.years || '[]');
+                    let counts = JSON.parse(canvas.dataset.counts || '[]');
+
+                    // Fallback for demo/testing if data is empty
+                    if (!years || years.length === 0) {
+                        years = ['2020', '2021', '2022', '2023', '2024'];
+                        counts = [100, 150, 200, 180, 220];
+                    }
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: years,
+                            datasets: [{
+                                label: 'Jumlah Siswa Masuk per Tahun',
+                                data: counts,
+                                backgroundColor: 'rgba(30, 58, 95, 0.7)',
+                                borderColor: 'rgba(30, 58, 95, 1)',
+                                borderWidth: 1,
+                                borderRadius: 5
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Grafik Enrollment Siswa',
+                                    font: {
+                                        size: 16,
+                                        family: 'Inter',
+                                        weight: '600'
+                                    }
+                                },
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.05)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                };
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initChart);
+                } else {
+                    initChart();
                 }
-            });
-        };
+            })();
+        </script>
+    @endsection
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initChart);
-        } else {
-            initChart();
-        }
-    })();
-</script>
-@endsection
+    <!-- Latest News Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Berita & Kegiatan Terbaru</h2>
+            <p class="section-subtitle">Ikuti perkembangan terbaru dari sekolah kami</p>
 
-<!-- Latest News Section -->
-<section class="section">
-    <div class="container">
-        <h2 class="section-title">Berita & Kegiatan Terbaru</h2>
-        <p class="section-subtitle">Ikuti perkembangan terbaru dari sekolah kami</p>
-
-        @if($latestActivities->isEmpty())
-        <p style="text-align: center; color: var(--text-light);">Belum ada kegiatan terbaru.</p>
-        @else
-        <div class="news-grid">
-            @foreach($latestActivities as $activity)
-            <a href="{{ route('activities.show', $activity->slug) }}" class="news-card" style="text-decoration: none;">
-                <div class="news-image">
-                    @if($activity->image)
-                    @if(Str::startsWith($activity->image, 'data:'))
-                    <img src="{{ $activity->image }}" alt="{{ $activity->title }}">
-                    @else
-                    <img src="{{ asset('storage/' . $activity->image) }}" alt="{{ $activity->title }}">
-                    @endif
-                    @else
-                    <i class="fas fa-newspaper"></i>
-                    @endif
+            @if($latestActivities->isEmpty())
+                <p style="text-align: center; color: var(--text-light);">Belum ada kegiatan terbaru.</p>
+            @else
+                <div class="news-grid">
+                    @foreach($latestActivities as $activity)
+                        <a href="{{ route('activities.show', $activity->slug) }}" class="news-card" style="text-decoration: none;">
+                            <div class="news-image">
+                                @if($activity->image)
+                                    @if(Str::startsWith($activity->image, 'data:'))
+                                        <img src="{{ $activity->image }}" alt="{{ $activity->title }}">
+                                    @else
+                                        <img src="{{ route('public.storage.view', ['path' => $activity->image]) }}"
+                                            alt="{{ $activity->title }}">
+                                    @endif
+                                @else
+                                    <i class="fas fa-newspaper"></i>
+                                @endif
+                            </div>
+                            <div class="news-content">
+                                <span class="news-category">{{ $activity->category == 'news' ? 'Berita' : 'Acara' }}</span>
+                                <h3 class="news-title">{{ $activity->title }}</h3>
+                                <span class="news-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    {{ $activity->published_at ? $activity->published_at->format('d M Y') : '-' }}
+                                </span>
+                            </div>
+                        </a>
+                    @endforeach
                 </div>
-                <div class="news-content">
-                    <span class="news-category">{{ $activity->category == 'news' ? 'Berita' : 'Acara' }}</span>
-                    <h3 class="news-title">{{ $activity->title }}</h3>
-                    <span class="news-date">
-                        <i class="far fa-calendar-alt"></i>
-                        {{ $activity->published_at ? $activity->published_at->format('d M Y') : '-' }}
-                    </span>
-                </div>
-            </a>
-            @endforeach
+            @endif
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="{{ route('activities.index') }}" class="btn btn-primary">
+                    Lihat Semua Kegiatan <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                </a>
+            </div>
         </div>
-        @endif
+    </section>
 
-        <div style="text-align: center; margin-top: 40px;">
-            <a href="{{ route('activities.index') }}" class="btn btn-primary">
-                Lihat Semua Kegiatan <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
-            </a>
-        </div>
-    </div>
-</section>
+    <!-- Important Info Section -->
+    @if($importantInfo->isNotEmpty())
+        <section class="section info-section">
+            <div class="container">
+                <h2 class="section-title">Informasi Penting</h2>
+                <p class="section-subtitle">Pengumuman dan informasi terbaru untuk siswa dan orang tua</p>
 
-<!-- Important Info Section -->
-@if($importantInfo->isNotEmpty())
-<section class="section info-section">
-    <div class="container">
-        <h2 class="section-title">Informasi Penting</h2>
-        <p class="section-subtitle">Pengumuman dan informasi terbaru untuk siswa dan orang tua</p>
-
-        <div class="info-list">
-            @foreach($importantInfo as $info)
-            <div class="info-item">
-                <div class="info-icon">
-                    <i class="fas fa-bullhorn"></i>
+                <div class="info-list">
+                    @foreach($importantInfo as $info)
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                            <div class="info-text">
+                                <h4>{{ $info->title }}</h4>
+                                <p>{{ Str::limit(strip_tags($info->content), 100) }}</p>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
-                <div class="info-text">
-                    <h4>{{ $info->title }}</h4>
-                    <p>{{ Str::limit(strip_tags($info->content), 100) }}</p>
+
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="{{ route('information.index') }}" class="btn-hero btn-hero-outline">
+                        Lihat Semua Informasi
+                    </a>
                 </div>
             </div>
-            @endforeach
-        </div>
+        </section>
+    @endif
 
-        <div style="text-align: center; margin-top: 40px;">
-            <a href="{{ route('information.index') }}" class="btn-hero btn-hero-outline">
-                Lihat Semua Informasi
-            </a>
-        </div>
-    </div>
-</section>
-@endif
+    <!-- Social Media Section -->
+    @if($socials->isNotEmpty())
+        <section class="social-section">
+            <div class="container text-center">
+                <h2 class="section-title">Terhubung Dengan Kami</h2>
+                <p class="section-subtitle">Ikuti media sosial resmi kami untuk informasi terkini</p>
 
-<!-- Social Media Section -->
-@if($socials->isNotEmpty())
-<section class="social-section">
-    <div class="container text-center">
-        <h2 class="section-title">Terhubung Dengan Kami</h2>
-        <p class="section-subtitle">Ikuti media sosial resmi kami untuk informasi terkini</p>
-
-        <div class="social-links">
-            @foreach($socials as $social)
-            <a href="{{ $social->url }}" target="_blank" class="social-link" title="{{ $social->platform }}">
-                <i class="{{ $social->icon }}"></i>
-            </a>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
+                <div class="social-links">
+                    @foreach($socials as $social)
+                        <a href="{{ $social->url }}" target="_blank" class="social-link" title="{{ $social->platform }}">
+                            <i class="{{ $social->icon }}"></i>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 @endsection
