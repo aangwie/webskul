@@ -60,6 +60,16 @@
                             <a href="{{ route('admin.pmb-registrations.show', $reg) }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-eye"></i> Detail
                             </a>
+                            <a href="{{ route('admin.pmb-registrations.edit', $reg) }}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form action="{{ route('admin.pmb-registrations.destroy', $reg) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pendaftaran ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach

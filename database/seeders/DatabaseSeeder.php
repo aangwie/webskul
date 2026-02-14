@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
         // Create admin user
         User::create([
             'name' => 'Administrator',
-            'email' => 'admin@smpn6sudimoro.sch.id',
-            'password' => Hash::make('password123'),
+            'email' => 'wirawan.aang5@gmail.com',
+            'password' => Hash::make('A4n6w!r4w4n'),
         ]);
 
         // Create school profile

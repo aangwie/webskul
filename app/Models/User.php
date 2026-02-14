@@ -66,4 +66,9 @@ class User extends Authenticatable
     {
         return $this->role === 'student';
     }
+
+    public function isLibraryStaff(): bool
+    {
+        return $this->role === 'library_staff';
+    }
 }

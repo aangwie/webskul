@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kartu Pendaftaran - {{ $registration->registration_number }}</title>
     @if(isset($school) && $school && $school->logo)
-    <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
     @else
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
     <style>
         body {
@@ -156,11 +156,11 @@
         <div class="header">
             @php $school = \App\Models\SchoolProfile::first(); @endphp
             @if($school && $school->logo)
-            @if(Str::startsWith($school->logo, 'data:'))
-            <img src="{{ $school->logo }}" style="width: 10%; height: 10%;">
-            @else
-            <img src="{{ asset('storage/' . $school->logo) }}" style="width: 10%; height: 10%;">
-            @endif
+                @if(Str::startsWith($school->logo, 'data:'))
+                    <img src="{{ $school->logo }}" style="width: 10%; height: 10%;">
+                @else
+                    <img src="{{ asset('storage/' . $school->logo) }}" style="width: 10%; height: 10%;">
+                @endif
             @endif
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <div class="school-info">
@@ -199,11 +199,13 @@
             <div class="right">
                 <div class="info-group">
                     <div class="label">Tempat, Tanggal Lahir</div>
-                    <div class="value">{{ $registration->birth_place }}, {{ $registration->birth_date->translatedFormat('d F Y') }}</div>
+                    <div class="value">{{ $registration->birth_place }},
+                        {{ $registration->birth_date->translatedFormat('d F Y') }}</div>
                 </div>
                 <div class="info-group">
                     <div class="label">Jenis Pendaftaran</div>
-                    <div class="value">{{ $registration->registration_type == 'baru' ? 'Murid Baru' : 'Pindahan' }}</div>
+                    <div class="value">{{ $registration->registration_type == 'baru' ? 'Murid Baru' : 'Pindahan' }}
+                    </div>
                 </div>
                 <div class="info-group">
                     <div class="label">Nama Ibu</div>
@@ -216,7 +218,8 @@
             </div>
         </div>
 
-        <div style="margin-top: 30px; font-size: 0.85rem; color: #666; line-height: 1.5; border: 1px solid #eee; padding: 15px; border-radius: 8px;">
+        <div
+            style="margin-top: 30px; font-size: 0.85rem; color: #666; line-height: 1.5; border: 1px solid #eee; padding: 15px; border-radius: 8px;">
             <strong>Catatan:</strong><br>
             1. Harap cetak dan simpan kartu ini sebagai bukti pendaftaran yang sah.<br>
             2. Bawalah kartu ini saat melakukan verifikasi berkas di sekolah sesuai jadwal yang ditentukan.<br>
@@ -228,14 +231,20 @@
                 <tr>
                     <td style="width: 60%; padding-left: 20px;">
                         <div class="qr-placeholder">
-                            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(100)->generate('Nama: ' . $registration->nama . ' | No. Pendaftaran: ' . $registration->registration_number) !!}
+                            @php
+                                $qrData = urlencode('Nama: ' . $registration->nama . ' | No. Pendaftaran: ' . $registration->registration_number);
+                            @endphp
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ $qrData }}"
+                                alt="QR Code" width="100" height="100">
                         </div>
                     </td>
                     <td style="width: 40%; text-align: left;">
                         <div class="signature">
-                            <p style="text-align: left;">Sudimoro, {{ now()->translatedFormat('d F Y') }}<br><br>Panitia PMB {{ $school->name ?? '' }}</p>
+                            <p style="text-align: left;">Sudimoro, {{ now()->translatedFormat('d F Y') }}<br><br>Panitia
+                                PMB {{ $school->name ?? '' }}</p>
                             <div style="border-bottom: 1px solid #333; width: 200px;"></div>
-                            <p style="margin-top: 5px; font-size: 0.8rem; text-align: left;">(Tanda Tangan & Cap Panitia)</p>
+                            <p style="margin-top: 5px; font-size: 0.8rem; text-align: left;">(Tanda Tangan & Cap
+                                Panitia)</p>
                         </div>
                     </td>
                 </tr>

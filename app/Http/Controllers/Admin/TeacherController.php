@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TeacherController extends Controller
 {
@@ -39,9 +40,8 @@ class TeacherController extends Controller
         $validated['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('photo')) {
-            $image = $request->file('photo');
-            $base64 = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
-            $validated['photo'] = $base64;
+            $path = $request->file('photo')->store('teachers', 'public');
+            $validated['photo'] = $path;
         }
 
         Teacher::create($validated);
@@ -74,9 +74,13 @@ class TeacherController extends Controller
         $validated['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('photo')) {
-            $image = $request->file('photo');
-            $base64 = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
-            $validated['photo'] = $base64;
+            // Delete old photo
+            if ($teacher->photo && !Str::startsWith($teacher->photo, 'data:')) {
+                Storage::disk('public')->delete($teacher->photo);
+            }
+
+            $path = $request->file('photo')->store('teachers', 'public');
+            $validated['photo'] = $path;
         }
 
         $teacher->update($validated);

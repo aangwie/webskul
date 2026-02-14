@@ -6,33 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Panel') - {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</title>
     @if(isset($school) && $school && $school->logo)
-    <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
     @else
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @yield('styles')
+    @include('partials.theme')
     <style>
-        :root {
-            --primary: #1e3a5f;
-            --primary-light: #2c4f7c;
-            --primary-dark: #0f2340;
-            --secondary: #ffffff;
-            --accent: #f8f9fa;
-            --accent-gold: #d4af37;
-            --text: #333333;
-            --text-light: #6c757d;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --shadow: 0 4px 20px rgba(30, 58, 95, 0.1);
-            --shadow-lg: 0 10px 40px rgba(30, 58, 95, 0.15);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --sidebar-width: 260px;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -41,7 +25,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--accent);
+            background: var(--body-bg);
             color: var(--text);
             min-height: 100vh;
         }
@@ -53,7 +37,7 @@
             left: 0;
             width: var(--sidebar-width);
             height: 100vh;
-            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: var(--nav-bg);
             color: var(--secondary);
             padding: 20px 0;
             z-index: 1000;
@@ -167,14 +151,22 @@
         /* Top Bar */
         .topbar {
             background: var(--secondary);
-            padding: 15px 30px;
+            border-bottom: 2px solid var(--primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 15px 30px;
             box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: var(--transition);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .topbar-left h1 {
@@ -228,6 +220,23 @@
         .btn-logout:hover {
             background: var(--danger);
             color: var(--secondary);
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
         }
 
         /* Content Area */
@@ -536,17 +545,24 @@
         /* Mobile Toggle */
         .sidebar-toggle {
             display: none;
+            background: rgba(30, 58, 95, 0.1);
+            color: var(--primary);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: var(--transition);
+        }
+
+        .sidebar-toggle:hover {
             background: var(--primary);
             color: var(--secondary);
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.2rem;
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
             }
@@ -560,14 +576,48 @@
             }
 
             .sidebar-toggle {
-                display: block;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
+            .topbar {
+                padding: 15px 20px;
+            }
+
+            .topbar-right .user-name {
+                display: none;
+            }
+
+            .btn-logout span {
+                display: none;
+            }
+
+            .btn-logout {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+            }
+
+            .topbar-left h1 {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .topbar-left h1 {
+                display: none;
             }
 
             .content {
+                padding: 15px;
+            }
+
+            .stat-card {
                 padding: 20px;
             }
         }
@@ -576,6 +626,9 @@
 </head>
 
 <body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
@@ -585,146 +638,278 @@
 
         <ul class="sidebar-menu">
             <li>
-                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('admin.dashboard') }}"
+                    class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
             </li>
             @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
-            <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}" id="school-menu">
-                <a href="javascript:void(0)" onclick="toggleSubmenu('school-menu')" class="submenu-toggle">
-                    <span><i class="fas fa-school"></i> Data Sekolah</span>
+                <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') || request()->routeIs('admin.subjects.*') ? 'active' : '' }}"
+                    id="school-menu">
+                    <a href="javascript:void(0)" onclick="toggleSubmenu('school-menu')" class="submenu-toggle">
+                        <span><i class="fas fa-school"></i> Data Sekolah</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li>
+                            <a href="{{ route('admin.school-profile.index') }}"
+                                class="{{ request()->routeIs('admin.school-profile.*') ? 'active' : '' }}">
+                                <i class="fas fa-school"></i> Profil Sekolah
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.classes.index') }}"
+                                class="{{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
+                                <i class="fas fa-layer-group"></i> Kelas
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('admin.teachers.index') }}"
+                                class="{{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}">
+                                <i class="fas fa-chalkboard-teacher"></i> Guru
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.students.index') }}"
+                                class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
+                                <i class="fas fa-user-graduate"></i> Siswa
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.subjects.index') }}"
+                                class="{{ request()->routeIs('admin.subjects.*') ? 'active' : '' }}">
+                                <i class="fas fa-book"></i> Mata Pelajaran
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.teaching-modules.index') }}"
+                                class="{{ request()->routeIs('admin.teaching-modules.*') ? 'active' : '' }}">
+                                <i class="fas fa-book-reader"></i> Modul Ajar
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
+            @endif
+            <li class="has-submenu {{ request()->routeIs('admin.archives.*') || request()->routeIs('admin.archive-types.*') ? 'active' : '' }}"
+                id="archive-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('archive-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-archive"></i> Arsip PTK</span>
                     <i class="fas fa-chevron-right"></i>
                 </a>
                 <ul class="submenu">
                     <li>
-                        <a href="{{ route('admin.school-profile.index') }}" class="{{ request()->routeIs('admin.school-profile.*') ? 'active' : '' }}">
-                            <i class="fas fa-school"></i> Profil Sekolah
+                        <a href="{{ route('admin.archives.index') }}"
+                            class="{{ request()->routeIs('admin.archives.*') ? 'active' : '' }}">
+                            <i class="fas fa-file-archive"></i> Daftar Arsip
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('admin.teachers.index') }}" class="{{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}">
-                            <i class="fas fa-chalkboard-teacher"></i> Guru
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.classes.index') }}" class="{{ request()->routeIs('admin.classes.*') ? 'active' : '' }}">
-                            <i class="fas fa-layer-group"></i> Kelas
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.students.index') }}" class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
-                            <i class="fas fa-user-graduate"></i> Siswa
-                        </a>
-                    </li>
+                    @if(auth()->user()->isAdmin())
+                        <li>
+                            <a href="{{ route('admin.archive-types.index') }}"
+                                class="{{ request()->routeIs('admin.archive-types.*') ? 'active' : '' }}">
+                                <i class="fas fa-tags"></i> Jenis Arsip
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
-            @endif
-
             <li>
-                <a href="{{ route('admin.activities.index') }}" class="{{ request()->routeIs('admin.activities.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.activities.index') }}"
+                    class="{{ request()->routeIs('admin.activities.*') ? 'active' : '' }}">
                     <i class="fas fa-newspaper"></i> Kegiatan
                 </a>
             </li>
             <li>
-                <a href="{{ route('admin.social-media.index') }}" class="{{ request()->routeIs('admin.social-media.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.social-media.index') }}"
+                    class="{{ request()->routeIs('admin.social-media.*') ? 'active' : '' }}">
                     <i class="fas fa-share-alt"></i> Media Sosial
                 </a>
             </li>
             @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
-            <li>
-                <a href="{{ route('admin.information.index') }}" class="{{ request()->routeIs('admin.information.*') ? 'active' : '' }}">
-                    <i class="fas fa-bullhorn"></i> Informasi
-                </a>
-            </li>
+                <li>
+                    <a href="{{ route('admin.information.index') }}"
+                        class="{{ request()->routeIs('admin.information.*') ? 'active' : '' }}">
+                        <i class="fas fa-bullhorn"></i> Informasi
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.public-complaints.index') }}"
+                        class="{{ request()->routeIs('admin.public-complaints.*') ? 'active' : '' }}">
+                        <i class="fas fa-comments"></i> Aduan Masyarakat
+                        @if(auth()->user()->isAdmin() && isset($unrespondedComplaintsCount) && $unrespondedComplaintsCount > 0)
+                            <span class="badge"
+                                style="margin-left: auto; background: var(--danger); color: white;">{{ $unrespondedComplaintsCount }}</span>
+                        @endif
+                    </a>
+                </li>
             @endif
 
             @if(auth()->user()->isAdmin() || auth()->user()->isAdminKomite())
-            <div class="sidebar-divider"></div>
-            <p style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">Penerimaan Murid Baru</p>
-            <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}" id="pmb-menu">
-                <a href="javascript:void(0)" onclick="toggleSubmenu('pmb-menu')" class="submenu-toggle">
-                    <span><i class="fas fa-graduation-cap"></i> PMB</span>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-                <ul class="submenu">
-                    <li>
-                        <a href="{{ route('admin.settings.pmb') }}" class="{{ request()->routeIs('admin.settings.pmb') ? 'active' : '' }}">
-                            <i class="fas fa-cog"></i> Pengaturan
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.academic-years.index') }}" class="{{ request()->routeIs('admin.academic-years.*') ? 'active' : '' }}">
-                            <i class="fas fa-calendar-alt"></i> Tahun Pelajaran
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.pmb-registrations.index') }}" class="{{ request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}">
-                            <i class="fas fa-user-plus"></i> Data Pendaftaran
-                        </a>
-                    </li>
-                </ul>
-            </li>
+                <div class="sidebar-divider"></div>
+                <p
+                    style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">
+                    Penerimaan Murid Baru</p>
+                <li class="has-submenu {{ request()->routeIs('admin.settings.pmb') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}"
+                    id="pmb-menu">
+                    <a href="javascript:void(0)" onclick="toggleSubmenu('pmb-menu')" class="submenu-toggle">
+                        <span><i class="fas fa-graduation-cap"></i> PMB</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li>
+                            <a href="{{ route('admin.settings.pmb') }}"
+                                class="{{ request()->routeIs('admin.settings.pmb') ? 'active' : '' }}">
+                                <i class="fas fa-cog"></i> Pengaturan
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.academic-years.index') }}"
+                                class="{{ request()->routeIs('admin.academic-years.*') ? 'active' : '' }}">
+                                <i class="fas fa-calendar-alt"></i> Tahun Pelajaran
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.pmb-registrations.index') }}"
+                                class="{{ request()->routeIs('admin.pmb-registrations.*') ? 'active' : '' }}">
+                                <i class="fas fa-user-plus"></i> Data Pendaftaran
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             @endif
 
             @if(auth()->user()->isAdmin() || auth()->user()->isAdminKomite())
-            <div class="sidebar-divider"></div>
-            <p style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">Komite Sekolah</p>
-            <li class="has-submenu {{ request()->routeIs('admin.committee.*') ? 'active' : '' }}" id="committee-menu">
-                <a href="javascript:void(0)" onclick="toggleSubmenu('committee-menu')" class="submenu-toggle">
-                    <span><i class="fas fa-hand-holding-usd"></i> Komite</span>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-                <ul class="submenu">
-                    <li>
-                        <a href="{{ route('admin.committee.nominal.index') }}" class="{{ request()->routeIs('admin.committee.nominal.*') ? 'active' : '' }}">
-                            <i class="fas fa-money-bill-wave"></i> Set Nominal
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.committee.payments.index') }}" class="{{ request()->routeIs('admin.committee.payments.*') ? 'active' : '' }}">
-                            <i class="fas fa-receipt"></i> Pembayaran
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.committee.report.index') }}" class="{{ request()->routeIs('admin.committee.report.*') ? 'active' : '' }}">
-                            <i class="fas fa-file-alt"></i> Laporan
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.committee.expenditures.index') }}" class="{{ request()->routeIs('admin.committee.expenditures.*') ? 'active' : '' }}">
-                            <i class="fas fa-hand-holding-heart"></i> Penggunaan
-                        </a>
-                    </li>
-                </ul>
-            </li>
+                <div class="sidebar-divider"></div>
+                <p
+                    style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">
+                    Komite Sekolah</p>
+                <li class="has-submenu {{ request()->routeIs('admin.committee.*') ? 'active' : '' }}" id="committee-menu">
+                    <a href="javascript:void(0)" onclick="toggleSubmenu('committee-menu')" class="submenu-toggle">
+                        <span><i class="fas fa-hand-holding-usd"></i> Komite</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li>
+                            <a href="{{ route('admin.committee.nominal.index') }}"
+                                class="{{ request()->routeIs('admin.committee.nominal.*') ? 'active' : '' }}">
+                                <i class="fas fa-money-bill-wave"></i> Set Nominal
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.committee.planning.index') }}"
+                                class="{{ request()->routeIs('admin.committee.planning.*') ? 'active' : '' }}">
+                                <i class="fas fa-tasks"></i> Perencanaan
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.committee.payments.index') }}"
+                                class="{{ request()->routeIs('admin.committee.payments.*') ? 'active' : '' }}">
+                                <i class="fas fa-receipt"></i> Pembayaran
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.committee.report.index') }}"
+                                class="{{ request()->routeIs('admin.committee.report.*') ? 'active' : '' }}">
+                                <i class="fas fa-file-alt"></i> Laporan
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.committee.expenditures.index') }}"
+                                class="{{ request()->routeIs('admin.committee.expenditures.*') ? 'active' : '' }}">
+                                <i class="fas fa-hand-holding-heart"></i> Penggunaan
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
+
+            @if(auth()->user()->isAdmin() || auth()->user()->isAdminKomite() || auth()->user()->isLibraryStaff())
+                <div class="sidebar-divider"></div>
+                <p
+                    style="padding: 10px 25px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5;">
+                    Perpustakaan</p>
+                <li class="has-submenu {{ request()->routeIs('admin.library.*') ? 'active' : '' }}" id="library-menu">
+                    <a href="javascript:void(0)" onclick="toggleSubmenu('library-menu')" class="submenu-toggle">
+                        <span><i class="fas fa-book-open"></i> Perpustakaan</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li>
+                            <a href="{{ route('admin.library.book-types.index') }}"
+                                class="{{ request()->routeIs('admin.library.book-types.*') ? 'active' : '' }}">
+                                <i class="fas fa-tags"></i> Jenis Buku
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.library.books.index') }}"
+                                class="{{ request()->routeIs('admin.library.books.*') ? 'active' : '' }}">
+                                <i class="fas fa-book"></i> Pendataan
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.library.conditions.index') }}"
+                                class="{{ request()->routeIs('admin.library.conditions.*') ? 'active' : '' }}">
+                                <i class="fas fa-clipboard-check"></i> Jumlah & Kondisi
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.library.borrowings.index') }}"
+                                class="{{ request()->routeIs('admin.library.borrowings.*') ? 'active' : '' }}">
+                                <i class="fas fa-hand-holding"></i> Peminjaman
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.library.reports.index') }}"
+                                class="{{ request()->routeIs('admin.library.reports.*') ? 'active' : '' }}">
+                                <i class="fas fa-file-alt"></i> Laporan
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             @endif
         </ul>
 
         @if(auth()->user()->isAdmin())
-        <div class="sidebar-divider"></div>
+            <div class="sidebar-divider"></div>
 
-        <ul class="sidebar-menu">
-            <li>
-                <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                    <i class="fas fa-users"></i> Manajemen User
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('admin.profile.index') }}" class="{{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
-                    <i class="fas fa-user-cog"></i> Profil Admin
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('admin.system.index') }}" class="{{ request()->routeIs('admin.system.*') ? 'active' : '' }}">
-                    <i class="fas fa-tools"></i> Pengaturan Sistem
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('admin.settings.smtp') }}" class="{{ request()->routeIs('admin.settings.smtp') ? 'active' : '' }}">
-                    <i class="fas fa-cog"></i> Pengaturan SMTP
-                </a>
-            </li>
-        </ul>
+            <ul class="sidebar-menu">
+                <li class="has-submenu {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.profile.*') || request()->routeIs('admin.system.*') || request()->routeIs('admin.settings.smtp') ? 'active' : '' }}"
+                    id="admin-management-menu">
+                    <a href="javascript:void(0)" onclick="toggleSubmenu('admin-management-menu')" class="submenu-toggle">
+                        <span><i class="fas fa-user-shield"></i> Manajemen Admin</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li>
+                            <a href="{{ route('admin.users.index') }}"
+                                class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                <i class="fas fa-users"></i> Manajemen User
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.profile.index') }}"
+                                class="{{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
+                                <i class="fas fa-user-cog"></i> Profil Admin
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.system.index') }}"
+                                class="{{ request()->routeIs('admin.system.*') ? 'active' : '' }}">
+                                <i class="fas fa-tools"></i> Pengaturan Sistem
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.settings.smtp') }}"
+                                class="{{ request()->routeIs('admin.settings.smtp') ? 'active' : '' }}">
+                                <i class="fas fa-cog"></i> Pengaturan SMTP
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         @endif
 
         <div class="sidebar-divider"></div>
@@ -758,7 +943,7 @@
                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                     @csrf
                     <button type="submit" class="btn-logout">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                        <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                     </button>
                 </form>
             </div>
@@ -767,17 +952,17 @@
         <!-- Content -->
         <div class="content">
             @if(session('success'))
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i>
-                {{ session('success') }}
-            </div>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('success') }}
+                </div>
             @endif
 
             @if(session('error'))
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-circle"></i>
-                {{ session('error') }}
-            </div>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ session('error') }}
+                </div>
             @endif
 
             @yield('content')
@@ -787,6 +972,16 @@
     <script>
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+
+            // Prevent scrolling when sidebar is open on mobile
+            if (window.innerWidth <= 992) {
+                if (document.getElementById('sidebar').classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
         }
 
         function toggleSubmenu(id) {

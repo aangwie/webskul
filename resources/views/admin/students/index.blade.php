@@ -50,7 +50,15 @@
     <div class="card-body">
         <!-- Filter Form -->
         <form action="{{ route('admin.students.index') }}" method="GET" style="margin-bottom: 25px; padding: 20px; background: var(--accent); border-radius: 10px;">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: end;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; align-items: end;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="status" class="form-label">Filter Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                        <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Non-Aktif</option>
+                        <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>Semua</option>
+                    </select>
+                </div>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="class_id" class="form-label">Filter Kelas</label>
                     <select name="class_id" id="class_id" class="form-select">
@@ -71,15 +79,40 @@
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary" style="height: 45px;">
-                    <i class="fas fa-filter"></i> Terapkan Filter
+                    <i class="fas fa-filter"></i> Filter
                 </button>
             </div>
         </form>
+
+        @if(auth()->user()->isAdmin())
+        <!-- Bulk Action Bar (Hidden by default) -->
+        <div id="bulk-action-bar" style="display: none; background: var(--primary); color: white; padding: 15px 25px; border-radius: 10px; margin-bottom: 20px; align-items: center; justify-content: space-between; position: sticky; top: 100px; z-index: 90; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span id="selected-count" style="font-weight: 600;">0 Siswa Terpilih</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn btn-success btn-sm" onclick="bulkUpdateStatus('active')">
+                    <i class="fas fa-check-circle"></i> Aktifkan
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="bulkUpdateStatus('inactive')">
+                    <i class="fas fa-times-circle"></i> Non-Aktifkan
+                </button>
+                <button type="button" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white;" onclick="clearSelection()">
+                    Batal
+                </button>
+            </div>
+        </div>
+        @endif
 
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
+                        @if(auth()->user()->isAdmin())
+                        <th style="width: 40px;">
+                            <input type="checkbox" id="select-all" style="width: 18px; height: 18px; cursor: pointer;">
+                        </th>
+                        @endif
                         <th>NIS</th>
                         <th>Nama Siswa</th>
                         <th>Kelas</th>
@@ -92,6 +125,11 @@
                 <tbody>
                     @forelse($students as $student)
                     <tr>
+                        @if(auth()->user()->isAdmin())
+                        <td>
+                            <input type="checkbox" class="student-checkbox" value="{{ $student->id }}" style="width: 18px; height: 18px; cursor: pointer;">
+                        </td>
+                        @endif
                         <td>{{ $student->nis ?? '-' }}</td>
                         <td><strong>{{ $student->name }}</strong></td>
                         <td>
@@ -135,7 +173,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 20px; color: var(--text-light);">
+                        <td colspan="{{ auth()->user()->isAdmin() ? '8' : '7' }}" style="text-align: center; padding: 20px; color: var(--text-light);">
                             Data siswa tidak ditemukan.
                         </td>
                     </tr>
@@ -149,4 +187,118 @@
         </div>
     </div>
 </div>
+@section('scripts')
+@if(auth()->user()->isAdmin())
+<script>
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.student-checkbox');
+    const bulkBar = document.getElementById('bulk-action-bar');
+    const selectedCountSpan = document.getElementById('selected-count');
+
+    function updateBulkBar() {
+        const checkedCount = document.querySelectorAll('.student-checkbox:checked').length;
+        if (checkedCount > 0) {
+            bulkBar.style.display = 'flex';
+            selectedCountSpan.textContent = `${checkedCount} Siswa Terpilih`;
+        } else {
+            bulkBar.style.display = 'none';
+        }
+    }
+
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll.checked;
+            });
+            updateBulkBar();
+        });
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            if (!this.checked) {
+                selectAll.checked = false;
+            } else if (document.querySelectorAll('.student-checkbox:checked').length === checkboxes.length) {
+                selectAll.checked = true;
+            }
+            updateBulkBar();
+        });
+    });
+
+    function clearSelection() {
+        checkboxes.forEach(cb => cb.checked = false);
+        if (selectAll) selectAll.checked = false;
+        updateBulkBar();
+    }
+
+    function bulkUpdateStatus(status) {
+        const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked')).map(cb => cb.value);
+        
+        if (selectedIds.length === 0) return;
+
+        const statusLabel = status === 'active' ? 'Mengaktifkan' : 'Menonaktifkan';
+        
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: `Apakah Anda yakin ingin ${statusLabel} ${selectedIds.length} siswa yang dipilih?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--primary)',
+            cancelButtonColor: 'var(--danger)',
+            confirmButtonText: 'Ya, Lanjutkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Memproses...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch("{{ route('admin.students.bulk-status') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        student_ids: selectedIds,
+                        status: status
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: data.message
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: data.message || 'Terjadi kesalahan saat memperbarui status.'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan sistem.'
+                    });
+                });
+            }
+        });
+    }
+</script>
+@endif
+@endsection
 @endsection

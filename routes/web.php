@@ -19,6 +19,14 @@ use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\PmbRegistrationController as AdminPmbRegistrationController;
 use App\Http\Controllers\Admin\CommitteeController;
 use App\Http\Controllers\Admin\CommitteeExpenditureController;
+use App\Http\Controllers\Admin\CommitteePlanningController;
+use App\Http\Controllers\Admin\ArchiveController;
+use App\Http\Controllers\Admin\ArchiveTypeController;
+use App\Http\Controllers\Admin\BookTypeController;
+use App\Http\Controllers\Admin\BookController;
+use App\Http\Controllers\Admin\BookConditionController;
+use App\Http\Controllers\Admin\BookBorrowingController;
+use App\Http\Controllers\Admin\LibraryReportController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -34,6 +42,20 @@ Route::get('/pmb/status', [PmbController::class, 'status'])->name('pmb.status');
 Route::get('/pmb/download-pdf/{registration_number}', [PmbController::class, 'downloadPdf'])->name('pmb.downloadPdf');
 Route::get('/pmb/print/{registration_number}', [PmbController::class, 'printCard'])->name('pmb.print');
 Route::get('/komite-status', [KomiteStatusController::class, 'index'])->name('komite.status');
+Route::get('/modules', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'index'])->name('modules.index');
+Route::get('/modules/{teachingModule}/view', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'showPdf'])->name('modules.view');
+Route::get('/modules/{teachingModule}/download', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'downloadPdf'])->name('modules.download');
+
+// Public Storage Proxy (Fallback for Shared Hosting)
+Route::get('/public-storage/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
+    ->where('path', '.*')
+    ->name('public.storage.view');
+
+// Public Complaints
+Route::get('/public-complaints', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'create'])->name('public-complaints.create');
+Route::post('/public-complaints', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'store'])->name('public-complaints.store');
+Route::get('/public-complaints/status', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'status'])->name('public-complaints.status');
+Route::post('/public-complaints/check', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'check'])->name('public-complaints.check');
 
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -65,10 +87,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/students/import', [\App\Http\Controllers\Admin\StudentController::class, 'import'])->name('students.import');
         Route::post('/students/import', [\App\Http\Controllers\Admin\StudentController::class, 'storeImport'])->name('students.import.store');
         Route::get('/students/import/template', [\App\Http\Controllers\Admin\StudentController::class, 'downloadTemplate'])->name('students.import.template');
+        Route::post('/students/bulk-status', [\App\Http\Controllers\Admin\StudentController::class, 'bulkStatusUpdate'])->name('students.bulk-status');
         Route::resource('students', \App\Http\Controllers\Admin\StudentController::class)->except(['show']);
 
         // Information
         Route::resource('information', AdminInformationController::class)->except(['show']);
+
+        // Public Complaints
+        Route::get('/public-complaints', [\App\Http\Controllers\Admin\PublicComplaintController::class, 'index'])->name('public-complaints.index');
+        Route::post('/public-complaints/{publicComplaint}/respond', [\App\Http\Controllers\Admin\PublicComplaintController::class, 'respond'])->name('public-complaints.respond');
+        Route::delete('/public-complaints/{publicComplaint}', [\App\Http\Controllers\Admin\PublicComplaintController::class, 'destroy'])->name('public-complaints.destroy');
     });
 
     // Committee (Admin, Admin Komite)
@@ -90,9 +118,22 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             Route::get('/report', [CommitteeController::class, 'reportIndex'])->name('report.index');
             Route::post('/report/generate', [CommitteeController::class, 'reportGenerate'])->name('report.generate');
             Route::post('/report/pdf', [CommitteeController::class, 'reportPdf'])->name('report.pdf');
+            Route::post('/report/excel', [CommitteeController::class, 'reportExcel'])->name('report.excel');
+
+            // Planning (Perencanaan)
+            Route::get('/planning', [CommitteePlanningController::class, 'index'])->name('planning.index');
+            Route::post('/planning', [CommitteePlanningController::class, 'store'])->name('planning.store');
+            Route::put('/planning/{program}', [CommitteePlanningController::class, 'update'])->name('planning.update');
+            Route::delete('/planning/{program}', [CommitteePlanningController::class, 'destroy'])->name('planning.destroy');
+            Route::get('/planning/{program}/activities', [CommitteePlanningController::class, 'showActivities'])->name('planning.activities');
+            Route::post('/planning/{program}/activities', [CommitteePlanningController::class, 'storeActivity'])->name('planning.activities.store');
+            Route::put('/planning/activities/{activity}', [CommitteePlanningController::class, 'updateActivity'])->name('planning.activities.update');
+            Route::delete('/planning/activities/{activity}', [CommitteePlanningController::class, 'destroyActivity'])->name('planning.activities.destroy');
 
             // Expenditures (Penggunaan)
             Route::get('/expenditures/report', [CommitteeExpenditureController::class, 'report'])->name('expenditures.report');
+            Route::get('/expenditures/get-programs', [CommitteeExpenditureController::class, 'getPrograms'])->name('expenditures.programs');
+            Route::get('/expenditures/get-activities', [CommitteeExpenditureController::class, 'getActivities'])->name('expenditures.activities');
             Route::get('/expenditures/{expenditure}/print', [CommitteeExpenditureController::class, 'print'])->name('expenditures.print');
             Route::resource('expenditures', CommitteeExpenditureController::class)->names([
                 'index' => 'expenditures.index',
@@ -103,6 +144,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
                 'destroy' => 'expenditures.destroy',
             ]);
         });
+    });
+
+    // Library (Perpustakaan)
+    Route::middleware(['role:admin,admin_komite,library_staff'])->prefix('library')->name('library.')->group(function () {
+        Route::resource('book-types', BookTypeController::class)->except(['show', 'create', 'edit']);
+        Route::get('/books/template', [BookController::class, 'downloadTemplate'])->name('books.template');
+        Route::post('/books/import', [BookController::class, 'import'])->name('books.import');
+        Route::resource('books', BookController::class)->except(['show']);
+        Route::resource('conditions', BookConditionController::class)->except(['show', 'create', 'edit']);
+        Route::resource('borrowings', BookBorrowingController::class)->except(['show']);
+        Route::put('/borrowings/{borrowing}/return', [BookBorrowingController::class, 'markReturned'])->name('borrowings.return');
+        Route::get('/reports', [LibraryReportController::class, 'index'])->name('reports.index');
     });
 
     // Routes accessible by Admin, Teacher, and Student
@@ -134,6 +187,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/system/storage-link', [\App\Http\Controllers\Admin\SystemController::class, 'storageLink'])->name('system.storage-link');
         Route::post('/system/update', [\App\Http\Controllers\Admin\SystemController::class, 'updateApp'])->name('system.update');
         Route::post('/system/cache-clear', [\App\Http\Controllers\Admin\SystemController::class, 'cacheClear'])->name('system.cache-clear');
+        Route::post('/system/composer-dump', [\App\Http\Controllers\Admin\SystemController::class, 'composerDumpAutoload'])->name('system.composer-dump');
+        Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
+
+        // Admin Storage Proxy (Restored for Admin Views)
+        Route::get('/storage-view/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
+            ->where('path', '.*')
+            ->name('storage.view');
     });
 
     // PMB Management (Admin, Admin Komite)
@@ -147,6 +207,23 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         // PMB Registrations Management
         Route::get('/pmb-registrations', [AdminPmbRegistrationController::class, 'index'])->name('pmb-registrations.index');
         Route::get('/pmb-registrations/{pmbRegistration}', [AdminPmbRegistrationController::class, 'show'])->name('pmb-registrations.show');
+        Route::get('/pmb-registrations/{pmbRegistration}/edit', [AdminPmbRegistrationController::class, 'edit'])->name('pmb-registrations.edit');
+        Route::put('/pmb-registrations/{pmbRegistration}', [AdminPmbRegistrationController::class, 'update'])->name('pmb-registrations.update');
         Route::put('/pmb-registrations/{pmbRegistration}/status', [AdminPmbRegistrationController::class, 'updateStatus'])->name('pmb-registrations.status');
+        Route::delete('/pmb-registrations/{pmbRegistration}', [AdminPmbRegistrationController::class, 'destroy'])->name('pmb-registrations.destroy');
+    });
+
+    // Data Sekolah Sub-menus (Admin Only)
+    Route::middleware(['role:admin,teacher'])->group(function () {
+        Route::resource('subjects', \App\Http\Controllers\Admin\SubjectController::class)->except(['create', 'show', 'edit']);
+        Route::resource('teaching-modules', \App\Http\Controllers\Admin\TeachingModuleController::class)->except(['create', 'show', 'edit']);
+
+        // Archive Management
+        Route::resource('archives', ArchiveController::class)->except(['show', 'create', 'edit']);
+
+        // Archive Types (Admin Only inside the controller logic or route group)
+        Route::middleware(['role:admin'])->group(function () {
+            Route::resource('archive-types', ArchiveTypeController::class)->except(['show', 'create', 'edit']);
+        });
     });
 });

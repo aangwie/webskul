@@ -109,32 +109,52 @@
     </div>
 
     <div class="report-title">LAPORAN PENGGUNAAN DANA KOMITE</div>
-    <div class="period">Periode: {{ date('d F Y', strtotime($startDate)) }} - {{ date('d F Y', strtotime($endDate)) }}</div>
+    <div class="period">Tahun Pelajaran: {{ $selectedYear ? $selectedYear->year : 'Semua' }}</div>
 
     <table>
         <thead>
             <tr>
                 <th class="text-center" width="40">No</th>
-                <th class="text-center" width="100">Tanggal</th>
-                <th class="text-center" width="150">No. Pengeluaran</th>
+                <th class="text-center" width="120">No. Pengeluaran</th>
+                <th class="text-center" width="80">Tanggal</th>
+                <th>Nama Program</th>
+                <th>Sub Program</th>
                 <th>Deskripsi Penggunaan</th>
-                <th class="text-right" width="130">Nominal</th>
+                <th class="text-right" width="100">Nominal</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($expenditures as $index => $exp)
+            @php $globalIndex = 1; @endphp
+            @forelse($groupedExpenditures as $activityName => $expenditures)
+            <tr style="background-color: #f0f0f0;">
+                <td colspan="7" style="font-weight: bold; text-align: left; padding-left: 10px;">
+                    Kegiatan: {{ $activityName }}
+                </td>
+            </tr>
+            @foreach($expenditures as $exp)
             <tr>
-                <td class="text-center">{{ $index + 1 }}</td>
-                <td class="text-center">{{ $exp->date->format('d/m/Y') }}</td>
+                <td class="text-center">{{ $globalIndex++ }}</td>
                 <td class="text-center">{{ $exp->expenditure_number }}</td>
+                <td class="text-center">{{ $exp->date->format('d/m/Y') }}</td>
+                <td>{{ $exp->activity->program->name ?? '-' }}</td>
+                <td>{{ $exp->activity->name ?? '-' }}</td>
                 <td>{{ $exp->description }}</td>
                 <td class="text-right">Rp {{ number_format($exp->amount, 0, ',', '.') }}</td>
             </tr>
             @endforeach
+            <tr style="background-color: #fafafa;">
+                <td colspan="6" class="text-right" style="font-weight: bold;">Total {{ $activityName }}</td>
+                <td class="text-right" style="font-weight: bold;">Rp {{ number_format($expenditures->sum('amount'), 0, ',', '.') }}</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="7" class="text-center">Tidak ada data.</td>
+            </tr>
+            @endforelse
         </tbody>
         <tfoot>
             <tr class="total-row">
-                <td colspan="4" class="text-right">TOTAL PENGGUNAAN</td>
+                <td colspan="6" class="text-right">TOTAL KESELURUHAN</td>
                 <td class="text-right">Rp {{ number_format($total, 0, ',', '.') }}</td>
             </tr>
         </tfoot>

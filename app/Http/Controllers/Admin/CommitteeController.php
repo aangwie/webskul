@@ -245,18 +245,40 @@ class CommitteeController extends Controller
 
     public function reportGenerate(Request $request)
     {
-        $request->validate([
-            'academic_year_id' => 'required|exists:academic_years,id',
-            'school_class_id' => 'required',
-            'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
-        ]);
+        $filterType = $request->input('filter_type', 'academic_year');
 
-        $academicYear = AcademicYear::findOrFail($request->academic_year_id);
+        // Validate based on filter type
+        if ($filterType === 'academic_year') {
+            $request->validate([
+                'academic_year_id' => 'required|exists:academic_years,id',
+                'school_class_id' => 'required',
+                'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
+            ]);
+            $academicYear = AcademicYear::findOrFail($request->academic_year_id);
+            $dateFrom = null;
+            $dateTo = null;
+        } else {
+            $request->validate([
+                'date_from' => 'required|date',
+                'date_to' => 'required|date|after_or_equal:date_from',
+                'school_class_id' => 'required',
+                'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
+            ]);
+            $academicYear = null;
+            $dateFrom = $request->date_from;
+            $dateTo = $request->date_to;
+        }
+
         $reportType = $request->report_type;
 
-        // Handle case where specific class is selected but report type is for all classes
-        if (($reportType == 'class_summary' || $reportType == 'all_summary') && $request->school_class_id == 'all') {
-            $classes = SchoolClass::where('is_active', true)->ordered()->get();
+        // Handle case where report type is class summary/all summary
+        if ($reportType == 'class_summary' || $reportType == 'all_summary') {
+            if ($request->school_class_id == 'all') {
+                $classes = SchoolClass::where('is_active', true)->ordered()->get();
+            } else {
+                $classes = SchoolClass::where('id', $request->school_class_id)->get();
+            }
+
             $reportData = [];
             $grandTotalTagihan = 0;
             $grandTotalTerbayar = 0;
@@ -264,17 +286,32 @@ class CommitteeController extends Controller
 
             foreach ($classes as $class) {
                 $studentIds = \App\Models\Student::where('school_class_id', $class->id)->pluck('id');
-                $fee = CommitteeFee::where('academic_year_id', $academicYear->id)
-                    ->where('school_class_id', $class->id)
-                    ->first();
 
-                $totalPaid = CommitteePayment::whereIn('student_id', $studentIds)
-                    ->whereHas('committeeFee', function ($q) use ($academicYear) {
-                        $q->where('academic_year_id', $academicYear->id);
-                    })->sum('amount');
+                if ($filterType === 'academic_year') {
+                    $fee = CommitteeFee::where('academic_year_id', $academicYear->id)
+                        ->where('school_class_id', $class->id)
+                        ->first();
 
-                $totalStudents = $studentIds->count();
-                $totalTarget = $fee ? $fee->amount * $totalStudents : 0;
+                    $totalPaid = CommitteePayment::whereIn('student_id', $studentIds)
+                        ->whereHas('committeeFee', function ($q) use ($academicYear) {
+                            $q->where('academic_year_id', $academicYear->id);
+                        })->sum('amount');
+
+                    $totalStudents = $studentIds->count();
+                    $totalTarget = $fee ? $fee->amount * $totalStudents : 0;
+                } else {
+                    // Date period filter - sum all payments in date range
+                    $totalPaid = CommitteePayment::whereIn('student_id', $studentIds)
+                        ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                        ->sum('amount');
+
+                    $totalStudents = $studentIds->count();
+                    // For date period, get the most recent fee for target calculation
+                    $fee = CommitteeFee::where('school_class_id', $class->id)
+                        ->latest('created_at')
+                        ->first();
+                    $totalTarget = $fee ? $fee->amount * $totalStudents : 0;
+                }
 
                 $reportData[] = [
                     'class' => $class,
@@ -296,7 +333,10 @@ class CommitteeController extends Controller
                 'total_sisa' => max(0, $grandTotalTagihan - $grandTotalTerbayar),
             ];
 
-            $schoolClass = (object)['name' => 'Semua Kelas'];
+            $schoolClass = ($request->school_class_id == 'all')
+                ? (object) ['name' => 'Semua Kelas']
+                : $classes->first();
+
             $committeeFee = null;
 
             return view('admin.committee.report.result', compact(
@@ -305,52 +345,92 @@ class CommitteeController extends Controller
                 'committeeFee',
                 'reportData',
                 'summary',
-                'reportType'
+                'reportType',
+                'filterType',
+                'dateFrom',
+                'dateTo'
             ));
         }
 
-        // Existing logic for single class
-        $schoolClass = SchoolClass::findOrFail($request->school_class_id);
-        $committeeFee = CommitteeFee::where('academic_year_id', $academicYear->id)
-            ->where('school_class_id', $schoolClass->id)
-            ->first();
+        // Handle Detail / Recapitulation for One OR All Classes
+        if ($request->school_class_id == 'all') {
+            $classes = SchoolClass::where('is_active', true)->ordered()->get();
+            $schoolClass = (object) ['name' => 'Semua Kelas'];
+            $committeeFee = null;
+        } else {
+            $class = SchoolClass::findOrFail($request->school_class_id);
+            $classes = collect([$class]);
+            $schoolClass = $class;
 
-        if (!$committeeFee) {
-            return redirect()->back()->with('error', 'Nominal dana komite belum diatur untuk kelas dan tahun ajaran yang dipilih.');
+            if ($filterType === 'academic_year') {
+                $committeeFee = CommitteeFee::where('academic_year_id', $academicYear->id)
+                    ->where('school_class_id', $class->id)
+                    ->first();
+            } else {
+                $committeeFee = CommitteeFee::where('school_class_id', $class->id)
+                    ->latest('created_at')
+                    ->first();
+            }
         }
-
-        $students = Student::where('school_class_id', $schoolClass->id)
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
 
         $reportData = [];
         $totalTagihan = 0;
         $totalTerbayar = 0;
+        $totalStudentsCount = 0;
 
-        foreach ($students as $student) {
-            $payments = CommitteePayment::where('student_id', $student->id)
-                ->where('committee_fee_id', $committeeFee->id)
-                ->orderBy('payment_date', 'asc')
+        foreach ($classes as $class) {
+            if ($filterType === 'academic_year') {
+                $fee = CommitteeFee::where('academic_year_id', $academicYear->id)
+                    ->where('school_class_id', $class->id)
+                    ->first();
+            } else {
+                $fee = CommitteeFee::where('school_class_id', $class->id)
+                    ->latest('created_at')
+                    ->first();
+            }
+
+            if (!$fee)
+                continue;
+
+            $students = Student::where('school_class_id', $class->id)
+                ->where('is_active', true)
+                ->orderBy('name')
                 ->get();
 
-            $totalPaid = $payments->sum('amount');
-            $remaining = $committeeFee->amount - $totalPaid;
+            foreach ($students as $student) {
+                if ($filterType === 'academic_year') {
+                    $payments = CommitteePayment::where('student_id', $student->id)
+                        ->where('committee_fee_id', $fee->id)
+                        ->orderBy('payment_date', 'asc')
+                        ->get();
+                } else {
+                    $payments = CommitteePayment::where('student_id', $student->id)
+                        ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                        ->orderBy('payment_date', 'asc')
+                        ->get();
+                }
 
-            $reportData[] = [
-                'student' => $student,
-                'payments' => $payments,
-                'total_paid' => $totalPaid,
-                'remaining' => max(0, $remaining),
-                'is_paid_full' => $totalPaid >= $committeeFee->amount,
-            ];
+                $totalPaid = $payments->sum('amount');
+                $remaining = $fee->amount - $totalPaid;
 
-            $totalTagihan += $committeeFee->amount;
-            $totalTerbayar += $totalPaid;
+                $reportData[] = [
+                    'student' => $student,
+                    'class_name' => $class->name,
+                    'fee_amount' => $fee->amount,
+                    'payments' => $payments,
+                    'total_paid' => $totalPaid,
+                    'remaining' => max(0, $remaining),
+                    'is_paid_full' => $totalPaid >= $fee->amount,
+                ];
+
+                $totalTagihan += $fee->amount;
+                $totalTerbayar += $totalPaid;
+            }
+            $totalStudentsCount += $students->count();
         }
 
         $summary = [
-            'total_students' => count($students),
+            'total_students' => $totalStudentsCount,
             'total_tagihan' => $totalTagihan,
             'total_terbayar' => $totalTerbayar,
             'total_sisa' => max(0, $totalTagihan - $totalTerbayar),
@@ -364,23 +444,48 @@ class CommitteeController extends Controller
             'committeeFee',
             'reportData',
             'summary',
-            'reportType'
+            'reportType',
+            'filterType',
+            'dateFrom',
+            'dateTo'
         ));
     }
 
     public function reportPdf(Request $request)
     {
-        $request->validate([
-            'academic_year_id' => 'required|exists:academic_years,id',
-            'school_class_id' => 'required',
-            'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
-        ]);
+        $filterType = $request->input('filter_type', 'academic_year');
 
-        $academicYear = AcademicYear::findOrFail($request->academic_year_id);
+        // Validate based on filter type
+        if ($filterType === 'academic_year') {
+            $request->validate([
+                'academic_year_id' => 'required|exists:academic_years,id',
+                'school_class_id' => 'required',
+                'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
+            ]);
+            $academicYear = AcademicYear::findOrFail($request->academic_year_id);
+            $dateFrom = null;
+            $dateTo = null;
+        } else {
+            $request->validate([
+                'date_from' => 'required|date',
+                'date_to' => 'required|date|after_or_equal:date_from',
+                'school_class_id' => 'required',
+                'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
+            ]);
+            $academicYear = null;
+            $dateFrom = $request->date_from;
+            $dateTo = $request->date_to;
+        }
+
         $reportType = $request->report_type;
 
-        if (($reportType == 'class_summary' || $reportType == 'all_summary') && $request->school_class_id == 'all') {
-            $classes = SchoolClass::where('is_active', true)->ordered()->get();
+        if ($reportType == 'class_summary' || $reportType == 'all_summary') {
+            if ($request->school_class_id == 'all') {
+                $classes = SchoolClass::where('is_active', true)->ordered()->get();
+            } else {
+                $classes = SchoolClass::where('id', $request->school_class_id)->get();
+            }
+
             $reportData = [];
             $grandTotalTagihan = 0;
             $grandTotalTerbayar = 0;
@@ -388,17 +493,30 @@ class CommitteeController extends Controller
 
             foreach ($classes as $class) {
                 $studentIds = \App\Models\Student::where('school_class_id', $class->id)->pluck('id');
-                $fee = CommitteeFee::where('academic_year_id', $academicYear->id)
-                    ->where('school_class_id', $class->id)
-                    ->first();
 
-                $totalPaid = CommitteePayment::whereIn('student_id', $studentIds)
-                    ->whereHas('committeeFee', function ($q) use ($academicYear) {
-                        $q->where('academic_year_id', $academicYear->id);
-                    })->sum('amount');
+                if ($filterType === 'academic_year') {
+                    $fee = CommitteeFee::where('academic_year_id', $academicYear->id)
+                        ->where('school_class_id', $class->id)
+                        ->first();
 
-                $totalStudents = $studentIds->count();
-                $totalTarget = $fee ? $fee->amount * $totalStudents : 0;
+                    $totalPaid = CommitteePayment::whereIn('student_id', $studentIds)
+                        ->whereHas('committeeFee', function ($q) use ($academicYear) {
+                            $q->where('academic_year_id', $academicYear->id);
+                        })->sum('amount');
+
+                    $totalStudents = $studentIds->count();
+                    $totalTarget = $fee ? $fee->amount * $totalStudents : 0;
+                } else {
+                    $totalPaid = CommitteePayment::whereIn('student_id', $studentIds)
+                        ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                        ->sum('amount');
+
+                    $totalStudents = $studentIds->count();
+                    $fee = CommitteeFee::where('school_class_id', $class->id)
+                        ->latest('created_at')
+                        ->first();
+                    $totalTarget = $fee ? $fee->amount * $totalStudents : 0;
+                }
 
                 $reportData[] = [
                     'class' => $class,
@@ -420,50 +538,93 @@ class CommitteeController extends Controller
                 'total_sisa' => max(0, $grandTotalTagihan - $grandTotalTerbayar),
             ];
 
-            $schoolClass = (object)['name' => 'Semua Kelas'];
+            $schoolClass = ($request->school_class_id == 'all')
+                ? (object) ['name' => 'Semua Kelas']
+                : $classes->first();
+
             $committeeFee = null;
-        } else {
-            $schoolClass = SchoolClass::findOrFail($request->school_class_id);
-            $committeeFee = CommitteeFee::where('academic_year_id', $academicYear->id)
-                ->where('school_class_id', $schoolClass->id)
-                ->first();
+        }
 
-            if (!$committeeFee) {
-                return redirect()->back()->with('error', 'Nominal dana komite belum diatur.');
+        // Handle Detail / Recapitulation for One OR All Classes
+        if ($reportType != 'class_summary' && $reportType != 'all_summary') {
+            if ($request->school_class_id == 'all') {
+                $classes = SchoolClass::where('is_active', true)->ordered()->get();
+                $schoolClass = (object) ['name' => 'Semua Kelas'];
+                $committeeFee = null;
+            } else {
+                $class = SchoolClass::findOrFail($request->school_class_id);
+                $classes = collect([$class]);
+                $schoolClass = $class;
+
+                if ($filterType === 'academic_year') {
+                    $committeeFee = CommitteeFee::where('academic_year_id', $academicYear->id)
+                        ->where('school_class_id', $class->id)
+                        ->first();
+                } else {
+                    $committeeFee = CommitteeFee::where('school_class_id', $class->id)
+                        ->latest('created_at')
+                        ->first();
+                }
             }
-
-            $students = Student::where('school_class_id', $schoolClass->id)
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get();
 
             $reportData = [];
             $totalTagihan = 0;
             $totalTerbayar = 0;
+            $totalStudentsCount = 0;
 
-            foreach ($students as $student) {
-                $payments = CommitteePayment::where('student_id', $student->id)
-                    ->where('committee_fee_id', $committeeFee->id)
-                    ->orderBy('payment_date', 'asc')
+            foreach ($classes as $class) {
+                if ($filterType === 'academic_year') {
+                    $fee = CommitteeFee::where('academic_year_id', $academicYear->id)
+                        ->where('school_class_id', $class->id)
+                        ->first();
+                } else {
+                    $fee = CommitteeFee::where('school_class_id', $class->id)
+                        ->latest('created_at')
+                        ->first();
+                }
+
+                if (!$fee)
+                    continue;
+
+                $students = Student::where('school_class_id', $class->id)
+                    ->where('is_active', true)
+                    ->orderBy('name')
                     ->get();
 
-                $totalPaid = $payments->sum('amount');
-                $remaining = $committeeFee->amount - $totalPaid;
+                foreach ($students as $student) {
+                    if ($filterType === 'academic_year') {
+                        $payments = CommitteePayment::where('student_id', $student->id)
+                            ->where('committee_fee_id', $fee->id)
+                            ->orderBy('payment_date', 'asc')
+                            ->get();
+                    } else {
+                        $payments = CommitteePayment::where('student_id', $student->id)
+                            ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                            ->orderBy('payment_date', 'asc')
+                            ->get();
+                    }
 
-                $reportData[] = [
-                    'student' => $student,
-                    'payments' => $payments,
-                    'total_paid' => $totalPaid,
-                    'remaining' => max(0, $remaining),
-                    'is_paid_full' => $totalPaid >= $committeeFee->amount,
-                ];
+                    $totalPaid = $payments->sum('amount');
+                    $remaining = $fee->amount - $totalPaid;
 
-                $totalTagihan += $committeeFee->amount;
-                $totalTerbayar += $totalPaid;
+                    $reportData[] = [
+                        'student' => $student,
+                        'class_name' => $class->name,
+                        'fee_amount' => $fee->amount,
+                        'payments' => $payments,
+                        'total_paid' => $totalPaid,
+                        'remaining' => max(0, $remaining),
+                        'is_paid_full' => $totalPaid >= $fee->amount,
+                    ];
+
+                    $totalTagihan += $fee->amount;
+                    $totalTerbayar += $totalPaid;
+                }
+                $totalStudentsCount += $students->count();
             }
 
             $summary = [
-                'total_students' => count($students),
+                'total_students' => $totalStudentsCount,
                 'total_tagihan' => $totalTagihan,
                 'total_terbayar' => $totalTerbayar,
                 'total_sisa' => max(0, $totalTagihan - $totalTerbayar),
@@ -483,7 +644,53 @@ class CommitteeController extends Controller
             'summary',
             'reportType',
             'school',
-            'signatory'
+            'signatory',
+            'filterType',
+            'dateFrom',
+            'dateTo'
         ));
+    }
+
+    public function reportExcel(Request $request)
+    {
+        $filterType = $request->input('filter_type', 'academic_year');
+
+        // Validate based on filter type
+        if ($filterType === 'academic_year') {
+            $request->validate([
+                'academic_year_id' => 'required|exists:academic_years,id',
+                'school_class_id' => 'required',
+                'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
+            ]);
+            $academicYear = AcademicYear::findOrFail($request->academic_year_id);
+            $dateFrom = null;
+            $dateTo = null;
+        } else {
+            $request->validate([
+                'date_from' => 'required|date',
+                'date_to' => 'required|date|after_or_equal:date_from',
+                'school_class_id' => 'required',
+                'report_type' => 'required|in:detail,recapitulation,class_summary,all_summary',
+            ]);
+            $academicYear = null;
+            $dateFrom = $request->date_from;
+            $dateTo = $request->date_to;
+        }
+
+        $params = [
+            'filter_type' => $filterType,
+            'academic_year' => $academicYear,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'school_class_id' => $request->school_class_id,
+            'report_type' => $request->report_type,
+        ];
+
+        $filename = 'laporan_komite_' . date('Y-m-d_His') . '.xlsx';
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\CommitteeReportExport($params),
+            $filename
+        );
     }
 }

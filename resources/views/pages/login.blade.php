@@ -217,8 +217,12 @@
 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-input @error('password') error @enderror"
-                        placeholder="••••••••" required>
+                    <div style="position: relative;">
+                        <input type="password" name="password" id="password"
+                            class="form-input @error('password') error @enderror" placeholder="••••••••" required>
+                        <i class="fas fa-eye" id="togglePassword"
+                            style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);"></i>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -243,6 +247,14 @@
             </a>
         </div>
     </div>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const password = document.getElementById('password');
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
 
 </html>

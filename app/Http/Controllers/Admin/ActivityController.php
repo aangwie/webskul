@@ -39,9 +39,8 @@ class ActivityController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $base64 = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
-            $validated['image'] = $base64;
+            $path = $request->file('image')->store('activities', 'public');
+            $validated['image'] = $path;
         }
 
         Activity::create($validated);
@@ -73,9 +72,13 @@ class ActivityController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $base64 = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
-            $validated['image'] = $base64;
+            // Delete old image
+            if ($activity->image && !Str::startsWith($activity->image, 'data:')) {
+                Storage::disk('public')->delete($activity->image);
+            }
+
+            $path = $request->file('image')->store('activities', 'public');
+            $validated['image'] = $path;
         }
 
         $activity->update($validated);
