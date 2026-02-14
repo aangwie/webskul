@@ -4,14 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - {{$school->name}}</title>
+    <title>Login - {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</title>
     @php $schoolFavicon = \App\Models\SchoolProfile::first(); @endphp
     @if($schoolFavicon && $schoolFavicon->logo)
-    <link rel="icon" type="image/png" href="{{ asset('storage/' . $schoolFavicon->logo) }}">
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $schoolFavicon->logo) }}">
     @else
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -193,16 +194,17 @@
             <p class="login-subtitle">Masuk ke panel administrasi sekolah</p>
 
             @if(session('success'))
-            <div style="background: #e8f5e9; color: #28a745; padding: 12px 18px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 20px; text-align: left;">
-                <i class="fas fa-check-circle"></i> {{ session('success') }}
-            </div>
+                <div
+                    style="background: #e8f5e9; color: #28a745; padding: 12px 18px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 20px; text-align: left;">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
+                </div>
             @endif
 
             @if($errors->any())
-            <div class="error-message">
-                <i class="fas fa-exclamation-circle"></i>
-                {{ $errors->first() }}
-            </div>
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ $errors->first() }}
+                </div>
             @endif
 
             <form method="POST" action="{{ route('login') }}">
@@ -227,7 +229,8 @@
                 </div>
 
                 <div style="text-align: right; margin-bottom: 15px;">
-                    <a href="{{ route('password.request') }}" style="color: var(--primary); font-size: 0.85rem; text-decoration: none;">Lupa password?</a>
+                    <a href="{{ route('password.request') }}"
+                        style="color: var(--primary); font-size: 0.85rem; text-decoration: none;">Lupa password?</a>
                 </div>
 
                 <button type="submit" class="btn-login">
