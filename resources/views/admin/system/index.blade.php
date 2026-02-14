@@ -36,6 +36,14 @@
                             </button>
                         @endif
                     </form>
+
+                    @if(session('storage_log'))
+                        <div style="margin-top: 20px;">
+                            <h5>Log Symlink:</h5>
+                            <pre
+                                style="background: #1e1e1e; color: #0f0; padding: 15px; border-radius: 5px; font-family: monospace; max-height: 200px; overflow-y: auto; font-size: 11px;">{{ session('storage_log') }}</pre>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

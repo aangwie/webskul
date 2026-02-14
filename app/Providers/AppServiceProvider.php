@@ -29,14 +29,10 @@ class AppServiceProvider extends ServiceProvider
         config(['app.locale' => 'id']);
         \Carbon\Carbon::setLocale('id');
 
-        $school = \App\Models\SchoolProfile::first();
-        \Illuminate\Support\Facades\View::share('school', $school);
-
-        $is_pmb_open = \App\Models\Setting::isPmbOpen();
-        \Illuminate\Support\Facades\View::share('is_pmb_open', $is_pmb_open);
-
-        // Theme Logic
-        $themeName = \App\Models\Setting::get('system_theme', 'default');
+        // Default values for global view variables
+        $school = null;
+        $is_pmb_open = false;
+        $themeName = 'default';
         $themeColors = [
             'default' => [
                 'primary' => '#1e3a5f',
@@ -64,36 +60,47 @@ class AppServiceProvider extends ServiceProvider
             ],
         ];
 
-        // Fallback to default if theme not found
-        $activeTheme = $themeColors[$themeName] ?? $themeColors['default'];
-
-        \Illuminate\Support\Facades\View::share('active_theme', $activeTheme);
-        \Illuminate\Support\Facades\View::share('theme_name', $themeName);
-
-        // Global SMTP Configuration Override
+        // Attempt to load from database if tables exist
         try {
-            $smtp = \App\Models\Setting::getSmtpSettings();
-            if ($smtp['mail_mailer'] && $smtp['mail_mailer'] !== 'log') {
-                config([
-                    'mail.default' => $smtp['mail_mailer'],
-                    'mail.mailers.smtp.host' => $smtp['mail_host'],
-                    'mail.mailers.smtp.port' => $smtp['mail_port'],
-                    'mail.mailers.smtp.username' => $smtp['mail_username'],
-                    'mail.mailers.smtp.password' => $smtp['mail_password'],
-                    'mail.mailers.smtp.encryption' => $smtp['mail_encryption'] === 'null' ? null : $smtp['mail_encryption'],
-                    'mail.from.address' => $smtp['mail_from_address'],
-                    'mail.from.name' => $smtp['mail_from_name'],
-                ]);
+            // Check for critical tables to avoid migration crashes
+            if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                $school = \App\Models\SchoolProfile::first();
+                $is_pmb_open = \App\Models\Setting::isPmbOpen();
+                $themeName = \App\Models\Setting::get('system_theme', 'default');
+
+                // Global SMTP Configuration Override
+                $smtp = \App\Models\Setting::getSmtpSettings();
+                if ($smtp['mail_mailer'] && $smtp['mail_mailer'] !== 'log') {
+                    config([
+                        'mail.default' => $smtp['mail_mailer'],
+                        'mail.mailers.smtp.host' => $smtp['mail_host'],
+                        'mail.mailers.smtp.port' => $smtp['mail_port'],
+                        'mail.mailers.smtp.username' => $smtp['mail_username'],
+                        'mail.mailers.smtp.password' => $smtp['mail_password'],
+                        'mail.mailers.smtp.encryption' => $smtp['mail_encryption'] === 'null' ? null : $smtp['mail_encryption'],
+                        'mail.from.address' => $smtp['mail_from_address'],
+                        'mail.from.name' => $smtp['mail_from_name'],
+                    ]);
+                }
             }
         } catch (\Exception $e) {
             // Silently fail if database is not ready or settings table missing
         }
 
+        // Share globally with views
+        $activeTheme = $themeColors[$themeName] ?? $themeColors['default'];
+        \Illuminate\Support\Facades\View::share('school', $school);
+        \Illuminate\Support\Facades\View::share('is_pmb_open', $is_pmb_open);
+        \Illuminate\Support\Facades\View::share('active_theme', $activeTheme);
+        \Illuminate\Support\Facades\View::share('theme_name', $themeName);
+
         // View Composer for Admin Layout - Complaint Badge
         \Illuminate\Support\Facades\View::composer('admin.layouts.app', function ($view) {
             $unrespondedComplaintsCount = 0;
             try {
-                $unrespondedComplaintsCount = \App\Models\PublicComplaint::where('status', 'pending')->count();
+                if (\Illuminate\Support\Facades\Schema::hasTable('public_complaints')) {
+                    $unrespondedComplaintsCount = \App\Models\PublicComplaint::where('status', 'pending')->count();
+                }
             } catch (\Exception $e) {
                 // Ignore if table doesn't exist yet
             }

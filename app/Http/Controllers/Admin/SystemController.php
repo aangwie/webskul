@@ -18,24 +18,51 @@ class SystemController extends Controller
 
     public function storageLink()
     {
+        $log = [];
         try {
+            $log[] = "Mencoba Artisan: storage:link...";
             Artisan::call('storage:link');
-            return back()->with('success', 'Symlink storage berhasil dibuat (Artisan)!');
+            $log[] = "✓ Berhasil via Artisan.";
+            return back()->with('success', 'Symlink storage berhasil dibuat (Artisan)!')->with('storage_log', implode("\n", $log));
         } catch (\Exception $e) {
+            $log[] = "✗ Gagal via Artisan: " . $e->getMessage();
+
             // Fallback for Shared Hosting (Manual Symlink)
             try {
                 $target = storage_path('app/public');
-                $link = public_path('storage');
+                $links = [
+                    public_path('storage'), // Default
+                ];
 
-                if (file_exists($link)) {
-                    // Try to unlink if exists (might be broken)
-                    @unlink($link);
+                // Detect public_html sibling (Common Shared Hosting)
+                // Case: /home/user/laravel_smp (root) and /home/user/public_html
+                $basePath = base_path();
+                $parentDir = dirname($basePath);
+                $publicHtmlPath = $parentDir . DIRECTORY_SEPARATOR . 'public_html';
+
+                if (is_dir($publicHtmlPath)) {
+                    $log[] = "Terdeteksi folder public_html di: " . $publicHtmlPath;
+                    $links[] = $publicHtmlPath . DIRECTORY_SEPARATOR . 'storage';
                 }
 
-                symlink($target, $link);
-                return back()->with('success', 'Symlink storage berhasil dibuat (Manual PHP)!');
+                foreach ($links as $link) {
+                    $log[] = "Mencoba membuat symlink di: " . $link;
+                    if (file_exists($link)) {
+                        $log[] = "- File/link sudah ada, mencoba menghapus...";
+                        @unlink($link);
+                    }
+
+                    if (symlink($target, $link)) {
+                        $log[] = "✓ Berhasil membuat symlink di: " . $link;
+                    } else {
+                        $log[] = "✗ Gagal membuat symlink di: " . $link;
+                    }
+                }
+
+                return back()->with('success', 'Proses symlink selesai! Cek log di bawah.')->with('storage_log', implode("\n", $log));
             } catch (\Exception $ex) {
-                return back()->with('error', 'Gagal membuat symlink: ' . $e->getMessage() . ' | Manual: ' . $ex->getMessage());
+                $log[] = "✗ Gagal Total: " . $ex->getMessage();
+                return back()->with('error', 'Gagal membuat symlink!')->with('storage_log', implode("\n", $log));
             }
         }
     }
