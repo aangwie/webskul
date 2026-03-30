@@ -208,7 +208,7 @@
             @endif
 
             <div class="article-body">
-                {!! nl2br(e($activity->content)) !!}
+                {!! $activity->content !!}
 
                 <a href="{{ route('activities.index') }}" class="back-link">
                     <i class="fas fa-arrow-left"></i> Kembali ke Kegiatan

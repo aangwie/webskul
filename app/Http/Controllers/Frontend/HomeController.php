@@ -12,7 +12,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $latestActivities = Activity::published()->latest('published_at')->take(3)->get();
+        $latestActivities = Activity::published()->latest('published_at')->take(6)->get();
         $importantInfo = Information::active()->important()->latest()->take(5)->get();
         $featuredTeachers = Teacher::active()->count();
 
