@@ -29,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
         config(['app.locale' => 'id']);
         \Carbon\Carbon::setLocale('id');
 
+        \App\Models\Activity::observe(\App\Observers\ActivityObserver::class);
+
         // Default values for global view variables
         $school = null;
         $is_pmb_open = false;

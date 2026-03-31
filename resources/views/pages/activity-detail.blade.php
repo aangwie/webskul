@@ -3,6 +3,7 @@
 @section('title', $activity->title . ' - ' . ($school->name ?? 'SMP Negeri 6 Sudimoro'))
 
 @section('styles')
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <style>
         .page-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
@@ -208,7 +209,9 @@
             @endif
 
             <div class="article-body">
-                {!! $activity->content !!}
+                <div class="ql-editor" style="padding: 0;">
+                    {!! $activity->content !!}
+                </div>
 
                 <a href="{{ route('activities.index') }}" class="back-link">
                     <i class="fas fa-arrow-left"></i> Kembali ke Kegiatan

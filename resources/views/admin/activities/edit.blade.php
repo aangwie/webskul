@@ -20,7 +20,7 @@
             <h2>Edit: {{ $activity->title }}</h2>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.activities.update', $activity) }}" method="POST" enctype="multipart/form-data">
+            <form id="activity-form" action="{{ route('admin.activities.update', $activity) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -110,7 +110,7 @@
         theme: 'snow'
     });
     
-    var form = document.querySelector('form');
+    var form = document.getElementById('activity-form');
     form.onsubmit = function() {
         document.querySelector('#content').value = quill.root.innerHTML;
     };

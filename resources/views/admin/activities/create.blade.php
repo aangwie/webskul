@@ -20,7 +20,7 @@
         <h2>Form Tambah Kegiatan</h2>
     </div>
     <div class="card-body">
-        <form action="{{ route('admin.activities.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="activity-form" action="{{ route('admin.activities.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="form-group">
@@ -95,7 +95,7 @@
         theme: 'snow'
     });
     
-    var form = document.querySelector('form');
+    var form = document.getElementById('activity-form');
     form.onsubmit = function() {
         document.querySelector('#content').value = quill.root.innerHTML;
     };

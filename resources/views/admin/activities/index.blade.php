@@ -3,6 +3,15 @@
 @section('title', 'Daftar Kegiatan')
 @section('page-title', 'Data Kegiatan')
 
+@section('styles')
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    .swal2-html-container {
+        text-align: left !important;
+    }
+</style>
+@endsection
+
 @section('content')
     <div class="card">
         <div class="card-header">
@@ -57,6 +66,11 @@
                                     <td>{{ $activity->published_at ? $activity->published_at->format('d M Y') : '-' }}</td>
                                     <td>
                                         <div style="display: flex; gap: 5px;">
+                                            <button type="button" class="btn btn-info btn-sm btn-preview"
+                                                data-title="{{ $activity->title }}"
+                                                data-content="{{ htmlspecialchars($activity->content) }}">
+                                                <i class="fas fa-eye" style="color: white;"></i>
+                                            </button>
                                             <a href="{{ route('admin.activities.edit', $activity) }}"
                                                 class="btn btn-warning btn-sm">
                                                 <i class="fas fa-edit"></i>
@@ -80,4 +94,31 @@
             @endif
         </div>
     </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const previewBtns = document.querySelectorAll('.btn-preview');
+        previewBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const title = this.dataset.title;
+                const content = this.dataset.content;
+
+                Swal.fire({
+                    title: '<h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0;">' + title + '</h3>',
+                    html: '<div class="ql-editor" style="padding: 0;">' + content + '</div>',
+                    width: '800px',
+                    showCloseButton: true,
+                    showConfirmButton: false,
+                    customClass: {
+                        container: 'preview-modal-container',
+                        popup: 'preview-modal-popup',
+                        content: 'preview-modal-content'
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endsection
