@@ -186,7 +186,7 @@
                 {{ $info->title }}
             </h3>
             <div class="info-text">
-                {!! nl2br(e($info->content)) !!}
+                {!! $info->content !!}
             </div>
             <div class="info-date">
                 <i class="far fa-clock"></i>

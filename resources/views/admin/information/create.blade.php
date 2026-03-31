@@ -3,13 +3,24 @@
 @section('title', 'Tambah Informasi')
 @section('page-title', 'Tambah Informasi Baru')
 
+@section('styles')
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    .ql-editor {
+        min-height: 200px;
+        background: var(--secondary);
+        color: var(--text);
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="card">
     <div class="card-header">
         <h2>Form Tambah Informasi</h2>
     </div>
     <div class="card-body">
-        <form action="{{ route('admin.information.store') }}" method="POST">
+        <form id="information-form" action="{{ route('admin.information.store') }}" method="POST">
             @csrf
 
             <div class="form-group">
@@ -20,7 +31,8 @@
 
             <div class="form-group">
                 <label class="form-label">Konten *</label>
-                <textarea name="content" class="form-textarea" rows="6" required>{{ old('content') }}</textarea>
+                <input type="hidden" name="content" id="content" value="{{ old('content') }}">
+                <div id="editor" style="background: var(--secondary);">{!! old('content') !!}</div>
                 @error('content')<span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>@enderror
             </div>
 
@@ -49,4 +61,37 @@
         </form>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script>
+    var toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],        
+        ['blockquote', 'code-block'],
+        [{ 'header': 1 }, { 'header': 2 }],               
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'script': 'sub'}, { 'script': 'super' }],      
+        [{ 'indent': '-1'}, { 'indent': '+1' }],          
+        [{ 'direction': 'rtl' }],                         
+        [{ 'size': ['small', false, 'large', 'huge'] }],  
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ 'color': [] }, { 'background': [] }],          
+        [{ 'align': [] }],                                
+        ['clean'],                                         
+        ['link', 'image', 'video']                         
+    ];
+
+    var quill = new Quill('#editor', {
+        modules: {
+            toolbar: toolbarOptions
+        },
+        theme: 'snow'
+    });
+    
+    var form = document.getElementById('information-form');
+    form.onsubmit = function() {
+        document.querySelector('#content').value = quill.root.innerHTML;
+    };
+</script>
 @endsection
