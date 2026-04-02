@@ -717,6 +717,12 @@
                 </ul>
             </li>
             <li>
+                <a href="{{ route('admin.carousel.index') }}"
+                    class="{{ request()->routeIs('admin.carousel.*') ? 'active' : '' }}">
+                    <i class="fas fa-images"></i> Carousel
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('admin.activities.index') }}"
                     class="{{ request()->routeIs('admin.activities.*') ? 'active' : '' }}">
                     <i class="fas fa-newspaper"></i> Kegiatan

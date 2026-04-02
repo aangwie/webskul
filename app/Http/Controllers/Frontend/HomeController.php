@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
+use App\Models\CarouselImage;
 use App\Models\Information;
 use App\Models\SchoolProfile;
 use App\Models\Teacher;
@@ -16,11 +17,14 @@ class HomeController extends Controller
         $importantInfo = Information::active()->important()->latest()->take(5)->get();
         $featuredTeachers = Teacher::active()->count();
 
+        // Carousel
+        $carouselImages = CarouselImage::active()->ordered()->get();
+
         // Student Statistics
         $studentStats = [
-            'total_classes' => \App\Models\SchoolClass::active()->count(),
-            'total_students' => \App\Models\Student::active()->count(),
-            'male_students' => \App\Models\Student::active()->male()->count(),
+            'total_classes'   => \App\Models\SchoolClass::active()->count(),
+            'total_students'  => \App\Models\Student::active()->count(),
+            'male_students'   => \App\Models\Student::active()->male()->count(),
             'female_students' => \App\Models\Student::active()->female()->count(),
         ];
 
@@ -50,6 +54,10 @@ class HomeController extends Controller
         // Social Media
         $socials = \App\Models\SocialMedia::active()->ordered()->get();
 
-        return view('pages.home', compact('latestActivities', 'importantInfo', 'featuredTeachers', 'studentStats', 'classStats', 'enrollmentData', 'socials'));
+        return view('pages.home', compact(
+            'latestActivities', 'importantInfo', 'featuredTeachers',
+            'studentStats', 'classStats', 'enrollmentData', 'socials',
+            'carouselImages'
+        ));
     }
 }

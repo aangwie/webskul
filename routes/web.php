@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\CommitteeExpenditureController;
 use App\Http\Controllers\Admin\CommitteePlanningController;
 use App\Http\Controllers\Admin\ArchiveController;
 use App\Http\Controllers\Admin\ArchiveTypeController;
+use App\Http\Controllers\Admin\CarouselController;
 use App\Http\Controllers\Admin\BookTypeController;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\BookConditionController;
@@ -225,5 +226,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::middleware(['role:admin'])->group(function () {
             Route::resource('archive-types', ArchiveTypeController::class)->except(['show', 'create', 'edit']);
         });
+
+        // Carousel Images
+        Route::resource('carousel', CarouselController::class)->except(['show', 'create', 'edit']);
     });
 });
