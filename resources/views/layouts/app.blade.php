@@ -443,6 +443,7 @@
                     <ul class="dropdown-menu">
                         <li><a href="{{ route('profile.school') }}" class="dropdown-item">Profil Sekolah</a></li>
                         <li><a href="{{ route('profile.teachers') }}" class="dropdown-item">Profil Guru</a></li>
+                        <li><a href="{{ route('profile.facilities') }}" class="dropdown-item">Fasilitas Sekolah</a></li>
                     </ul>
                 </li>
                 <li class="nav-item">

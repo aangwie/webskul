@@ -4,6 +4,7 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\ProfileController;
 use App\Http\Controllers\Frontend\ActivityController;
 use App\Http\Controllers\Frontend\InformationController;
+use App\Http\Controllers\Frontend\SchoolFacilityController;
 use App\Http\Controllers\Frontend\AuthController;
 use App\Http\Controllers\Frontend\PmbController;
 use App\Http\Controllers\Frontend\KomiteStatusController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\ActivityController as AdminActivityController;
 use App\Http\Controllers\Admin\InformationController as AdminInformationController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
+use App\Http\Controllers\Admin\SchoolFacilityController as AdminSchoolFacilityController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\AcademicYearController;
@@ -34,6 +36,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/profile/school', [ProfileController::class, 'school'])->name('profile.school');
 Route::get('/profile/teachers', [ProfileController::class, 'teachers'])->name('profile.teachers');
+Route::get('/profile/facilities', [SchoolFacilityController::class, 'index'])->name('profile.facilities');
 Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
 Route::get('/activities/{slug}', [ActivityController::class, 'show'])->name('activities.show');
 Route::get('/information', [InformationController::class, 'index'])->name('information.index');
@@ -93,6 +96,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
         // Information
         Route::resource('information', AdminInformationController::class)->except(['show']);
+        
+        // School Facilities
+        Route::resource('school-facilities', AdminSchoolFacilityController::class)->except(['show']);
 
         // Public Complaints
         Route::get('/public-complaints', [\App\Http\Controllers\Admin\PublicComplaintController::class, 'index'])->name('public-complaints.index');

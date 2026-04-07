@@ -688,6 +688,12 @@
                                 <i class="fas fa-book-reader"></i> Modul Ajar
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('admin.school-facilities.index') }}"
+                                class="{{ request()->routeIs('admin.school-facilities.*') ? 'active' : '' }}">
+                                <i class="fas fa-building"></i> Fasilitas Sekolah
+                            </a>
+                        </li>
 
                     </ul>
                 </li>
