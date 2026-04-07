@@ -16,7 +16,7 @@
                         @elseif($reportType == 'all_summary')
                             Laporan Rekapitulasi Semua Kelas
                         @else
-                            Laporan {{ $reportType == 'detail' ? 'Detail' : 'Rekapitulasi' }} Pembayaran Dana Komite
+                            Laporan {{ $reportType == 'detail' ? 'Detail' : 'Rekapitulasi' }} Sumbangan Dana Komite
                         @endif
                     </h3>
                     <div style="display: flex; gap: 30px; flex-wrap: wrap; color: var(--text-light);">
@@ -349,7 +349,7 @@
                                     </tbody>
                                 </table>
                             @else
-                                <p style="color: var(--text-light); font-style: italic;">Belum ada pembayaran.</p>
+                                <p style="color: var(--text-light); font-style: italic;">Belum ada sumbangan.</p>
                             @endif
 
                             <div

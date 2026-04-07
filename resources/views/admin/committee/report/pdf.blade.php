@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <title>Laporan Dana Komite - {{ $schoolClass->name }}</title>
     @if(isset($school) && $school && $school->logo)
-    <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $school->logo) }}">
     @else
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
     <style>
         @page {
@@ -237,7 +237,7 @@
 
     {{-- Report Title --}}
     <div class="report-title">
-        <h3>Laporan {{ $reportType == 'detail' ? 'Detail' : 'Rekapitulasi' }} Pembayaran Dana Komite</h3>
+        <h3>Laporan {{ $reportType == 'detail' ? 'Detail' : 'Rekapitulasi' }} Sumbangan Dana Komite</h3>
     </div>
 
     {{-- Info Box --}}
@@ -283,94 +283,94 @@
     </div>
 
     @if($reportType == 'recapitulation')
-    {{-- Recapitulation Table --}}
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 30px;">No</th>
-                <th>Nama Siswa</th>
-                <th style="width: 70px;">NIS</th>
-                <th class="text-right" style="width: 90px;">Tagihan</th>
-                <th class="text-right" style="width: 90px;">Terbayar</th>
-                <th class="text-right" style="width: 90px;">Sisa</th>
-                <th class="text-center" style="width: 70px;">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($reportData as $index => $data)
-            <tr>
-                <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ $data['student']->name }}</td>
-                <td>{{ $data['student']->nis ?? '-' }}</td>
-                <td class="text-right">Rp {{ number_format($committeeFee->amount, 0, ',', '.') }}</td>
-                <td class="text-right text-success">Rp {{ number_format($data['total_paid'], 0, ',', '.') }}</td>
-                <td class="text-right text-danger">Rp {{ number_format($data['remaining'], 0, ',', '.') }}</td>
-                <td class="text-center">
-                    @if($data['is_paid_full'])
-                    <span class="badge badge-success">LUNAS</span>
-                    @else
-                    <span class="badge badge-warning">BELUM</span>
-                    @endif
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3" class="text-right"><strong>TOTAL</strong></td>
-                <td class="text-right">Rp {{ number_format($summary['total_tagihan'], 0, ',', '.') }}</td>
-                <td class="text-right text-success">Rp {{ number_format($summary['total_terbayar'], 0, ',', '.') }}</td>
-                <td class="text-right text-danger">Rp {{ number_format($summary['total_sisa'], 0, ',', '.') }}</td>
-                <td></td>
-            </tr>
-        </tfoot>
-    </table>
-    @else
-    {{-- Detail Report --}}
-    @foreach($reportData as $index => $data)
-    <div class="student-section">
-        <div class="student-header">
-            <strong>{{ $index + 1 }}. {{ $data['student']->name }}</strong>
-            <span style="color: #666;">(NIS: {{ $data['student']->nis ?? '-' }})</span>
-            @if($data['is_paid_full'])
-            <span class="badge badge-success" style="float: right;">LUNAS</span>
-            @else
-            <span class="badge badge-warning" style="float: right;">BELUM LUNAS</span>
-            @endif
-        </div>
-
-        @if($data['payments']->count() > 0)
+        {{-- Recapitulation Table --}}
         <table>
             <thead>
                 <tr>
                     <th style="width: 30px;">No</th>
-                    <th style="width: 100px;">Tanggal</th>
-                    <th class="text-right" style="width: 120px;">Nominal</th>
-                    <th>Keterangan</th>
+                    <th>Nama Siswa</th>
+                    <th style="width: 70px;">NIS</th>
+                    <th class="text-right" style="width: 90px;">Tagihan</th>
+                    <th class="text-right" style="width: 90px;">Terbayar</th>
+                    <th class="text-right" style="width: 90px;">Sisa</th>
+                    <th class="text-center" style="width: 70px;">Status</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data['payments'] as $pIndex => $payment)
-                <tr>
-                    <td class="text-center">{{ $pIndex + 1 }}</td>
-                    <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
-                    <td class="text-right text-success">Rp {{ number_format($payment->amount, 0, ',', '.') }}</td>
-                    <td>{{ $payment->notes ?? '-' }}</td>
-                </tr>
+                @foreach($reportData as $index => $data)
+                    <tr>
+                        <td class="text-center">{{ $index + 1 }}</td>
+                        <td>{{ $data['student']->name }}</td>
+                        <td>{{ $data['student']->nis ?? '-' }}</td>
+                        <td class="text-right">Rp {{ number_format($committeeFee->amount, 0, ',', '.') }}</td>
+                        <td class="text-right text-success">Rp {{ number_format($data['total_paid'], 0, ',', '.') }}</td>
+                        <td class="text-right text-danger">Rp {{ number_format($data['remaining'], 0, ',', '.') }}</td>
+                        <td class="text-center">
+                            @if($data['is_paid_full'])
+                                <span class="badge badge-success">LUNAS</span>
+                            @else
+                                <span class="badge badge-warning">BELUM</span>
+                            @endif
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-right"><strong>TOTAL</strong></td>
+                    <td class="text-right">Rp {{ number_format($summary['total_tagihan'], 0, ',', '.') }}</td>
+                    <td class="text-right text-success">Rp {{ number_format($summary['total_terbayar'], 0, ',', '.') }}</td>
+                    <td class="text-right text-danger">Rp {{ number_format($summary['total_sisa'], 0, ',', '.') }}</td>
+                    <td></td>
+                </tr>
+            </tfoot>
         </table>
-        @else
-        <p style="color: #666; font-style: italic; padding: 10px;">Belum ada pembayaran.</p>
-        @endif
+    @else
+        {{-- Detail Report --}}
+        @foreach($reportData as $index => $data)
+            <div class="student-section">
+                <div class="student-header">
+                    <strong>{{ $index + 1 }}. {{ $data['student']->name }}</strong>
+                    <span style="color: #666;">(NIS: {{ $data['student']->nis ?? '-' }})</span>
+                    @if($data['is_paid_full'])
+                        <span class="badge badge-success" style="float: right;">LUNAS</span>
+                    @else
+                        <span class="badge badge-warning" style="float: right;">BELUM LUNAS</span>
+                    @endif
+                </div>
 
-        <p style="font-size: 9pt; color: #666;">
-            Tagihan: <strong>Rp {{ number_format($committeeFee->amount, 0, ',', '.') }}</strong> |
-            Terbayar: <strong class="text-success">Rp {{ number_format($data['total_paid'], 0, ',', '.') }}</strong> |
-            Sisa: <strong class="text-danger">Rp {{ number_format($data['remaining'], 0, ',', '.') }}</strong>
-        </p>
-    </div>
-    @endforeach
+                @if($data['payments']->count() > 0)
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;">No</th>
+                                <th style="width: 100px;">Tanggal</th>
+                                <th class="text-right" style="width: 120px;">Nominal</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($data['payments'] as $pIndex => $payment)
+                                <tr>
+                                    <td class="text-center">{{ $pIndex + 1 }}</td>
+                                    <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
+                                    <td class="text-right text-success">Rp {{ number_format($payment->amount, 0, ',', '.') }}</td>
+                                    <td>{{ $payment->notes ?? '-' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <p style="color: #666; font-style: italic; padding: 10px;">Belum ada sumbangan.</p>
+                @endif
+
+                <p style="font-size: 9pt; color: #666;">
+                    Tagihan: <strong>Rp {{ number_format($committeeFee->amount, 0, ',', '.') }}</strong> |
+                    Terbayar: <strong class="text-success">Rp {{ number_format($data['total_paid'], 0, ',', '.') }}</strong> |
+                    Sisa: <strong class="text-danger">Rp {{ number_format($data['remaining'], 0, ',', '.') }}</strong>
+                </p>
+            </div>
+        @endforeach
     @endif
 
     {{-- Footer with Signature --}}

@@ -12,7 +12,7 @@
             @if($activeYear)
                 <div style="margin-bottom: 30px;">
                     <h3 style="margin-bottom: 15px; color: var(--primary);">
-                        <i class="fas fa-chart-pie"></i> Ringkasan Pembayaran TA {{ $activeYear->year }}
+                        <i class="fas fa-chart-pie"></i> Ringkasan Sumbangan TA {{ $activeYear->year }}
                     </h3>
                     <div class="table-responsive"
                         style="background: white; border-radius: 12px; border: 1px solid var(--accent);">
@@ -176,7 +176,7 @@
                                     <div>
                                         <strong style="display: block; font-size: 0.9rem;">Detail</strong>
                                         <span style="font-size: 0.75rem; color: var(--text-light);">Rincian tiap
-                                            pembayaran</span>
+                                            sumbangan</span>
                                     </div>
                                 </label>
                                 <label

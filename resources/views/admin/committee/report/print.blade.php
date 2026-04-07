@@ -288,7 +288,7 @@
         <div class="report-title">
             <h3>LAPORAN
                 {{ strtoupper($reportType == 'detail' ? 'Detail' : ($reportType == 'class_summary' ? 'Rekap Per Kelas' : ($reportType == 'all_summary' ? 'Rekap Semua Kelas' : 'Rekapitulasi'))) }}
-                PEMBAYARAN DANA KOMITE
+                SUMBANGAN DANA KOMITE
             </h3>
         </div>
 
@@ -387,7 +387,8 @@
                     style="text-align: center; margin-top: 0; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px;">
                     RINGKASAN GLOBAL @if($filterType === 'academic_year' && $academicYear) TA {{ $academicYear->year }}
                     @else Periode {{ \Carbon\Carbon::parse($dateFrom)->format('d/m/Y') }} -
-                    {{ \Carbon\Carbon::parse($dateTo)->format('d/m/Y') }} @endif</h3>
+                    {{ \Carbon\Carbon::parse($dateTo)->format('d/m/Y') }} @endif
+                </h3>
                 <table style="width: 100%; border: none;">
                     <tr style="border: none;">
                         <td style="border: none; padding: 10px 0;">Total Siswa (Semua Kelas)</td>
@@ -401,7 +402,7 @@
                                 {{ number_format($summary['total_tagihan'], 0, ',', '.') }}</strong></td>
                     </tr>
                     <tr style="border: none;">
-                        <td style="border: none; padding: 10px 0;">Total Pembayaran Masuk</td>
+                        <td style="border: none; padding: 10px 0;">Total Sumbangan Masuk</td>
                         <td style="border: none; padding: 10px 0;" class="text-right"><strong class="text-success">Rp
                                 {{ number_format($summary['total_terbayar'], 0, ',', '.') }}</strong></td>
                     </tr>
@@ -497,9 +498,11 @@
                                 @endif
                             </td>
                             <td class="text-right text-success" style="border: 1px solid #ddd;">Rp
-                                {{ number_format($data['total_paid'], 0, ',', '.') }}</td>
+                                {{ number_format($data['total_paid'], 0, ',', '.') }}
+                            </td>
                             <td class="text-right text-danger" style="border: 1px solid #ddd;">Rp
-                                {{ number_format($data['remaining'], 0, ',', '.') }}</td>
+                                {{ number_format($data['remaining'], 0, ',', '.') }}
+                            </td>
                             <td class="text-center" style="border: 1px solid #ddd;">
                                 @if($data['is_paid_full'])
                                     <span class="badge badge-success">LUNAS</span>

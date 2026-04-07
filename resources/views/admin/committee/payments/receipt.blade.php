@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kwitansi Pembayaran - {{ $committeePayment->student->name }}</title>
+    <title>Kwitansi Sumbangan - {{ $committeePayment->student->name }}</title>
     <style>
         body {
             font-family: 'Courier New', Courier, monospace;
@@ -112,10 +112,12 @@
 
 <body>
     <div class="no-print" style="text-align: center; margin-bottom: 20px;">
-        <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; background: #1e3a5f; color: white; border: none; border-radius: 5px;">
+        <button onclick="window.print()"
+            style="padding: 10px 20px; cursor: pointer; background: #1e3a5f; color: white; border: none; border-radius: 5px;">
             <i class="fas fa-print"></i> Cetak Kwitansi
         </button>
-        <button onclick="window.close()" style="padding: 10px 20px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 5px;">
+        <button onclick="window.close()"
+            style="padding: 10px 20px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 5px;">
             Tutup
         </button>
     </div>
@@ -139,11 +141,13 @@
         </div>
         <div class="row">
             <div class="label">Telah Terima Dari</div>
-            <div class="value"><strong>{{ $committeePayment->student->name }}</strong> (NIS: {{ $committeePayment->student->nis }})</div>
+            <div class="value"><strong>{{ $committeePayment->student->name }}</strong> (NIS:
+                {{ $committeePayment->student->nis }})</div>
         </div>
         <div class="row">
             <div class="label">Kelas</div>
-            <div class="value">{{ $committeePayment->student->schoolClass->name }} (Grade {{ $committeePayment->student->schoolClass->grade }})</div>
+            <div class="value">{{ $committeePayment->student->schoolClass->name }} (Grade
+                {{ $committeePayment->student->schoolClass->grade }})</div>
         </div>
         <div class="row">
             <div class="label">Tahun Ajaran</div>
