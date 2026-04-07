@@ -178,9 +178,9 @@
         <div class="facility-grid">
             @foreach($facilities as $facility)
                 <div class="facility-card animate-fade-in" style="animation-delay: {{ $loop->index * 0.1 }}s">
-                    <div class="facility-image-container" onclick="openLightbox('{{ asset('storage/' . $facility->image) }}')">
+                    <div class="facility-image-container" onclick="openLightbox('{{ route('public.storage.view', ['path' => $facility->image]) }}')">
                         @if($facility->image)
-                            <img src="{{ asset('storage/' . $facility->image) }}" alt="Fasilitas" class="facility-image">
+                            <img src="{{ route('public.storage.view', ['path' => $facility->image]) }}" alt="Fasilitas" class="facility-image">
                         @else
                             <div style="width: 100%; height: 100%; background: var(--accent); display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-image" style="font-size: 3rem; color: var(--text-light); opacity: 0.5;"></i>
