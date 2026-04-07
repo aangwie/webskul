@@ -481,10 +481,16 @@
                         Manajemen <i class="fas fa-chevron-down"></i>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ route('komite.status') }}" class="dropdown-item">Cek Pembayaran Komite</a></li>
+                        <li><a href="{{ route('komite.status') }}" class="dropdown-item">Cek Sumbangan Komite</a></li>
                         <li><a href="https://simsiswa.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">SIM
                                 Siswa</a></li>
-                        <li><a href="https://my.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">SPPD</a>
+                        <li><a href="https://sppd.sppddikdaspacitan.my.id" target="_blank"
+                                class="dropdown-item">SPPD</a>
+                        </li>
+                        <li><a href="https://cbt.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">CBT</a>
+                        </li>
+                        <li><a href="https://lulus.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">Cek
+                                Kelulusan</a>
                         </li>
                     </ul>
                 </li>
