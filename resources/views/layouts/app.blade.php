@@ -427,7 +427,7 @@
                 @endif
                 <div class="nav-brand-text">
                     <span class="nav-brand-name">{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</span>
-                    <span class="nav-brand-sub">Excellence in Education</span>
+                    <span class="nav-brand-sub">{{ $school->brand_subtitle ?? 'Excellence in Education' }}</span>
                 </div>
             </a>
 

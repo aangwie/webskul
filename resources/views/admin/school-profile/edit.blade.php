@@ -20,6 +20,12 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">Sub Judul (Slogan Navbar)</label>
+                    <input type="text" name="brand_subtitle" class="form-input" value="{{ old('brand_subtitle', $school->brand_subtitle) }}" placeholder="Contoh: Excellence in Education">
+                    @error('brand_subtitle')<span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>@enderror
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">Alamat</label>
                     <textarea name="address" class="form-textarea"
                         rows="3">{{ old('address', $school->address) }}</textarea>

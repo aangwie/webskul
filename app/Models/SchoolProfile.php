@@ -8,6 +8,7 @@ class SchoolProfile extends Model
 {
     protected $fillable = [
         'name',
+        'brand_subtitle',
         'address',
         'city',
         'phone',
