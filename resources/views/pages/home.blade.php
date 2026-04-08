@@ -59,11 +59,12 @@
             flex-shrink: 0;
         }
 
-        .hero-content h2 {
-            font-size: 3rem;
+        .hero-content h1 {
+            font-size: clamp(1.5rem, 3.5vw, 2.4rem);
             font-weight: 800;
             line-height: 1.2;
             color: #ffffff;
+            white-space: nowrap;
         }
 
         .hero-content p {
@@ -293,8 +294,9 @@
                 text-align: center;
             }
 
-            .hero-content h2 {
-                font-size: 2rem;
+            .hero-content h1 {
+                font-size: clamp(1.2rem, 5vw, 1.8rem);
+                white-space: normal;
             }
 
             .hero-buttons {
@@ -583,12 +585,13 @@
                     display: none !important;
                 }
 
-                .hero-content h2, 
+                .hero-content h1,
                 .hero-content p {
                     background: var(--nav-bg) !important;
                     -webkit-background-clip: text !important;
                     -webkit-text-fill-color: transparent !important;
-                    color: var(--primary) !important; /* Fallback */
+                    color: var(--primary) !important;
+                    /* Fallback */
                     text-shadow: none !important;
                 }
 
@@ -610,7 +613,7 @@
                     @else
                         <div class="hero-logo-ssn-placeholder"></div>
                     @endif
-                    <h2>Selamat Datang di<br>{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</h2>
+                    <h1>Selamat Datang di<br>{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</h1>
                 </div>
                 <p>Mewujudkan generasi muda yang berilmu, berakhlak mulia, dan siap menghadapi tantangan masa depan dengan
                     pendidikan berkualitas.</p>
