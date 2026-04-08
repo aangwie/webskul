@@ -63,9 +63,9 @@
                         </td>
                         <td><span class="badge badge-success">{{ $module->academicYear->year }}</span></td>
                         <td style="text-align: center;">
-                            <a href="{{ asset('storage/' . $module->file_path) }}" target="_blank" class="btn btn-sm btn-primary" title="Lihat PDF">
+                            <button type="button" class="btn btn-sm btn-primary" title="Lihat PDF" onclick="openPdfModal('{{ $module->title }}', '{{ route('modules.view', $module->id) }}')">
                                 <i class="fas fa-file-pdf"></i> View
-                            </a>
+                            </button>
                         </td>
                         <td style="text-align: center;">
                             <form action="{{ route('admin.teaching-modules.destroy', $module->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus modul ini?')">
@@ -86,6 +86,19 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+{{-- PDF Modal --}}
+<div id="pdfModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div style="background: white; width: 90%; height: 90%; max-width: 1000px; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.5);">
+        <div style="padding: 15px 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="modalTitle" style="margin: 0; font-size: 1.1rem; color: white;">Lihat Modul</h3>
+            <button onclick="closePdfModal()" style="background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+        <div style="flex-grow: 1; background: #eee;">
+            <iframe id="pdfViewer" src="" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
     </div>
 </div>
@@ -152,6 +165,19 @@
 </div>
 
 <script>
+    function openPdfModal(title, url) {
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('pdfViewer').src = url;
+        document.getElementById('pdfModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePdfModal() {
+        document.getElementById('pdfModal').style.display = 'none';
+        document.getElementById('pdfViewer').src = '';
+        document.body.style.overflow = 'auto';
+    }
+
     function openAddModal() {
         document.getElementById('addModal').style.display = 'flex';
     }
@@ -183,6 +209,9 @@
     window.onclick = function(event) {
         if (event.target == document.getElementById('addModal')) {
             closeAddModal();
+        }
+        if (event.target == document.getElementById('pdfModal')) {
+            closePdfModal();
         }
     }
 </script>

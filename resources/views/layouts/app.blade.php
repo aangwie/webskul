@@ -444,7 +444,8 @@
                         <ul class="dropdown-menu">
                             <li><a href="{{ route('profile.school') }}" class="dropdown-item">Profil Sekolah</a></li>
                             <li><a href="{{ route('profile.teachers') }}" class="dropdown-item">Profil Guru</a></li>
-                            <li><a href="{{ route('profile.facilities') }}" class="dropdown-item">Fasilitas Sekolah</a></li>
+                            <li><a href="{{ route('profile.facilities') }}" class="dropdown-item">Fasilitas Sekolah</a>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -461,8 +462,10 @@
                             Informasi <i class="fas fa-chevron-down"></i>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ route('information.index') }}" class="dropdown-item">Informasi Sekolah</a></li>
-                            <li><a href="{{ route('public-complaints.create') }}" class="dropdown-item">Aduan Masyarakat</a>
+                            <li><a href="{{ route('information.index') }}" class="dropdown-item">Informasi Sekolah</a>
+                            </li>
+                            <li><a href="{{ route('public-complaints.create') }}" class="dropdown-item">Aduan
+                                    Masyarakat</a>
                             </li>
                             <li><a href="{{ route('public-complaints.status') }}" class="dropdown-item">Respon Aduan</a>
                             </li>
@@ -482,21 +485,23 @@
                             Manajemen <i class="fas fa-chevron-down"></i>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ route('komite.status') }}" class="dropdown-item">Cek Sumbangan Komite</a></li>
+                            <li><a href="{{ route('komite.status') }}" class="dropdown-item">Cek Sumbangan Komite</a>
+                            </li>
                             <li><a href="https://simsiswa.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">SIM
                                     Siswa</a></li>
-                            <li><a href="https://sppd.sppddikdaspacitan.my.id" target="_blank"
+                            <li><a href="https://sppd.smpn6sudimoro.my.id" target="_blank"
                                     class="dropdown-item">SPPD</a>
                             </li>
-                            <li><a href="https://cbt.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">CBT</a>
+                            <li><a href="https://cbt.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">CBT</a>
                             </li>
-                            <li><a href="https://lulus.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">Cek
+                            <li><a href="https://lulus.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">Cek
                                     Kelulusan</a>
                             </li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('login') }}" class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">
+                        <a href="{{ route('login') }}"
+                            class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">
                             <i class="fas fa-sign-in-alt"></i> Login
                         </a>
                     </li>
