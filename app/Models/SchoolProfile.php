@@ -16,5 +16,6 @@ class SchoolProfile extends Model
         'mission',
         'history',
         'logo',
+        'logo_ssn',
     ];
 }

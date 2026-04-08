@@ -37,6 +37,7 @@ class SchoolProfileController extends Controller
             'mission' => 'nullable|string',
             'history' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo_ssn' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $school = SchoolProfile::first();
@@ -54,10 +55,47 @@ class SchoolProfileController extends Controller
             $validated['logo'] = $path;
         }
 
+        if ($request->hasFile('logo_ssn')) {
+            // Delete old logo ssn if it exists and is not base64
+            if ($school->logo_ssn && !Str::startsWith($school->logo_ssn, 'data:')) {
+                Storage::disk('public')->delete($school->logo_ssn);
+            }
+
+            $pathSsn = $request->file('logo_ssn')->store('school', 'public');
+            $validated['logo_ssn'] = $pathSsn;
+        }
+
         $school->fill($validated);
         $school->save();
 
         return redirect()->route('admin.school-profile.index')
             ->with('success', 'Profil sekolah berhasil diperbarui!');
+    }
+
+    public function deleteLogo(Request $request, $type)
+    {
+        $school = SchoolProfile::first();
+        if (!$school) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Profil sekolah tidak ditemukan.'], 404);
+            }
+            return redirect()->back()->with('error', 'Profil sekolah tidak ditemukan.');
+        }
+
+        $field = $type === 'ssn' ? 'logo_ssn' : 'logo';
+
+        if ($school->$field && !Str::startsWith($school->$field, 'data:')) {
+            Storage::disk('public')->delete($school->$field);
+        }
+
+        $school->$field = null;
+        $school->save();
+
+        $label = $type === 'ssn' ? 'Logo SSN' : 'Logo Sekolah';
+        
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => "$label berhasil dihapus!"]);
+        }
+        return redirect()->back()->with('success', "$label berhasil dihapus!");
     }
 }

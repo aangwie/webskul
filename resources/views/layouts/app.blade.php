@@ -75,6 +75,8 @@
             height: 45px;
         }
 
+
+
         .nav-brand-text {
             display: flex;
             flex-direction: column;
@@ -281,6 +283,8 @@
                 height: 50px;
             }
 
+
+
             .nav-brand-name {
                 font-size: 1.1rem;
             }
@@ -427,79 +431,83 @@
                 </div>
             </a>
 
-            <button class="nav-toggle" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <ul class="nav-menu" id="navMenu">
+                    <li class="nav-item">
+                        <a href="{{ route('home') }}"
+                            class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Beranda</a>
+                    </li>
+                    <li class="nav-item" onclick="toggleDropdown(this)">
+                        <a href="#" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                            Profil <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ route('profile.school') }}" class="dropdown-item">Profil Sekolah</a></li>
+                            <li><a href="{{ route('profile.teachers') }}" class="dropdown-item">Profil Guru</a></li>
+                            <li><a href="{{ route('profile.facilities') }}" class="dropdown-item">Fasilitas Sekolah</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('activities.index') }}"
+                            class="nav-link {{ request()->routeIs('activities.*') ? 'active' : '' }}">Kegiatan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('modules.index') }}"
+                            class="nav-link {{ request()->routeIs('modules.*') ? 'active' : '' }}">Modul Ajar</a>
+                    </li>
+                    <li class="nav-item" onclick="toggleDropdown(this)">
+                        <a href="#"
+                            class="nav-link {{ request()->routeIs('information.*') || request()->routeIs('public-complaints.*') ? 'active' : '' }}">
+                            Informasi <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ route('information.index') }}" class="dropdown-item">Informasi Sekolah</a></li>
+                            <li><a href="{{ route('public-complaints.create') }}" class="dropdown-item">Aduan Masyarakat</a>
+                            </li>
+                            <li><a href="{{ route('public-complaints.status') }}" class="dropdown-item">Respon Aduan</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item" onclick="toggleDropdown(this)">
+                        <a href="#" class="nav-link {{ request()->routeIs('pmb.*') ? 'active' : '' }}">
+                            PMB <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ route('pmb.index') }}" class="dropdown-item">Pendaftaran</a></li>
+                            <li><a href="{{ route('pmb.status') }}" class="dropdown-item">Cek Status</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item" onclick="toggleDropdown(this)">
+                        <a href="#" class="nav-link">
+                            Manajemen <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ route('komite.status') }}" class="dropdown-item">Cek Sumbangan Komite</a></li>
+                            <li><a href="https://simsiswa.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">SIM
+                                    Siswa</a></li>
+                            <li><a href="https://sppd.sppddikdaspacitan.my.id" target="_blank"
+                                    class="dropdown-item">SPPD</a>
+                            </li>
+                            <li><a href="https://cbt.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">CBT</a>
+                            </li>
+                            <li><a href="https://lulus.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">Cek
+                                    Kelulusan</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('login') }}" class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </li>
+                </ul>
 
-            <ul class="nav-menu" id="navMenu">
-                <li class="nav-item">
-                    <a href="{{ route('home') }}"
-                        class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Beranda</a>
-                </li>
-                <li class="nav-item" onclick="toggleDropdown(this)">
-                    <a href="#" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
-                        Profil <i class="fas fa-chevron-down"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ route('profile.school') }}" class="dropdown-item">Profil Sekolah</a></li>
-                        <li><a href="{{ route('profile.teachers') }}" class="dropdown-item">Profil Guru</a></li>
-                        <li><a href="{{ route('profile.facilities') }}" class="dropdown-item">Fasilitas Sekolah</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('activities.index') }}"
-                        class="nav-link {{ request()->routeIs('activities.*') ? 'active' : '' }}">Kegiatan</a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('modules.index') }}"
-                        class="nav-link {{ request()->routeIs('modules.*') ? 'active' : '' }}">Modul Ajar</a>
-                </li>
-                <li class="nav-item" onclick="toggleDropdown(this)">
-                    <a href="#"
-                        class="nav-link {{ request()->routeIs('information.*') || request()->routeIs('public-complaints.*') ? 'active' : '' }}">
-                        Informasi <i class="fas fa-chevron-down"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ route('information.index') }}" class="dropdown-item">Informasi Sekolah</a></li>
-                        <li><a href="{{ route('public-complaints.create') }}" class="dropdown-item">Aduan Masyarakat</a>
-                        </li>
-                        <li><a href="{{ route('public-complaints.status') }}" class="dropdown-item">Respon Aduan</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item" onclick="toggleDropdown(this)">
-                    <a href="#" class="nav-link {{ request()->routeIs('pmb.*') ? 'active' : '' }}">
-                        PMB <i class="fas fa-chevron-down"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ route('pmb.index') }}" class="dropdown-item">Pendaftaran</a></li>
-                        <li><a href="{{ route('pmb.status') }}" class="dropdown-item">Cek Status</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item" onclick="toggleDropdown(this)">
-                    <a href="#" class="nav-link">
-                        Manajemen <i class="fas fa-chevron-down"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ route('komite.status') }}" class="dropdown-item">Cek Sumbangan Komite</a></li>
-                        <li><a href="https://simsiswa.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">SIM
-                                Siswa</a></li>
-                        <li><a href="https://sppd.sppddikdaspacitan.my.id" target="_blank"
-                                class="dropdown-item">SPPD</a>
-                        </li>
-                        <li><a href="https://cbt.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">CBT</a>
-                        </li>
-                        <li><a href="https://lulus.sppddikdaspacitan.my.id" target="_blank" class="dropdown-item">Cek
-                                Kelulusan</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('login') }}" class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </a>
-                </li>
-            </ul>
+
+
+                <button class="nav-toggle" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
         </div>
     </nav>
 

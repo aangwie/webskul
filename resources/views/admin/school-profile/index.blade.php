@@ -20,7 +20,17 @@
                         @if(Str::startsWith($school->logo, 'data:'))
                              <img src="{{ $school->logo }}" alt="Logo" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
                         @else
-                             <img src="{{ asset('storage/' . $school->logo) }}" alt="Logo" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
+                             <img src="{{ route('admin.storage.view', ['path' => $school->logo]) }}" alt="Logo" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
+                        @endif
+                    </div>
+                @endif
+                @if($school->logo_ssn)
+                    <div>
+                        <strong>Logo SSN:</strong><br>
+                        @if(Str::startsWith($school->logo_ssn, 'data:'))
+                             <img src="{{ $school->logo_ssn }}" alt="Logo SSN" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
+                        @else
+                             <img src="{{ route('admin.storage.view', ['path' => $school->logo_ssn]) }}" alt="Logo SSN" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
                         @endif
                     </div>
                 @endif

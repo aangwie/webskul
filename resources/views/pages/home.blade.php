@@ -33,11 +33,36 @@
             align-items: center;
         }
 
+        .hero-heading-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .hero-logo-ssn {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            flex-shrink: 0;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+            transition: var(--transition);
+        }
+
+        .hero-logo-ssn:hover {
+            transform: scale(1.05);
+        }
+
+        .hero-logo-ssn-placeholder {
+            width: 90px;
+            height: 90px;
+            flex-shrink: 0;
+        }
+
         .hero-content h1 {
             font-size: 3rem;
             font-weight: 800;
             line-height: 1.2;
-            margin-bottom: 20px;
         }
 
         .hero-content p {
@@ -275,6 +300,16 @@
                 flex-wrap: wrap;
             }
 
+            .hero-heading-wrapper {
+                justify-content: center;
+            }
+
+            .hero-logo-ssn,
+            .hero-logo-ssn-placeholder {
+                width: 60px;
+                height: 60px;
+            }
+
             .hero-image {
                 display: none;
             }
@@ -342,7 +377,7 @@
 
         .carousel-track {
             display: flex;
-            transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+            transition: transform 0.55s cubic-bezier(.4, 0, .2, 1);
             will-change: transform;
         }
 
@@ -483,7 +518,7 @@
             max-width: 90vw;
             max-height: 85vh;
             border-radius: 14px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
             object-fit: contain;
         }
 
@@ -493,7 +528,7 @@
             margin-top: 12px;
             font-size: 0.95rem;
             font-weight: 500;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
         }
 
         /* Close button – top-right of the overlay (not relative to image) */
@@ -504,8 +539,8 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            border: 2px solid rgba(255,255,255,0.5);
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.5);
             color: #fff;
             font-size: 1.3rem;
             cursor: pointer;
@@ -519,7 +554,7 @@
         }
 
         .lightbox-close:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
             transform: scale(1.1) rotate(90deg);
         }
 
@@ -531,10 +566,49 @@
 
 @section('content')
     <!-- Hero Section -->
+    @if(\Illuminate\Support\Facades\Storage::disk('public')->exists('hero/hero_bg.webp'))
+        <style>
+            @media (min-width: 769px) {
+                .hero {
+                    background: url('{{ route('public.storage.view', ['path' => 'hero/hero_bg.webp']) }}?v={{ time() }}') center center / cover no-repeat !important;
+                }
+
+                .hero::before {
+                    display: none !important;
+                }
+
+                .hero-image {
+                    display: none !important;
+                }
+
+                .hero-content h1 {
+                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+                }
+
+                .hero-content p {
+                    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+                }
+
+                .btn-hero-outline {
+                    background: rgba(0, 0, 0, 0.3) !important;
+                    border-color: transparent !important;
+                    color: white !important;
+                }
+            }
+        </style>
+    @endif
     <section class="hero">
         <div class="hero-container">
             <div class="hero-content animate-fade-in">
-                <h1>Selamat Datang di<br>{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</h1>
+                <div class="hero-heading-wrapper">
+                    @if(isset($school) && $school && $school->logo_ssn)
+                        <img class="hero-logo-ssn" src="{{ route('public.storage.view', ['path' => $school->logo_ssn]) }}"
+                            alt="Logo SSN">
+                    @else
+                        <div class="hero-logo-ssn-placeholder"></div>
+                    @endif
+                    <h2>Selamat Datang di<br>{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</h2>
+                </div>
                 <p>Mewujudkan generasi muda yang berilmu, berakhlak mulia, dan siap menghadapi tantangan masa depan dengan
                     pendidikan berkualitas.</p>
                 <div class="hero-buttons">
@@ -546,6 +620,7 @@
                     </a>
                 </div>
             </div>
+
             <div class="hero-image">
                 <i class="fas fa-graduation-cap"></i>
             </div>
@@ -699,145 +774,145 @@
 
         {{-- ===== CAROUSEL JS ===== --}}
         <script>
-        (function () {
-            const track   = document.getElementById('carouselTrack');
-            const dotsBox = document.getElementById('carouselDots');
-            if (!track) return; // no carousel images
+            (function () {
+                const track = document.getElementById('carouselTrack');
+                const dotsBox = document.getElementById('carouselDots');
+                if (!track) return; // no carousel images
 
-            const slides = track.querySelectorAll('.carousel-slide');
-            const total  = slides.length;
+                const slides = track.querySelectorAll('.carousel-slide');
+                const total = slides.length;
 
-            // Determine how many slides are visible based on viewport
-            function visibleCount() {
-                return window.innerWidth <= 768 ? 1 : 5;
-            }
-
-            let current = 0;
-            let autoTimer;
-
-            function pageCount() {
-                return Math.ceil(total / visibleCount());
-            }
-
-            // Build dot buttons
-            function buildDots() {
-                dotsBox.innerHTML = '';
-                const pages = pageCount();
-                for (let i = 0; i < pages; i++) {
-                    const btn = document.createElement('button');
-                    btn.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-                    btn.setAttribute('aria-label', 'Halaman ' + (i + 1));
-                    btn.addEventListener('click', () => goTo(i));
-                    dotsBox.appendChild(btn);
+                // Determine how many slides are visible based on viewport
+                function visibleCount() {
+                    return window.innerWidth <= 768 ? 1 : 5;
                 }
-            }
 
-            function updateDots() {
-                dotsBox.querySelectorAll('.carousel-dot').forEach((d, i) => {
-                    d.classList.toggle('active', i === current);
-                });
-            }
+                let current = 0;
+                let autoTimer;
 
-            function goTo(page) {
-                const pages = pageCount();
-                current = ((page % pages) + pages) % pages;
-                const offset = current * visibleCount() * (100 / total);
-                track.style.transform = `translateX(-${offset}%)`;
-                updateDots();
-            }
+                function pageCount() {
+                    return Math.ceil(total / visibleCount());
+                }
 
-            function next() { goTo(current + 1); }
-            function prev() { goTo(current - 1); }
+                // Build dot buttons
+                function buildDots() {
+                    dotsBox.innerHTML = '';
+                    const pages = pageCount();
+                    for (let i = 0; i < pages; i++) {
+                        const btn = document.createElement('button');
+                        btn.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                        btn.setAttribute('aria-label', 'Halaman ' + (i + 1));
+                        btn.addEventListener('click', () => goTo(i));
+                        dotsBox.appendChild(btn);
+                    }
+                }
 
-            function startAuto() {
-                stopAuto();
-                autoTimer = setInterval(next, 4000);
-            }
+                function updateDots() {
+                    dotsBox.querySelectorAll('.carousel-dot').forEach((d, i) => {
+                        d.classList.toggle('active', i === current);
+                    });
+                }
 
-            function stopAuto() {
-                clearInterval(autoTimer);
-            }
+                function goTo(page) {
+                    const pages = pageCount();
+                    current = ((page % pages) + pages) % pages;
+                    const offset = current * visibleCount() * (100 / total);
+                    track.style.transform = `translateX(-${offset}%)`;
+                    updateDots();
+                }
 
-            // Set each slide width based on total slides count (track scrolls by page)
-            function setSlideSizes() {
-                const pct = 100 / total + '%';
-                slides.forEach(s => s.style.minWidth = pct);
-            }
+                function next() { goTo(current + 1); }
+                function prev() { goTo(current - 1); }
 
-            function init() {
-                setSlideSizes();
-                buildDots();
-                goTo(0);
-                startAuto();
-            }
+                function startAuto() {
+                    stopAuto();
+                    autoTimer = setInterval(next, 4000);
+                }
 
-            document.getElementById('carouselNext').addEventListener('click', () => { stopAuto(); next(); startAuto(); });
-            document.getElementById('carouselPrev').addEventListener('click', () => { stopAuto(); prev(); startAuto(); });
+                function stopAuto() {
+                    clearInterval(autoTimer);
+                }
 
-            // Touch / swipe support
-            let touchStartX = 0;
-            track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; stopAuto(); }, { passive: true });
-            track.addEventListener('touchend', e => {
-                const diff = touchStartX - e.changedTouches[0].clientX;
-                if (Math.abs(diff) > 40) diff > 0 ? next() : prev();
-                startAuto();
-            }, { passive: true });
+                // Set each slide width based on total slides count (track scrolls by page)
+                function setSlideSizes() {
+                    const pct = 100 / total + '%';
+                    slides.forEach(s => s.style.minWidth = pct);
+                }
 
-            // Rebuild on resize (mobile ↔ desktop switch)
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(() => {
+                function init() {
+                    setSlideSizes();
                     buildDots();
                     goTo(0);
-                }, 200);
-            });
+                    startAuto();
+                }
 
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
-            }
-        })();
+                document.getElementById('carouselNext').addEventListener('click', () => { stopAuto(); next(); startAuto(); });
+                document.getElementById('carouselPrev').addEventListener('click', () => { stopAuto(); prev(); startAuto(); });
+
+                // Touch / swipe support
+                let touchStartX = 0;
+                track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; stopAuto(); }, { passive: true });
+                track.addEventListener('touchend', e => {
+                    const diff = touchStartX - e.changedTouches[0].clientX;
+                    if (Math.abs(diff) > 40) diff > 0 ? next() : prev();
+                    startAuto();
+                }, { passive: true });
+
+                // Rebuild on resize (mobile ↔ desktop switch)
+                let resizeTimer;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(() => {
+                        buildDots();
+                        goTo(0);
+                    }, 200);
+                });
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', init);
+                } else {
+                    init();
+                }
+            })();
         </script>
 
         {{-- ===== LIGHTBOX JS ===== --}}
         <script>
-        (function () {
-            const overlay  = document.getElementById('lightboxOverlay');
-            const lbImg    = document.getElementById('lightboxImg');
-            const lbCap    = document.getElementById('lightboxCaption');
+            (function () {
+                const overlay = document.getElementById('lightboxOverlay');
+                const lbImg = document.getElementById('lightboxImg');
+                const lbCap = document.getElementById('lightboxCaption');
 
-            if (!overlay) return;
+                if (!overlay) return;
 
-            window.openLightbox = function (imgEl) {
-                lbImg.src = imgEl.src;
-                lbImg.alt = imgEl.alt;
-                lbCap.textContent = imgEl.dataset.caption || '';
-                lbCap.style.display = imgEl.dataset.caption ? 'block' : 'none';
-                overlay.classList.add('open');
-                document.body.style.overflow = 'hidden'; // prevent background scroll
-            };
+                window.openLightbox = function (imgEl) {
+                    lbImg.src = imgEl.src;
+                    lbImg.alt = imgEl.alt;
+                    lbCap.textContent = imgEl.dataset.caption || '';
+                    lbCap.style.display = imgEl.dataset.caption ? 'block' : 'none';
+                    overlay.classList.add('open');
+                    document.body.style.overflow = 'hidden'; // prevent background scroll
+                };
 
-            window.closeLightbox = function () {
-                overlay.classList.remove('open');
-                document.body.style.overflow = '';
-                // clear src after transition ends to avoid flicker
-                setTimeout(() => { lbImg.src = ''; }, 300);
-            };
+                window.closeLightbox = function () {
+                    overlay.classList.remove('open');
+                    document.body.style.overflow = '';
+                    // clear src after transition ends to avoid flicker
+                    setTimeout(() => { lbImg.src = ''; }, 300);
+                };
 
-            // Close when clicking the dark backdrop (not the image/caption)
-            window.closeLightboxOnBackdrop = function (e) {
-                if (e.target === overlay) closeLightbox();
-            };
+                // Close when clicking the dark backdrop (not the image/caption)
+                window.closeLightboxOnBackdrop = function (e) {
+                    if (e.target === overlay) closeLightbox();
+                };
 
-            // Close with ESC key
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && overlay.classList.contains('open')) {
-                    closeLightbox();
-                }
-            });
-        })();
+                // Close with ESC key
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && overlay.classList.contains('open')) {
+                        closeLightbox();
+                    }
+                });
+            })();
         </script>
     @endsection
 
@@ -918,39 +993,37 @@
 
     {{-- ======================== CAROUSEL SECTION ======================== --}}
     @if(isset($carouselImages) && $carouselImages->isNotEmpty())
-    <section class="carousel-section" id="section-carousel">
-        <div class="container" style="text-align:center;">
-            <h2 class="section-title">Galeri Foto</h2>
-            <p class="section-subtitle">Momen dan kegiatan sekolah kami</p>
-        </div>
-
-        <div class="carousel-wrapper" id="carouselWrapper">
-            <div class="carousel-track" id="carouselTrack">
-                @foreach($carouselImages as $img)
-                <div class="carousel-slide">
-                    <img src="{{ route('public.storage.view', ['path' => $img->image_path]) }}"
-                         alt="{{ $img->title ?? 'Galeri' }}"
-                         loading="lazy"
-                         data-caption="{{ $img->title ?? '' }}"
-                         onclick="openLightbox(this)">
-                    @if($img->title)
-                        <div class="carousel-slide-caption">{{ $img->title }}</div>
-                    @endif
-                </div>
-                @endforeach
+        <section class="carousel-section" id="section-carousel">
+            <div class="container" style="text-align:center;">
+                <h2 class="section-title">Galeri Foto</h2>
+                <p class="section-subtitle">Momen dan kegiatan sekolah kami</p>
             </div>
-        </div>
 
-        <div class="carousel-nav">
-            <button class="carousel-btn" id="carouselPrev" aria-label="Sebelumnya">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <div class="carousel-dots" id="carouselDots"></div>
-            <button class="carousel-btn" id="carouselNext" aria-label="Selanjutnya">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </section>
+            <div class="carousel-wrapper" id="carouselWrapper">
+                <div class="carousel-track" id="carouselTrack">
+                    @foreach($carouselImages as $img)
+                        <div class="carousel-slide">
+                            <img src="{{ route('public.storage.view', ['path' => $img->image_path]) }}"
+                                alt="{{ $img->title ?? 'Galeri' }}" loading="lazy" data-caption="{{ $img->title ?? '' }}"
+                                onclick="openLightbox(this)">
+                            @if($img->title)
+                                <div class="carousel-slide-caption">{{ $img->title }}</div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="carousel-nav">
+                <button class="carousel-btn" id="carouselPrev" aria-label="Sebelumnya">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="carousel-dots" id="carouselDots"></div>
+                <button class="carousel-btn" id="carouselNext" aria-label="Selanjutnya">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </section>
     @endif
 
     {{-- ===== LIGHTBOX ===== --}}

@@ -172,4 +172,105 @@ class CarouselController extends Controller
 
         return $directory . '/' . $filename;
     }
+
+    /**
+     * Store Hero Section background image.
+     */
+    public function storeHero(Request $request)
+    {
+        $request->validate([
+            'hero_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $this->convertHeroToWebp($request->file('hero_image'));
+
+        return redirect()->back()->with('success', 'Gambar latar belakang Hero berhasil diperbarui!');
+    }
+
+    /**
+     * Remove Hero Section background image.
+     */
+    public function destroyHero()
+    {
+        $storagePath = storage_path('app/public/hero/hero_bg.webp');
+        if (file_exists($storagePath)) {
+            unlink($storagePath);
+        }
+
+        return redirect()->back()->with('success', 'Gambar latar belakang Hero berhasil direset ke bawaan!');
+    }
+
+    /**
+     * Convert Hero image to WebP and crop to exactly 1920x800.
+     */
+    private function convertHeroToWebp(\Illuminate\Http\UploadedFile $file): void
+    {
+        $mime = $file->getMimeType();
+
+        // Load source image
+        $source = match (true) {
+            str_contains($mime, 'jpeg') => imagecreatefromjpeg($file->getRealPath()),
+            str_contains($mime, 'png')  => imagecreatefrompng($file->getRealPath()),
+            str_contains($mime, 'gif')  => imagecreatefromgif($file->getRealPath()),
+            str_contains($mime, 'webp') => imagecreatefromwebp($file->getRealPath()),
+            default                     => imagecreatefromjpeg($file->getRealPath()),
+        };
+
+        if (function_exists('exif_read_data') && str_contains($mime, 'jpeg')) {
+            $exif = @exif_read_data($file->getRealPath());
+            if (!empty($exif['Orientation'])) {
+                $source = match ($exif['Orientation']) {
+                    3 => imagerotate($source, 180, 0),
+                    6 => imagerotate($source, -90, 0),
+                    8 => imagerotate($source, 90, 0),
+                    default => $source,
+                };
+            }
+        }
+
+        // Target size for Hero Section
+        $targetWidth = 1920;
+        $targetHeight = 800;
+        $resized = imagecreatetruecolor($targetWidth, $targetHeight);
+
+        if (str_contains($mime, 'png') || str_contains($mime, 'gif')) {
+            imagealphablending($resized, false);
+            imagesavealpha($resized, true);
+            $transparent = imagecolorallocatealpha($resized, 255, 255, 255, 127);
+            imagefilledrectangle($resized, 0, 0, $targetWidth, $targetHeight, $transparent);
+        }
+
+        $srcWidth = imagesx($source);
+        $srcHeight = imagesy($source);
+
+        // Center crop to 1920x800
+        $srcRatio = $srcWidth / $srcHeight;
+        $targetRatio = $targetWidth / $targetHeight;
+
+        $cropX = 0;
+        $cropY = 0;
+
+        if ($srcRatio > $targetRatio) {
+            $cropWidth = $srcHeight * $targetRatio;
+            $cropHeight = $srcHeight;
+            $cropX = ($srcWidth - $cropWidth) / 2;
+        } else {
+            $cropWidth = $srcWidth;
+            $cropHeight = $srcWidth / $targetRatio;
+            $cropY = ($srcHeight - $cropHeight) / 2;
+        }
+
+        imagecopyresampled($resized, $source, 0, 0, $cropX, $cropY, $targetWidth, $targetHeight, $cropWidth, $cropHeight);
+
+        $directory = storage_path('app/public/hero');
+        if (!is_dir($directory)) {
+            mkdir($directory, 0775, true);
+        }
+
+        $fullPath = $directory . '/hero_bg.webp';
+
+        imagewebp($resized, $fullPath, 100);
+        imagedestroy($source);
+        imagedestroy($resized);
+    }
 }

@@ -178,8 +178,8 @@
 @section('content')
     <div class="container section">
         <div style="text-align: center; margin-bottom: 50px;">
-            <h1 class="section-title">Modul Ajar</h1>
-            <p class="section-subtitle">Kumpulan materi pembelajaran digital untuk siswa.</p>
+            <h1 class="section-title">Modul Ajar dan RPP</h1>
+            <p class="section-subtitle">Kumpulan Modul Ajar dan RPP Sekolah.</p>
         </div>
 
         <!-- Filter -->

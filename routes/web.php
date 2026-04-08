@@ -82,6 +82,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/school-profile', [SchoolProfileController::class, 'index'])->name('school-profile.index');
         Route::get('/school-profile/edit', [SchoolProfileController::class, 'edit'])->name('school-profile.edit');
         Route::put('/school-profile', [SchoolProfileController::class, 'update'])->name('school-profile.update');
+        Route::delete('/school-profile/delete-logo/{type}', [SchoolProfileController::class, 'deleteLogo'])->name('school-profile.delete-logo');
 
         // Teachers
         Route::resource('teachers', TeacherController::class)->except(['show']);
@@ -233,7 +234,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             Route::resource('archive-types', ArchiveTypeController::class)->except(['show', 'create', 'edit']);
         });
 
-        // Carousel Images
+        // Carousel Images & Hero
+        Route::post('carousel/hero', [CarouselController::class, 'storeHero'])->name('carousel.hero.store');
+        Route::delete('carousel/hero', [CarouselController::class, 'destroyHero'])->name('carousel.hero.destroy');
         Route::resource('carousel', CarouselController::class)->except(['show', 'create', 'edit']);
     });
 });

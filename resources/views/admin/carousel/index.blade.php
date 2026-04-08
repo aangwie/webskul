@@ -224,6 +224,46 @@
         <span>Gambar yang diunggah akan otomatis dikompres ke format <strong>WebP</strong>. Ukuran file maksimal <strong>500 KB</strong>. Di halaman depan, 5 gambar ditampilkan sejajar di desktop dan 1 gambar di mobile.</span>
     </div>
 
+    {{-- Hero Settings --}}
+    <div class="card" style="margin-bottom: 30px; padding: 25px; border-radius: 16px; background: var(--secondary); box-shadow: var(--shadow);">
+        <h3 style="margin-top:0; margin-bottom: 15px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-desktop"></i> Pengaturan Latar Belakang Hero Section
+        </h3>
+        <p style="color: var(--text-light); margin-bottom: 20px;">Berikan tampilan utama yang menarik. Ukuran gambar yang direkomendasikan adalah <strong>1920x800 pixel</strong>. Gambar dengan rasio yang berbeda akan dipotong (crop) otomatis agar sesuai dengan ukuran tersebut tanpa mengurangi kualitas, kemudian diubah ke format WebP.</p>
+        
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px;">
+                <form action="{{ route('admin.carousel.hero.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="drop-zone" id="heroDropZone" onclick="document.getElementById('heroFileInput').click()" style="padding: 40px 20px; margin-bottom: 15px;">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Klik atau seret gambar Hero ke sini</span>
+                        <span class="file-info">Format: JPG, PNG, GIF, WebP — Maksimal 2 MB</span>
+                    </div>
+                    <input type="file" id="heroFileInput" name="hero_image" accept="image/*" style="display:none" onchange="previewFile(this,'heroPreviewActual','heroDropZone')" required>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-save"></i> Upload Gambar Hero</button>
+                </form>
+            </div>
+            
+            <div style="flex: 1; min-width: 300px; text-align: center;">
+                <h4 style="margin-top: 0;">Preview Saat Ini:</h4>
+                @if(\Illuminate\Support\Facades\Storage::disk('public')->exists('hero/hero_bg.webp'))
+                    <img id="heroPreviewActual" src="{{ route('public.storage.view', ['path' => 'hero/hero_bg.webp']) }}?v={{ time() }}" style="width: 100%; max-width: 400px; height: 166px; object-fit: cover; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;">
+                    <form action="{{ route('admin.carousel.hero.destroy') }}" method="POST" onsubmit="return confirm('Hapus gambar Hero dan kembali ke default?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger" style="width: 100%; max-width: 400px;"><i class="fas fa-trash"></i> Hapus & Gunakan Default</button>
+                    </form>
+                @else
+                    <div id="heroPreviewDefault" style="width: 100%; max-width: 400px; height: 166px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); border-radius: 8px; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white;">
+                        <span>Default (Gradiasi)</span>
+                    </div>
+                    <img id="heroPreviewActual" src="#" style="display:none; width: 100%; max-width: 400px; height: 166px; object-fit: cover; border-radius: 8px; box-shadow: var(--shadow); margin: 0 auto;">
+                @endif
+            </div>
+        </div>
+    </div>
+
     {{-- Grid --}}
     @if($images->isEmpty())
         <div class="card">
@@ -418,7 +458,7 @@
     }
 
     // Drag & drop
-    ['addDropZone', 'editDropZone'].forEach(id => {
+    ['addDropZone', 'editDropZone', 'heroDropZone'].forEach(id => {
         const dz = document.getElementById(id);
         if (!dz) return;
         dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
@@ -426,8 +466,19 @@
         dz.addEventListener('drop', e => {
             e.preventDefault();
             dz.classList.remove('drag-over');
-            const inputId = id === 'addDropZone' ? 'addFileInput' : 'editFileInput';
-            const prevId  = id === 'addDropZone' ? 'addPreview'  : 'editPreview';
+            
+            let inputId = 'addFileInput';
+            let prevId = 'addPreview';
+            if (id === 'editDropZone') {
+                inputId = 'editFileInput';
+                prevId = 'editPreview';
+            } else if (id === 'heroDropZone') {
+                inputId = 'heroFileInput';
+                prevId = 'heroPreviewActual';
+                const def = document.getElementById('heroPreviewDefault');
+                if(def) def.style.display = 'none';
+            }
+
             const inp = document.getElementById(inputId);
             inp.files = e.dataTransfer.files;
             previewFile(inp, prevId, id);

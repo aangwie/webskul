@@ -63,11 +63,33 @@
                     <label class="form-label">Logo Sekolah</label>
                     <input type="file" name="logo" class="form-input" accept="image/*">
                     @if($school->logo)
-                        @if(Str::startsWith($school->logo, 'data:'))
-                            <img src="{{ $school->logo }}" alt="Current Logo" class="preview-image">
-                        @else
-                            <img src="{{ asset('storage/' . $school->logo) }}" alt="Current Logo" class="preview-image">
-                        @endif
+                        <div style="display: flex; align-items: flex-end; gap: 12px; margin-top: 10px;">
+                            @if(Str::startsWith($school->logo, 'data:'))
+                                <img src="{{ $school->logo }}" alt="Current Logo" class="preview-image" style="margin-top:0;">
+                            @else
+                                <img src="{{ route('admin.storage.view', ['path' => $school->logo]) }}" alt="Current Logo" class="preview-image" style="margin-top:0;">
+                            @endif
+                            <button type="button" class="btn" style="background: var(--danger); color: white; padding: 8px 14px; font-size: 0.8rem;" onclick="deleteLogo('logo')">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Logo SSN</label>
+                    <input type="file" name="logo_ssn" class="form-input" accept="image/*">
+                    @if($school->logo_ssn)
+                        <div style="display: flex; align-items: flex-end; gap: 12px; margin-top: 10px;">
+                            @if(Str::startsWith($school->logo_ssn, 'data:'))
+                                <img src="{{ $school->logo_ssn }}" alt="Current Logo SSN" class="preview-image" style="margin-top:0;">
+                            @else
+                                <img src="{{ route('admin.storage.view', ['path' => $school->logo_ssn]) }}" alt="Current Logo SSN" class="preview-image" style="margin-top:0;">
+                            @endif
+                            <button type="button" class="btn" style="background: var(--danger); color: white; padding: 8px 14px; font-size: 0.8rem;" onclick="deleteLogo('ssn')">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
                     @endif
                 </div>
 
@@ -83,4 +105,31 @@
             </form>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+<script>
+function deleteLogo(type) {
+    const label = type === 'ssn' ? 'Logo SSN' : 'Logo Sekolah';
+    if (!confirm('Yakin ingin menghapus ' + label + '?')) return;
+
+    fetch('{{ url("admin/school-profile/delete-logo") }}/' + type, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json',
+        }
+    }).then(response => response.json())
+    .then(data => {
+        if (data && data.success) {
+            window.location.reload();
+        } else {
+            alert('Gagal: ' + (data.message || 'Terjadi kesalahan pada server'));
+        }
+    }).catch(error => {
+        console.error(error);
+        alert('Terjadi kesalahan jaringan atau server merespon tidak valid.');
+    });
+}
+</script>
 @endsection
