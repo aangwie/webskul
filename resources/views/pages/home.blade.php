@@ -59,10 +59,11 @@
             flex-shrink: 0;
         }
 
-        .hero-content h1 {
+        .hero-content h2 {
             font-size: 3rem;
             font-weight: 800;
             line-height: 1.2;
+            color: #ffffff;
         }
 
         .hero-content p {
@@ -70,6 +71,7 @@
             opacity: 0.9;
             margin-bottom: 35px;
             line-height: 1.8;
+            color: #ffffff;
         }
 
         .hero-buttons {
@@ -291,7 +293,7 @@
                 text-align: center;
             }
 
-            .hero-content h1 {
+            .hero-content h2 {
                 font-size: 2rem;
             }
 
@@ -581,12 +583,13 @@
                     display: none !important;
                 }
 
-                .hero-content h1 {
-                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-                }
-
+                .hero-content h2, 
                 .hero-content p {
-                    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+                    background: var(--nav-bg) !important;
+                    -webkit-background-clip: text !important;
+                    -webkit-text-fill-color: transparent !important;
+                    color: var(--primary) !important; /* Fallback */
+                    text-shadow: none !important;
                 }
 
                 .btn-hero-outline {
