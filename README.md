@@ -168,6 +168,17 @@ After seeding, you can log in to the admin panel:
 
 ## 🛠️ Configuration Guide
 
+### Cloudflare Turnstile (Security)
+
+To secure the login page against bots:
+
+1. Create a free account at [Cloudflare](https://dash.cloudflare.com/sign-up).
+2. Go to **Turnstile** and add your site domain.
+3. Choose the **Managed** or **Non-interactive** widget type.
+4. Copy the generated **Site Key** and **Secret Key**.
+5. In the Admin Panel, go to **Pengaturan Sistem**.
+6. Check **Aktifkan Cloudflare Turnstile** and paste the keys, then Save.
+
 ### SMTP (Email) Setup
 
 To enable password resets and notifications:

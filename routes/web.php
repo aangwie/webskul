@@ -197,7 +197,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/system/cache-clear', [\App\Http\Controllers\Admin\SystemController::class, 'cacheClear'])->name('system.cache-clear');
         Route::post('/system/composer-dump', [\App\Http\Controllers\Admin\SystemController::class, 'composerDumpAutoload'])->name('system.composer-dump');
         Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
-        Route::post('/system/recaptcha', [\App\Http\Controllers\Admin\SystemController::class, 'updateRecaptcha'])->name('system.recaptcha');
+        Route::post('/system/turnstile', [\App\Http\Controllers\Admin\SystemController::class, 'updateTurnstile'])->name('system.turnstile');
 
         // Admin Storage Proxy (Restored for Admin Views)
         Route::get('/storage-view/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])

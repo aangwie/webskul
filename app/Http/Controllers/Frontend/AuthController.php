@@ -30,26 +30,26 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (Setting::get('recaptcha_is_active', '0') == '1') {
-            $recaptcha_response = $request->input('g-recaptcha-response');
+        if (Setting::get('turnstile_is_active', '0') == '1') {
+            $turnstile_response = $request->input('cf-turnstile-response');
             
-            if (!$recaptcha_response) {
+            if (!$turnstile_response) {
                 return back()->withErrors([
-                    'email' => 'Mohon selesaikan verifikasi reCAPTCHA terlebih dahulu.',
+                    'email' => 'Mohon selesaikan verifikasi keamanan (Cloudflare Turnstile) terlebih dahulu.',
                 ])->onlyInput('email');
             }
             
-            $secret = Setting::get('recaptcha_secret_key');
-            $response = \Illuminate\Support\Facades\Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            $secret = Setting::get('turnstile_secret_key');
+            $response = \Illuminate\Support\Facades\Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
                 'secret' => $secret,
-                'response' => $recaptcha_response,
+                'response' => $turnstile_response,
             ]);
             
             $responseBody = json_decode($response->body());
             
             if (!$responseBody->success) {
                 return back()->withErrors([
-                    'email' => 'Verifikasi reCAPTCHA gagal, silakan coba lagi.',
+                    'email' => 'Verifikasi keamanan gagal, silakan coba lagi.',
                 ])->onlyInput('email');
             }
         }

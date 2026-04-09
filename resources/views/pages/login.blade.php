@@ -226,15 +226,15 @@
                 </div>
 
                 @php
-                    $recaptcha_is_active = \App\Models\Setting::get('recaptcha_is_active', '0') == '1';
-                    $recaptcha_site_key = \App\Models\Setting::get('recaptcha_site_key', '');
+                    $turnstile_is_active = \App\Models\Setting::get('turnstile_is_active', '0') == '1';
+                    $turnstile_site_key = \App\Models\Setting::get('turnstile_site_key', '');
                 @endphp
-                @if($recaptcha_is_active && $recaptcha_site_key)
+                @if($turnstile_is_active && $turnstile_site_key)
                 <div class="form-group" style="display: flex; justify-content: center; margin-bottom: 20px;">
-                    <div class="g-recaptcha" data-sitekey="{{ $recaptcha_site_key }}"></div>
+                    <div class="cf-turnstile" data-sitekey="{{ $turnstile_site_key }}"></div>
                 </div>
-                <!-- Load recaptcha script -->
-                <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                <!-- Load turnstile script -->
+                <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
                 @endif
 
                 <div class="form-group">
