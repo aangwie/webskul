@@ -30,6 +30,30 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        if (Setting::get('recaptcha_is_active', '0') == '1') {
+            $recaptcha_response = $request->input('g-recaptcha-response');
+            
+            if (!$recaptcha_response) {
+                return back()->withErrors([
+                    'email' => 'Mohon selesaikan verifikasi reCAPTCHA terlebih dahulu.',
+                ])->onlyInput('email');
+            }
+            
+            $secret = Setting::get('recaptcha_secret_key');
+            $response = \Illuminate\Support\Facades\Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => $secret,
+                'response' => $recaptcha_response,
+            ]);
+            
+            $responseBody = json_decode($response->body());
+            
+            if (!$responseBody->success) {
+                return back()->withErrors([
+                    'email' => 'Verifikasi reCAPTCHA gagal, silakan coba lagi.',
+                ])->onlyInput('email');
+            }
+        }
+
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
             return redirect()->intended('/admin');

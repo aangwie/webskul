@@ -253,6 +253,24 @@ class SystemController extends Controller
         }
     }
 
+    public function updateRecaptcha(Request $request)
+    {
+        try {
+            $request->validate([
+                'recaptcha_site_key' => 'nullable|string',
+                'recaptcha_secret_key' => 'nullable|string',
+            ]);
+
+            \App\Models\Setting::set('recaptcha_is_active', $request->has('recaptcha_is_active') ? '1' : '0');
+            \App\Models\Setting::set('recaptcha_site_key', $request->recaptcha_site_key);
+            \App\Models\Setting::set('recaptcha_secret_key', $request->recaptcha_secret_key);
+
+            return back()->with('success', 'Pengaturan Google reCAPTCHA berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal update Google reCAPTCHA: ' . $e->getMessage());
+        }
+    }
+
     public function composerDumpAutoload()
     {
         try {

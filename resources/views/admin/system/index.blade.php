@@ -5,6 +5,54 @@
 
 @section('content')
     <div class="row">
+        <!-- Google reCAPTCHA -->
+        <div class="col-12" style="margin-bottom: 30px;">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-shield-alt"></i> Google reCAPTCHA</h3>
+                </div>
+                <div class="card-body">
+                    <p style="color: var(--text-light); margin-bottom: 20px;">Pengaturan Google reCAPTCHA v2 (Checkbox) untuk halaman login.</p>
+                    
+                    <form action="{{ route('admin.system.recaptcha') }}" method="POST">
+                        @csrf
+                        @php
+                            $recaptcha_is_active = \App\Models\Setting::get('recaptcha_is_active', '0') == '1';
+                            $recaptcha_site_key = \App\Models\Setting::get('recaptcha_site_key', '');
+                            $recaptcha_secret_key = \App\Models\Setting::get('recaptcha_secret_key', '');
+                        @endphp
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="recaptcha_is_active" name="recaptcha_is_active" value="1" {{ $recaptcha_is_active ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--primary);">
+                                <label for="recaptcha_is_active" class="form-label" style="margin-bottom: 0; cursor: pointer;">Aktifkan Google reCAPTCHA</label>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="form-group mb-0">
+                                <label class="form-label">Site Key</label>
+                                <input type="text" class="form-input" name="recaptcha_site_key" value="{{ old('recaptcha_site_key', $recaptcha_site_key) }}" placeholder="Masukkan Site Key">
+                            </div>
+                            
+                            <div class="form-group mb-0">
+                                <label class="form-label">Secret Key</label>
+                                <input type="text" class="form-input" name="recaptcha_secret_key" value="{{ old('recaptcha_secret_key', $recaptcha_secret_key) }}" placeholder="Masukkan Secret Key">
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 25px;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Simpan Pengaturan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
         <!-- Storage Storage Link -->
         <div class="col-md-6" style="margin-bottom: 20px;">
             <div class="card h-100">

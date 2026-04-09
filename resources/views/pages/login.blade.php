@@ -225,6 +225,18 @@
                     </div>
                 </div>
 
+                @php
+                    $recaptcha_is_active = \App\Models\Setting::get('recaptcha_is_active', '0') == '1';
+                    $recaptcha_site_key = \App\Models\Setting::get('recaptcha_site_key', '');
+                @endphp
+                @if($recaptcha_is_active && $recaptcha_site_key)
+                <div class="form-group" style="display: flex; justify-content: center; margin-bottom: 20px;">
+                    <div class="g-recaptcha" data-sitekey="{{ $recaptcha_site_key }}"></div>
+                </div>
+                <!-- Load recaptcha script -->
+                <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                @endif
+
                 <div class="form-group">
                     <div class="form-checkbox">
                         <input type="checkbox" name="remember" id="remember">
