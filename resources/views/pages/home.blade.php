@@ -608,7 +608,7 @@
             <div class="hero-content animate-fade-in">
                 <div class="hero-heading-wrapper">
                     @if(isset($school) && $school && $school->logo_ssn)
-                        <img class="hero-logo-ssn" src="{{ URL::signedRoute('public.storage.view', ['path' => $school->logo_ssn]) }}"
+                        <img class="hero-logo-ssn" src="{!! URL::signedRoute('public.storage.view', ['path' => $school->logo_ssn]) !!}"
                             alt="Logo SSN">
                     @else
                         <div class="hero-logo-ssn-placeholder"></div>
@@ -939,7 +939,7 @@
                                     @if(Str::startsWith($activity->image, 'data:'))
                                         <img src="{{ $activity->image }}" alt="{{ $activity->title }}">
                                     @else
-                                        <img src="{{ URL::signedRoute('public.storage.view', ['path' => $activity->image]) }}"
+                                        <img src="{!! URL::signedRoute('public.storage.view', ['path' => $activity->image]) !!}"
                                             alt="{{ $activity->title }}">
                                     @endif
                                 @else
@@ -1009,7 +1009,7 @@
                 <div class="carousel-track" id="carouselTrack">
                     @foreach($carouselImages as $img)
                         <div class="carousel-slide">
-                            <img src="{{ URL::signedRoute('public.storage.view', ['path' => $img->image_path]) }}"
+                            <img src="{!! URL::signedRoute('public.storage.view', ['path' => $img->image_path]) !!}"
                                 alt="{{ $img->title ?? 'Galeri' }}" loading="lazy" data-caption="{{ $img->title ?? '' }}"
                                 onclick="openLightbox(this)">
                             @if($img->title)
