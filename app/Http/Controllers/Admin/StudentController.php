@@ -76,7 +76,7 @@ class StudentController extends Controller
             'gender' => 'required|in:male,female',
             'nis' => 'nullable|string|max:50',
             'nisn' => 'nullable|string|max:20',
-            'tanggal_lahir' => 'nullable|date',
+            'tanggal_lahir' => 'nullable|date_format:d/m/Y',
             'enrollment_year' => 'required|integer|min:2000|max:' . (date('Y') + 1),
             'is_active' => 'required|boolean',
             'status_lulus' => 'nullable|in:lulus,tidak_lulus',
@@ -93,6 +93,10 @@ class StudentController extends Controller
             if ($request->hasFile('ijazah_file')) {
                 $validated['ijazah_file'] = $request->file('ijazah_file')->store('ijazah', 'public');
             }
+        }
+
+        if (!empty($validated['tanggal_lahir'])) {
+            $validated['tanggal_lahir'] = \Carbon\Carbon::createFromFormat('d/m/Y', $validated['tanggal_lahir'])->format('Y-m-d');
         }
 
         Student::create($validated);
@@ -122,7 +126,7 @@ class StudentController extends Controller
             'gender' => 'required|in:male,female',
             'nis' => 'nullable|string|max:50',
             'nisn' => 'nullable|string|max:20',
-            'tanggal_lahir' => 'nullable|date',
+            'tanggal_lahir' => 'nullable|date_format:d/m/Y',
             'enrollment_year' => 'required|integer|min:2000|max:' . (date('Y') + 1),
             'is_active' => 'required|boolean',
             'status_lulus' => 'nullable|in:lulus,tidak_lulus',
@@ -146,6 +150,10 @@ class StudentController extends Controller
             if (!($request->hasFile('ijazah_file'))) {
                 unset($validated['ijazah_file']);
             }
+        }
+
+        if (!empty($validated['tanggal_lahir'])) {
+            $validated['tanggal_lahir'] = \Carbon\Carbon::createFromFormat('d/m/Y', $validated['tanggal_lahir'])->format('Y-m-d');
         }
 
         $student->update($validated);

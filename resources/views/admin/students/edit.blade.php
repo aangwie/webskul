@@ -4,6 +4,7 @@
 @section('page-title', 'Edit Siswa')
 
 @section('content')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <div class="card" style="max-width: 800px; margin: 0 auto;">
     <div class="card-header">
         <h2>Form Edit Siswa</h2>
@@ -42,7 +43,8 @@
             
             <div class="form-group">
                 <label for="tanggal_lahir" class="form-label">Tanggal Lahir (Siswa kelulusan wajib isi) <span style="color: red">*</span></label>
-                <input type="date" name="tanggal_lahir" id="tanggal_lahir" class="form-input" value="{{ old('tanggal_lahir', $student->tanggal_lahir) }}">
+                <input type="text" name="tanggal_lahir" id="tanggal_lahir" class="form-input" placeholder="Pilih Tanggal Lahir" autocomplete="off" value="{{ old('tanggal_lahir', $student->tanggal_lahir ? date('d/m/Y', strtotime($student->tanggal_lahir)) : '') }}">
+                <small style="color: var(--text-light); font-size: 0.8rem; margin-top: 5px; display: block;">Format: Hari/Bulan/Tahun (Contoh: 17/08/2005)</small>
                 @error('tanggal_lahir')
                     <span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>
                 @enderror
@@ -139,6 +141,7 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const activeRadio = document.querySelector('input[name="is_active"][value="1"]');
@@ -170,6 +173,14 @@
         // Initial setup based on current values
         toggleKelulusan();
         toggleIjazah();
+
+        // Initialize Flatpickr for Tanggal Lahir
+        flatpickr("#tanggal_lahir", {
+            dateFormat: "d/m/Y",
+            allowInput: true,
+            maxDate: "today",
+            theme: "light"
+        });
     });
 </script>
 @endsection

@@ -3,6 +3,7 @@
 @section('title', 'Cek Ijazah Digital')
 
 @section('content')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <div class="container section animate-fade-in">
     <div class="row justify-content-center" style="display: flex; justify-content: center;">
         <div class="col-md-8 mx-auto" style="width: 100%; max-width: 600px;">
@@ -19,7 +20,7 @@
                     
                     <div style="margin-bottom: 25px;">
                         <label for="tanggal_lahir" style="display:block; margin-bottom: 8px; font-weight: 600;">Tanggal Lahir</label>
-                        <input type="date" name="tanggal_lahir" id="tanggal_lahir" class="form-input" required value="{{ old('tanggal_lahir', request('tanggal_lahir')) }}" style="width: 100%; padding: 12px; border: 2px solid var(--accent); border-radius: 8px;">
+                        <input type="text" name="tanggal_lahir" id="tanggal_lahir" class="form-input" required value="{{ old('tanggal_lahir', request('tanggal_lahir')) }}" placeholder="Pilih Tanggal Lahir" autocomplete="off" style="width: 100%; padding: 12px; border: 2px solid var(--accent); border-radius: 8px;">
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px;">
@@ -101,7 +102,17 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr("#tanggal_lahir", {
+            dateFormat: "d/m/Y",
+            allowInput: true,
+            maxDate: "today",
+            theme: "light"
+        });
+    });
+
     function openLightbox(url) {
         document.getElementById('pdfIframe').src = url;
         const lightbox = document.getElementById('pdfLightbox');

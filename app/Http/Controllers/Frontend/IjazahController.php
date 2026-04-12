@@ -17,11 +17,13 @@ class IjazahController extends Controller
     {
         $request->validate([
             'nisn' => 'required|string',
-            'tanggal_lahir' => 'required|date'
+            'tanggal_lahir' => 'required|date_format:d/m/Y'
         ]);
 
+        $tanggal_lahir = \Carbon\Carbon::createFromFormat('d/m/Y', $request->tanggal_lahir)->format('Y-m-d');
+
         $student = Student::where('nisn', $request->nisn)
-                          ->where('tanggal_lahir', $request->tanggal_lahir)
+                          ->where('tanggal_lahir', $tanggal_lahir)
                           ->first();
 
         return view('pages.ijazah', compact('student'));
