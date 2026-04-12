@@ -574,7 +574,7 @@
         <style>
             @media (min-width: 769px) {
                 .hero {
-                    background: url('{{ URL::signedRoute('public.storage.view', ['path' => 'hero/hero_bg.webp']) }}?v={{ time() }}') center center / cover no-repeat !important;
+                    background: url('{{ URL::signedRoute('public.storage.view', ['path' => 'hero/hero_bg.webp', 'v' => time()]) }}') center center / cover no-repeat !important;
                 }
 
                 .hero::before {

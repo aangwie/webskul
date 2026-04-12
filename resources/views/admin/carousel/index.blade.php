@@ -248,7 +248,7 @@
             <div style="flex: 1; min-width: 300px; text-align: center;">
                 <h4 style="margin-top: 0;">Preview Saat Ini:</h4>
                 @if(\Illuminate\Support\Facades\Storage::disk('public')->exists('hero/hero_bg.webp'))
-                    <img id="heroPreviewActual" src="{{ URL::signedRoute('public.storage.view', ['path' => 'hero/hero_bg.webp']) }}?v={{ time() }}" style="width: 100%; max-width: 400px; height: 166px; object-fit: cover; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;">
+                    <img id="heroPreviewActual" src="{{ URL::signedRoute('public.storage.view', ['path' => 'hero/hero_bg.webp', 'v' => time()]) }}" style="width: 100%; max-width: 400px; height: 166px; object-fit: cover; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;">
                     <form action="{{ route('admin.carousel.hero.destroy') }}" method="POST" onsubmit="return confirm('Hapus gambar Hero dan kembali ke default?')">
                         @csrf
                         @method('DELETE')

@@ -12,8 +12,17 @@ class StorageHelperController extends Controller
      * Serve file from storage/app/public directly via PHP.
      * This bypasses symlink issues on shared hosting.
      */
-    public function show($path)
+    public function show(\Illuminate\Http\Request $request, $path = null)
     {
+        // If path is not passed in the URL segment, fetch from query string
+        if (!$path) {
+            $path = $request->query('path');
+        }
+
+        if (!$path) {
+            abort(404);
+        }
+
         // Decode path in case it has slashes encoded
         $path = urldecode($path);
 

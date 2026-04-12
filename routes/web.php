@@ -53,8 +53,7 @@ Route::get('/modules/{teachingModule}/view', [\App\Http\Controllers\Frontend\Tea
 Route::get('/modules/{teachingModule}/download', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'downloadPdf'])->name('modules.download');
 
 // Public Storage Proxy (Fallback for Shared Hosting)
-Route::get('/public-storage/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
-    ->where('path', '.*')
+Route::get('/public-storage/file', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
     ->name('public.storage.view')
     ->middleware('signed');
 

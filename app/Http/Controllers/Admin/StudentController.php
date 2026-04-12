@@ -234,9 +234,9 @@ class StudentController extends Controller
         $classExample = !empty($classes) ? $classes[0] : '7A';
         
         $data = [
-            ['nama_siswa', 'nis', 'jenis_kelamin', 'kelas', 'tahun_masuk'], // Header
-            ['Budi Santoso', '12345', 'L', $classExample, date('Y')], // Example
-            ['Siti Aminah', '12346', 'P', $classExample, date('Y')], // Example
+            ['nama_siswa', 'nis', 'nisn', 'tanggal_lahir', 'jenis_kelamin', 'kelas', 'tahun_masuk'], // Header
+            ['Budi Santoso', '12345', '0012345678', '17/08/2005', 'L', $classExample, date('Y')], // Example
+            ['Siti Aminah', '12346', '0012345679', '21/04/2006', 'P', $classExample, date('Y')], // Example
         ];
 
         // Ensure we force CSV if requested or as fallback

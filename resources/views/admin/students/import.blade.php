@@ -17,7 +17,9 @@
             <h4 style="margin-bottom: 10px; color: var(--primary);"><i class="fas fa-info-circle"></i> Petunjuk Import</h4>
             <ol style="margin-left: 20px; line-height: 1.6;">
                 <li>Unduh template Excel/CSV yang telah disediakan.</li>
-                <li>Isi data siswa sesuai kolom (Nama, NIS, L/P, Kelas, Tahun Masuk).</li>
+                <li>Isi data siswa sesuai kolom (Nama, NIS, NISN, Tanggal Lahir, L/P, Kelas, Tahun Masuk).</li>
+                <li>Kolom <strong>NISN</strong> opsional, namun wajib diisi bagi siswa yang akan diproses kelulusannya.</li>
+                <li>Format <strong>Tanggal Lahir</strong> harap menggunakan <strong>dd/mm/yyyy</strong> (Contoh: 17/08/2005).</li>
                 <li>Pastikan nama kelas <strong>sama persis</strong> dengan data di sistem (misal: "7A", "8B").</li>
                 <li>Upload file Excel atau CSV yang telah diisi.</li>
             </ol>

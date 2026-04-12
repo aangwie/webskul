@@ -45,9 +45,39 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation, SkipsEm
             $gender = 'female';
         }
 
+        // NISN mapping
+        $nisn = isset($row['nisn']) ? trim($row['nisn']) : null;
+        
+        // Tanggal Lahir mapping
+        $tanggalLahir = null;
+        if (!empty($row['tanggal_lahir'])) {
+            // Excel pure date value is typically numeric
+            if (is_numeric($row['tanggal_lahir'])) {
+                try {
+                    $tanggalLahir = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['tanggal_lahir'])->format('Y-m-d');
+                } catch (\Exception $e) {
+                    $tanggalLahir = null;
+                }
+            } else {
+                // assume text d/m/Y
+                try {
+                    $tanggalLahir = \Carbon\Carbon::createFromFormat('d/m/Y', trim($row['tanggal_lahir']))->format('Y-m-d');
+                } catch (\Exception $e) {
+                    try {
+                        // fallback to Y-m-d
+                        $tanggalLahir = \Carbon\Carbon::parse(trim($row['tanggal_lahir']))->format('Y-m-d');
+                    } catch (\Exception $e) {
+                        $tanggalLahir = null;
+                    }
+                }
+            }
+        }
+
         return new Student([
             'name'            => $row['nama_siswa'],
             'nis'             => $row['nis'] ?? null,
+            'nisn'            => $nisn,
+            'tanggal_lahir'   => $tanggalLahir,
             'gender'          => $gender,
             'school_class_id' => $classId,
             'enrollment_year' => $row['tahun_masuk'] ?? date('Y'),
