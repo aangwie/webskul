@@ -130,7 +130,7 @@
         <div class="profile-card">
             <div class="school-logo">
                 @if($school && $school->logo)
-                    <img src="{{ route('public.storage.view', ['path' => $school->logo]) }}" alt="Logo Sekolah">
+                    <img src="{{ URL::signedRoute('public.storage.view', ['path' => $school->logo]) }}" alt="Logo Sekolah">
                 @else
                     <i class="fas fa-school"></i>
                 @endif

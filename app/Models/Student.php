@@ -13,6 +13,10 @@ class Student extends Model
         'gender',
         'nis',
         'enrollment_year',
+        'nisn',
+        'tanggal_lahir',
+        'status_lulus',
+        'ijazah_file',
         'is_active',
     ];
 

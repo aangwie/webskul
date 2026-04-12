@@ -7,7 +7,7 @@
     <meta name="description" content="{{ $school->name ?? 'SMP Negeri 6 Sudimoro' }} - Sekolah Menengah Pertama Negeri">
     <title>@yield('title', $school->name ?? 'SMP Negeri 6 Sudimoro')</title>
     @if(isset($school) && $school && $school->logo)
-        <link rel="icon" type="image/png" href="{{ route('public.storage.view', ['path' => $school->logo]) }}">
+        <link rel="icon" type="image/png" href="{{ URL::signedRoute('public.storage.view', ['path' => $school->logo]) }}">
     @else
         <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
@@ -421,7 +421,7 @@
         <div class="nav-container">
             <a href="{{ route('home') }}" class="nav-brand">
                 @if(isset($school) && $school && $school->logo)
-                    <img src="{{ route('public.storage.view', ['path' => $school->logo]) }}" alt="Logo">
+                    <img src="{{ URL::signedRoute('public.storage.view', ['path' => $school->logo]) }}" alt="Logo">
                 @else
                     <i class="fas fa-school" style="font-size: 2rem;"></i>
                 @endif
@@ -487,6 +487,7 @@
                         <ul class="dropdown-menu">
                             <li><a href="{{ route('komite.status') }}" class="dropdown-item">Cek Sumbangan Komite</a>
                             </li>
+                            <li><a href="{{ route('ijazah.index') }}" class="dropdown-item">Cek Ijazah Digital</a></li>
                             <li><a href="https://simsiswa.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">SIM
                                     Siswa</a></li>
                             <li><a href="https://sppd.smpn6sudimoro.my.id" target="_blank"

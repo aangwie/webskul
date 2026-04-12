@@ -7,7 +7,7 @@
     <title>Login - {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</title>
     @php $schoolFavicon = \App\Models\SchoolProfile::first(); @endphp
     @if($schoolFavicon && $schoolFavicon->logo)
-        <link rel="icon" type="image/png" href="{{ route('public.storage.view', ['path' => $schoolFavicon->logo]) }}">
+        <link rel="icon" type="image/png" href="{{ URL::signedRoute('public.storage.view', ['path' => $schoolFavicon->logo]) }}">
     @else
         <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif

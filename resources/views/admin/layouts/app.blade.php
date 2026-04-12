@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Panel') - {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</title>
     @if(isset($school) && $school && $school->logo)
-        <link rel="icon" type="image/png" href="{{ route('public.storage.view', ['path' => $school->logo]) }}">
+        <link rel="icon" type="image/png" href="{{ URL::signedRoute('public.storage.view', ['path' => $school->logo]) }}">
     @else
         <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @endif
@@ -728,36 +728,45 @@
                     <i class="fas fa-images"></i> Carousel
                 </a>
             </li>
-            <li>
-                <a href="{{ route('admin.activities.index') }}"
-                    class="{{ request()->routeIs('admin.activities.*') ? 'active' : '' }}">
-                    <i class="fas fa-newspaper"></i> Kegiatan
+            <li class="has-submenu {{ request()->routeIs('admin.activities.*') || request()->routeIs('admin.social-media.*') || request()->routeIs('admin.information.*') || request()->routeIs('admin.public-complaints.*') ? 'active' : '' }}"
+                id="manajemen-menu">
+                <a href="javascript:void(0)" onclick="toggleSubmenu('manajemen-menu')" class="submenu-toggle">
+                    <span><i class="fas fa-tasks"></i> Manajemen</span>
+                    <i class="fas fa-chevron-right"></i>
                 </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{{ route('admin.activities.index') }}"
+                            class="{{ request()->routeIs('admin.activities.*') ? 'active' : '' }}">
+                            <i class="fas fa-newspaper"></i> Kegiatan
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.social-media.index') }}"
+                            class="{{ request()->routeIs('admin.social-media.*') ? 'active' : '' }}">
+                            <i class="fas fa-share-alt"></i> Media Sosial
+                        </a>
+                    </li>
+                    @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
+                        <li>
+                            <a href="{{ route('admin.information.index') }}"
+                                class="{{ request()->routeIs('admin.information.*') ? 'active' : '' }}">
+                                <i class="fas fa-bullhorn"></i> Informasi
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.public-complaints.index') }}"
+                                class="{{ request()->routeIs('admin.public-complaints.*') ? 'active' : '' }}">
+                                <i class="fas fa-comments"></i> Aduan Masyarakat
+                                @if(auth()->user()->isAdmin() && isset($unrespondedComplaintsCount) && $unrespondedComplaintsCount > 0)
+                                    <span class="badge"
+                                        style="margin-left: auto; background: var(--danger); color: white;">{{ $unrespondedComplaintsCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+                    @endif
+                </ul>
             </li>
-            <li>
-                <a href="{{ route('admin.social-media.index') }}"
-                    class="{{ request()->routeIs('admin.social-media.*') ? 'active' : '' }}">
-                    <i class="fas fa-share-alt"></i> Media Sosial
-                </a>
-            </li>
-            @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
-                <li>
-                    <a href="{{ route('admin.information.index') }}"
-                        class="{{ request()->routeIs('admin.information.*') ? 'active' : '' }}">
-                        <i class="fas fa-bullhorn"></i> Informasi
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.public-complaints.index') }}"
-                        class="{{ request()->routeIs('admin.public-complaints.*') ? 'active' : '' }}">
-                        <i class="fas fa-comments"></i> Aduan Masyarakat
-                        @if(auth()->user()->isAdmin() && isset($unrespondedComplaintsCount) && $unrespondedComplaintsCount > 0)
-                            <span class="badge"
-                                style="margin-left: auto; background: var(--danger); color: white;">{{ $unrespondedComplaintsCount }}</span>
-                        @endif
-                    </a>
-                </li>
-            @endif
 
             @if(auth()->user()->isAdmin() || auth()->user()->isAdminKomite())
                 <div class="sidebar-divider"></div>

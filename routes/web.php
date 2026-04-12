@@ -46,6 +46,8 @@ Route::get('/pmb/status', [PmbController::class, 'status'])->name('pmb.status');
 Route::get('/pmb/download-pdf/{registration_number}', [PmbController::class, 'downloadPdf'])->name('pmb.downloadPdf');
 Route::get('/pmb/print/{registration_number}', [PmbController::class, 'printCard'])->name('pmb.print');
 Route::get('/komite-status', [KomiteStatusController::class, 'index'])->name('komite.status');
+Route::get('/ijazah', [\App\Http\Controllers\Frontend\IjazahController::class, 'index'])->name('ijazah.index');
+Route::post('/ijazah/check', [\App\Http\Controllers\Frontend\IjazahController::class, 'check'])->name('ijazah.check');
 Route::get('/modules', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'index'])->name('modules.index');
 Route::get('/modules/{teachingModule}/view', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'showPdf'])->name('modules.view');
 Route::get('/modules/{teachingModule}/download', [\App\Http\Controllers\Frontend\TeachingModuleController::class, 'downloadPdf'])->name('modules.download');
@@ -53,7 +55,8 @@ Route::get('/modules/{teachingModule}/download', [\App\Http\Controllers\Frontend
 // Public Storage Proxy (Fallback for Shared Hosting)
 Route::get('/public-storage/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
     ->where('path', '.*')
-    ->name('public.storage.view');
+    ->name('public.storage.view')
+    ->middleware('signed');
 
 // Public Complaints
 Route::get('/public-complaints', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'create'])->name('public-complaints.create');

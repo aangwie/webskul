@@ -75,11 +75,25 @@ class StudentController extends Controller
             'name' => 'required|string|max:255',
             'gender' => 'required|in:male,female',
             'nis' => 'nullable|string|max:50',
+            'nisn' => 'nullable|string|max:20',
+            'tanggal_lahir' => 'nullable|date',
             'enrollment_year' => 'required|integer|min:2000|max:' . (date('Y') + 1),
-            'is_active' => 'boolean',
+            'is_active' => 'required|boolean',
+            'status_lulus' => 'nullable|in:lulus,tidak_lulus',
+            'ijazah_file' => 'nullable|mimes:pdf|max:500',
         ]);
 
-        $validated['is_active'] = $request->has('is_active');
+        $validated['is_active'] = $request->boolean('is_active');
+
+        if ($validated['is_active']) {
+            $validated['status_lulus'] = null;
+        }
+
+        if (!$validated['is_active'] && isset($validated['status_lulus']) && $validated['status_lulus'] === 'lulus') {
+            if ($request->hasFile('ijazah_file')) {
+                $validated['ijazah_file'] = $request->file('ijazah_file')->store('ijazah', 'public');
+            }
+        }
 
         Student::create($validated);
 
@@ -107,11 +121,32 @@ class StudentController extends Controller
             'name' => 'required|string|max:255',
             'gender' => 'required|in:male,female',
             'nis' => 'nullable|string|max:50',
+            'nisn' => 'nullable|string|max:20',
+            'tanggal_lahir' => 'nullable|date',
             'enrollment_year' => 'required|integer|min:2000|max:' . (date('Y') + 1),
-            'is_active' => 'boolean',
+            'is_active' => 'required|boolean',
+            'status_lulus' => 'nullable|in:lulus,tidak_lulus',
+            'ijazah_file' => 'nullable|mimes:pdf|max:500',
         ]);
 
-        $validated['is_active'] = $request->has('is_active');
+        $validated['is_active'] = $request->boolean('is_active');
+
+        if ($validated['is_active']) {
+            $validated['status_lulus'] = null;
+        }
+
+        if (!$validated['is_active'] && isset($validated['status_lulus']) && $validated['status_lulus'] === 'lulus') {
+            if ($request->hasFile('ijazah_file')) {
+                // If old file exists, it could be deleted here, but skipping for simplicity as not requested
+                $validated['ijazah_file'] = $request->file('ijazah_file')->store('ijazah', 'public');
+            }
+        } else {
+            // Unset ijazah_file from validated to avoid overwriting with null if no new file uploaded?
+            // Actually, if it's inactive but not 'lulus', maybe we should nullify it.
+            if (!($request->hasFile('ijazah_file'))) {
+                unset($validated['ijazah_file']);
+            }
+        }
 
         $student->update($validated);
 

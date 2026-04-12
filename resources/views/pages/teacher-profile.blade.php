@@ -212,7 +212,7 @@
                         <div class="teacher-photo">
                             @if($teacher->photo)
                                     @php
-                                        $imgSrc = Str::startsWith($teacher->photo, 'data:') ? $teacher->photo : route('public.storage.view', ['path' => $teacher->photo]);
+                                        $imgSrc = Str::startsWith($teacher->photo, 'data:') ? $teacher->photo : URL::signedRoute('public.storage.view', ['path' => $teacher->photo]);
                                     @endphp
                                     <img src="{{ $imgSrc }}" alt="{{ $teacher->name }}" onclick="openModal(this.src)">
                             @else

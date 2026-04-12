@@ -31,7 +31,7 @@
                     <small style="color: var(--text-light); margin-top: 5px; display: block;">Kosongkan jika tidak ingin mengubah foto. Gambar akan otomatis dikonversi ke format WebP.</small>
                     @if($schoolFacility->image)
                         <div style="margin-top: 10px;">
-                            <img src="{{ route('public.storage.view', ['path' => $schoolFacility->image]) }}" alt="Preview" style="max-height: 150px; border-radius: 8px;">
+                            <img src="{{ URL::signedRoute('public.storage.view', ['path' => $schoolFacility->image]) }}" alt="Preview" style="max-height: 150px; border-radius: 8px;">
                         </div>
                     @endif
                 </div>

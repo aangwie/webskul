@@ -117,7 +117,7 @@
                         <th>Nama Siswa</th>
                         <th>Kelas</th>
                         <th>L/P</th>
-                        <th>Tahun Masuk</th>
+                        <th>Tanggal Lahir</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
@@ -148,7 +148,7 @@
                                 <span style="color: #e83e8c;"><i class="fas fa-female"></i> P</span>
                             @endif
                         </td>
-                        <td>{{ $student->enrollment_year }}</td>
+                        <td>{{ $student->tanggal_lahir ? \Carbon\Carbon::parse($student->tanggal_lahir)->format('d/m/Y') : '-' }}</td>
                         <td>
                             @if($student->is_active)
                                 <span class="badge badge-success">Aktif</span>

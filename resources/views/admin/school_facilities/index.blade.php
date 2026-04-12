@@ -31,7 +31,7 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>
                                         @if($facility->image)
-                                            <img src="{{ route('public.storage.view', ['path' => $facility->image]) }}" alt="Fasilitas"
+                                            <img src="{{ URL::signedRoute('public.storage.view', ['path' => $facility->image]) }}" alt="Fasilitas"
                                                 style="width: 120px; height: 80px; object-fit: cover; border-radius: 8px;">
                                         @else
                                             <div

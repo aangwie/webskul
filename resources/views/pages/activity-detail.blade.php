@@ -203,7 +203,7 @@
                     @if(Str::startsWith($activity->image, 'data:'))
                         <img src="{{ $activity->image }}" alt="{{ $activity->title }}">
                     @else
-                        <img src="{{ route('public.storage.view', ['path' => $activity->image]) }}" alt="{{ $activity->title }}">
+                        <img src="{{ URL::signedRoute('public.storage.view', ['path' => $activity->image]) }}" alt="{{ $activity->title }}">
                     @endif
                 </div>
             @endif
@@ -230,7 +230,7 @@
                                     @if(Str::startsWith($related->image, 'data:'))
                                         <img src="{{ $related->image }}" alt="{{ $related->title }}">
                                     @else
-                                        <img src="{{ route('public.storage.view', ['path' => $related->image]) }}"
+                                        <img src="{{ URL::signedRoute('public.storage.view', ['path' => $related->image]) }}"
                                             alt="{{ $related->title }}">
                                     @endif
                                 @else

@@ -12,7 +12,7 @@
         </a>
     </div>
     <div class="card-body">
-        <form action="{{ route('admin.students.store') }}" method="POST">
+        <form action="{{ route('admin.students.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
             <div class="form-group">
@@ -27,6 +27,22 @@
                 <label for="nis" class="form-label">NIS (Nomor Induk Siswa)</label>
                 <input type="text" name="nis" id="nis" class="form-input" placeholder="Contoh: 12345" value="{{ old('nis') }}">
                 @error('nis')
+                    <span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="nisn" class="form-label">NISN (Siswa kelulusan wajib isi) <span style="color: red">*</span></label>
+                <input type="text" name="nisn" id="nisn" class="form-input" placeholder="Contoh: 0012345678" value="{{ old('nisn') }}">
+                @error('nisn')
+                    <span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>
+                @enderror
+            </div>
+            
+            <div class="form-group">
+                <label for="tanggal_lahir" class="form-label">Tanggal Lahir (Siswa kelulusan wajib isi) <span style="color: red">*</span></label>
+                <input type="date" name="tanggal_lahir" id="tanggal_lahir" class="form-input" value="{{ old('tanggal_lahir') }}">
+                @error('tanggal_lahir')
                     <span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>
                 @enderror
             </div>
@@ -67,10 +83,40 @@
             </div>
             
             <div class="form-group">
-                <label class="form-checkbox">
-                    <input type="checkbox" name="is_active" value="1" {{ old('is_active', '1') ? 'checked' : '' }}>
-                    <span>Siswa Aktif</span>
-                </label>
+                <label class="form-label">Status Siswa <span style="color: red">*</span></label>
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="radio" name="is_active" value="1" {{ old('is_active', '1') == '1' ? 'checked' : '' }} style="accent-color: var(--primary);">
+                        <span>Aktif</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="radio" name="is_active" value="0" {{ old('is_active', '1') == '0' ? 'checked' : '' }} style="accent-color: var(--primary);">
+                        <span>Tidak Aktif</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Graduation / Ijazah Fields (Hidden if Is Active is checked) -->
+            <div id="kelulusan_fields" style="display: {{ old('is_active', '1') ? 'none' : 'block' }}; padding: 15px; border: 1px solid var(--accent); border-radius: 8px; margin-bottom: 20px;">
+                <div class="form-group">
+                    <label for="status_lulus" class="form-label">Status Kelulusan</label>
+                    <select name="status_lulus" id="status_lulus" class="form-select">
+                        <option value="">Pilih Status</option>
+                        <option value="lulus" {{ old('status_lulus') == 'lulus' ? 'selected' : '' }}>Lulus</option>
+                        <option value="tidak_lulus" {{ old('status_lulus') == 'tidak_lulus' ? 'selected' : '' }}>Tidak Lulus / Pindah</option>
+                    </select>
+                    @error('status_lulus')
+                        <span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group" id="ijazah_upload_group" style="display: {{ old('status_lulus') == 'lulus' ? 'block' : 'none' }};">
+                    <label for="ijazah_file" class="form-label">Upload Ijazah Digital (PDF, max 500kb)</label>
+                    <input type="file" name="ijazah_file" id="ijazah_file" class="form-input" accept="application/pdf">
+                    @error('ijazah_file')
+                        <span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>
+                    @enderror
+                </div>
             </div>
             
             <div style="margin-top: 30px;">
@@ -81,4 +127,40 @@
         </form>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const activeRadio = document.querySelector('input[name="is_active"][value="1"]');
+        const inactiveRadio = document.querySelector('input[name="is_active"][value="0"]');
+        const kelulusanFields = document.getElementById('kelulusan_fields');
+        const statusLulusSelect = document.getElementById('status_lulus');
+        const ijazahUploadGroup = document.getElementById('ijazah_upload_group');
+
+        function toggleKelulusan() {
+            if (activeRadio.checked) {
+                kelulusanFields.style.display = 'none';
+            } else {
+                kelulusanFields.style.display = 'block';
+            }
+        }
+
+        function toggleIjazah() {
+            if (statusLulusSelect.value === 'lulus') {
+                ijazahUploadGroup.style.display = 'block';
+            } else {
+                ijazahUploadGroup.style.display = 'none';
+            }
+        }
+
+        activeRadio.addEventListener('change', toggleKelulusan);
+        inactiveRadio.addEventListener('change', toggleKelulusan);
+        statusLulusSelect.addEventListener('change', toggleIjazah);
+        
+        // Initial setup based on current values
+        toggleKelulusan();
+        toggleIjazah();
+    });
+</script>
 @endsection
