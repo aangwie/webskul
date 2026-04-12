@@ -185,7 +185,7 @@
         <div class="container">
             <div class="komite-container animate-fade-in">
                 <div class="section-title">Cek Sumbangan Dana Komite</div>
-                <p class="section-subtitle">Masukkan NIS (Nomor Induk Siswa) untuk melihat status pembayaran dana komite.
+                <p class="section-subtitle">Masukkan NISN (Nomor Induk Siswa Nasional) untuk melihat status pembayaran dana komite.
                 </p>
 
                 @if(session('error'))
