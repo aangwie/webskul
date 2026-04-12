@@ -199,7 +199,7 @@
                     <form action="{{ route('komite.status') }}" method="GET">
                         <div class="komite-search-group">
                             <input type="text" name="nis" class="komite-search-input" value="{{ request('nis') }}"
-                                placeholder="Masukkan NIS Siswa" required>
+                                placeholder="Masukkan NISN Siswa" required>
                             <button type="submit" class="btn-komite-search">
                                 <i class="fas fa-search"></i> Cek Status
                             </button>
