@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
     <url>
-    <loc>http://localhost</loc>
+    <loc>http://localhost/webskul/public</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
             </url>
     <url>
-    <loc>http://localhost/activities</loc>
+    <loc>http://localhost/webskul/public/activities</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://localhost/information</loc>
+    <loc>http://localhost/webskul/public/information</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://localhost/pmb</loc>
+    <loc>http://localhost/webskul/public/pmb</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://localhost/activities/upacara-bendera-memperingati-hari-kemerdekaan</loc>
-    <lastmod>2026-04-07T10:20:24+00:00</lastmod>
+    <loc>http://localhost/webskul/public/activities/upacara-bendera-memperingati-hari-kemerdekaan</loc>
+    <lastmod>2026-04-13T03:25:27+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
             </url>
     <url>
-    <loc>http://localhost/activities/pelaksanaan-ujian-tengah-semester-ganjil</loc>
-    <lastmod>2026-04-07T10:20:24+00:00</lastmod>
+    <loc>http://localhost/webskul/public/activities/pelaksanaan-ujian-tengah-semester-ganjil</loc>
+    <lastmod>2026-04-13T03:25:28+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
             </url>
     <url>
-    <loc>http://localhost/activities/workshop-pengembangan-karakter-siswa</loc>
-    <lastmod>2026-04-07T10:20:24+00:00</lastmod>
+    <loc>http://localhost/webskul/public/activities/workshop-pengembangan-karakter-siswa</loc>
+    <lastmod>2026-04-13T03:25:28+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
             </url>

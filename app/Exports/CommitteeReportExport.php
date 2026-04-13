@@ -66,7 +66,7 @@ class CommitteeReportExport implements FromCollection, WithHeadings, WithTitle, 
 
         if ($this->reportType == 'class_summary' || $this->reportType == 'all_summary') {
             foreach ($classes as $class) {
-                $studentIds = Student::where('school_class_id', $class->id)->pluck('id');
+                $studentIds = Student::where('school_class_id', $class->id)->where('is_active', true)->pluck('id');
 
                 if ($this->filterType === 'academic_year') {
                     $fee = CommitteeFee::where('academic_year_id', $this->academicYear->id)

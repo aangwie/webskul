@@ -217,7 +217,7 @@ class CommitteeController extends Controller
         $classSummaries = [];
         if ($activeYear) {
             foreach ($classes as $class) {
-                $studentIds = \App\Models\Student::where('school_class_id', $class->id)->pluck('id');
+                $studentIds = \App\Models\Student::where('school_class_id', $class->id)->where('is_active', true)->pluck('id');
                 $fee = \App\Models\CommitteeFee::where('academic_year_id', $activeYear->id)
                     ->where('school_class_id', $class->id)
                     ->first();
@@ -285,7 +285,7 @@ class CommitteeController extends Controller
             $grandTotalStudents = 0;
 
             foreach ($classes as $class) {
-                $studentIds = \App\Models\Student::where('school_class_id', $class->id)->pluck('id');
+                $studentIds = \App\Models\Student::where('school_class_id', $class->id)->where('is_active', true)->pluck('id');
 
                 if ($filterType === 'academic_year') {
                     $fee = CommitteeFee::where('academic_year_id', $academicYear->id)
@@ -492,7 +492,7 @@ class CommitteeController extends Controller
             $grandTotalStudents = 0;
 
             foreach ($classes as $class) {
-                $studentIds = \App\Models\Student::where('school_class_id', $class->id)->pluck('id');
+                $studentIds = \App\Models\Student::where('school_class_id', $class->id)->where('is_active', true)->pluck('id');
 
                 if ($filterType === 'academic_year') {
                     $fee = CommitteeFee::where('academic_year_id', $academicYear->id)
