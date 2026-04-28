@@ -126,7 +126,7 @@
         <div class="watermark">KWITANSI</div>
 
         <div class="header">
-            <h1>BUKTI PEMBAYARAN KOMITE</h1>
+            <h1>BUKTI SUMBANGAN KOMITE</h1>
             <p>{{ $school->name ?? 'SMP NEGERI 6 SUDIMORO' }}</p>
             <p>{{ $school->address ?? 'Kec. Sudimoro, Kab. Pacitan' }}</p>
         </div>
@@ -142,12 +142,14 @@
         <div class="row">
             <div class="label">Telah Terima Dari</div>
             <div class="value"><strong>{{ $committeePayment->student->name }}</strong> (NIS:
-                {{ $committeePayment->student->nis }})</div>
+                {{ $committeePayment->student->nis }})
+            </div>
         </div>
         <div class="row">
             <div class="label">Kelas</div>
             <div class="value">{{ $committeePayment->student->schoolClass->name }} (Grade
-                {{ $committeePayment->student->schoolClass->grade }})</div>
+                {{ $committeePayment->student->schoolClass->grade }})
+            </div>
         </div>
         <div class="row">
             <div class="label">Tahun Ajaran</div>
@@ -155,11 +157,11 @@
         </div>
         <div class="row">
             <div class="label">Untuk Pembayaran</div>
-            <div class="value">Dana Komite Sekolah ({{ $committeePayment->notes ?? 'Angsuran' }})</div>
+            <div class="value">Sumbangan Komite Sekolah ({{ $committeePayment->notes ?? 'Angsuran' }})</div>
         </div>
         <div class="row">
             <div class="label">Status</div>
-            <div class="value"><strong>{{ $isPaidFull ? 'LUNAS' : 'BELUM LUNAS' }}</strong></div>
+            <div class="value"><strong>{{ $isPaidFull ? 'SUDAH' : 'BELUM' }}</strong></div>
         </div>
 
         <div class="amount-box">
@@ -175,7 +177,7 @@
         </div>
 
         <div style="margin-top: 30px; font-size: 10px; color: #666; font-style: italic;">
-            * Simpan bukti pembayaran ini sebagai tanda bukti yang sah.
+            * Simpan bukti sumbangan ini sebagai tanda bukti yang sah.
             <br>Dicetak pada: {{ date('d/m/Y H:i:s') }}
         </div>
     </div>
