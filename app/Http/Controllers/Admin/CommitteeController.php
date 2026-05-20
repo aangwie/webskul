@@ -154,6 +154,36 @@ class CommitteeController extends Controller
         return view('admin.committee.payments.receipt', compact('committeePayment', 'isPaidFull'));
     }
 
+    public function invoice(Student $student)
+    {
+        $activeYear = AcademicYear::where('is_active', true)->first();
+        if (!$activeYear) {
+            return redirect()->back()->with('error', 'Tahun ajaran aktif belum ditentukan.');
+        }
+
+        $committeeFee = CommitteeFee::where('academic_year_id', $activeYear->id)
+            ->where('school_class_id', $student->school_class_id)
+            ->first();
+
+        if (!$committeeFee) {
+            return redirect()->back()->with('error', 'Nominal dana komite belum diatur.');
+        }
+
+        $payments = CommitteePayment::where('student_id', $student->id)
+            ->where('committee_fee_id', $committeeFee->id)
+            ->orderBy('payment_date', 'asc')
+            ->get();
+
+        $totalPaid = $payments->sum('amount');
+        $isPaidFull = $totalPaid >= $committeeFee->amount;
+
+        if (!$isPaidFull) {
+            return redirect()->back()->with('error', 'Tagihan belum lunas.');
+        }
+
+        return view('admin.committee.payments.invoice', compact('student', 'committeeFee', 'payments', 'totalPaid', 'isPaidFull'));
+    }
+
     public function editPayment(CommitteePayment $committeePayment)
     {
         $committeePayment->load(['student', 'committeeFee']);

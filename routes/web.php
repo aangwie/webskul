@@ -121,6 +121,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             Route::get('/payments/student/{student}', [CommitteeController::class, 'recordPayment'])->name('payments.record');
             Route::post('/payments/student/{student}', [CommitteeController::class, 'storePayment'])->name('payments.store');
             Route::get('/payments/receipt/{committeePayment}', [CommitteeController::class, 'receipt'])->name('payments.receipt');
+            Route::get('/payments/student/{student}/invoice', [CommitteeController::class, 'invoice'])->name('payments.invoice');
             Route::get('/payments/{committeePayment}/edit', [CommitteeController::class, 'editPayment'])->name('payments.edit');
             Route::put('/payments/{committeePayment}', [CommitteeController::class, 'updatePayment'])->name('payments.update');
             Route::delete('/payments/{committeePayment}', [CommitteeController::class, 'destroyPayment'])->name('payments.destroy');

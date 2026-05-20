@@ -65,7 +65,11 @@
                         style="margin-top: 30px; text-align: center; padding: 20px; background: rgba(40, 167, 69, 0.1); border: 2px dashed var(--success); border-radius: 12px;">
                         <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success); margin-bottom: 10px;"></i>
                         <h3 style="color: var(--success);">Pembayaran Lunas</h3>
-                        <p>Seluruh nominal dana komite telah dibayarkan.</p>
+                        <p style="margin-bottom: 15px;">Seluruh nominal dana komite telah dibayarkan.</p>
+                        <a href="{{ route('admin.committee.payments.invoice', $student->id) }}"
+                            class="btn btn-success" target="_blank" style="display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-print"></i> Cetak Tagihan Lunas
+                        </a>
                     </div>
                 @endif
             </div>

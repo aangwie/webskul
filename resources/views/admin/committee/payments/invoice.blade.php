@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kwitansi Sumbangan - {{ $committeePayment->student->name }}</title>
+    <title>Kwitansi Sumbangan Komite - {{ $student->name }}</title>
     <style>
         * {
             box-sizing: border-box;
@@ -36,7 +36,7 @@
 
         .header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 22px;
             text-transform: uppercase;
         }
 
@@ -47,7 +47,7 @@
 
         .row {
             display: flex;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .label {
@@ -60,29 +60,46 @@
             border-bottom: 1px dotted #999;
         }
 
+        .payments-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+
+        .payments-table th, .payments-table td {
+            border: 1px solid #333;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .payments-table th {
+            background-color: #f2f2f2;
+        }
+
         .amount-box {
             border: 2px solid #333;
             padding: 15px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             display: inline-block;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .footer {
-            margin-top: 50px;
+            margin-top: 40px;
             display: flex;
             justify-content: flex-end;
         }
 
         .signature {
             text-align: center;
-            width: 200px;
+            width: 250px;
         }
 
         .signature p {
-            margin-top: 80px;
-            border-top: 1px solid #333;
+            margin: 0;
+            line-height: 1.5;
         }
 
         @media print {
@@ -130,8 +147,8 @@
 <body>
     <div class="no-print" style="text-align: center; margin-bottom: 20px;">
         <button onclick="window.print()"
-            style="padding: 10px 20px; cursor: pointer; background: #1e3a5f; color: white; border: none; border-radius: 5px;">
-            <i class="fas fa-print"></i> Cetak Kwitansi
+            style="padding: 10px 20px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; margin-right: 10px;">
+            Cetak Invoice Sumbangan Komite
         </button>
         <button onclick="window.close()"
             style="padding: 10px 20px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 5px;">
@@ -143,59 +160,78 @@
         <div class="watermark">KWITANSI</div>
 
         <div class="header">
-            <h1>BUKTI SUMBANGAN KOMITE</h1>
+            <h1>BUKTI SUMBANGAN DANA KOMITE</h1>
             <p>{{ $school->name ?? 'SMP NEGERI 6 SUDIMORO' }}</p>
             <p>{{ $school->address ?? 'Kec. Sudimoro, Kab. Pacitan' }}</p>
         </div>
 
         <div class="row">
-            <div class="label">Nomor Transaksi</div>
-            <div class="value">#KM-{{ str_pad($committeePayment->id, 5, '0', STR_PAD_LEFT) }}</div>
+            <div class="label">Nama Siswa</div>
+            <div class="value"><strong>{{ $student->name }}</strong></div>
         </div>
         <div class="row">
-            <div class="label">Tanggal</div>
-            <div class="value">{{ $committeePayment->payment_date->format('d F Y') }}</div>
-        </div>
-        <div class="row">
-            <div class="label">Telah Terima Dari</div>
-            <div class="value"><strong>{{ $committeePayment->student->name }}</strong> (NIS:
-                {{ $committeePayment->student->nis }})
-            </div>
+            <div class="label">NIS</div>
+            <div class="value">{{ $student->nis }}</div>
         </div>
         <div class="row">
             <div class="label">Kelas</div>
-            <div class="value">{{ $committeePayment->student->schoolClass->name }} (Grade
-                {{ $committeePayment->student->schoolClass->grade }})
-            </div>
+            <div class="value">{{ $student->schoolClass->name }} (Grade {{ $student->schoolClass->grade }})</div>
         </div>
         <div class="row">
             <div class="label">Tahun Ajaran</div>
-            <div class="value">{{ $committeePayment->committeeFee->academicYear->year }}</div>
+            <div class="value">{{ $committeeFee->academicYear->year }}</div>
         </div>
         <div class="row">
-            <div class="label">Untuk Pembayaran</div>
-            <div class="value">Sumbangan Komite Sekolah ({{ $committeePayment->notes ?? 'Angsuran' }})</div>
+            <div class="label">Total Kewajiban</div>
+            <div class="value"><strong>Rp {{ number_format($committeeFee->amount, 0, ',', '.') }}</strong></div>
         </div>
+
+        <h3 style="margin-top: 30px; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Rincian Pembayaran (Cicilan)</h3>
+        <table class="payments-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px; text-align: center;">No</th>
+                    <th style="width: 150px;">Tanggal Bayar</th>
+                    <th>Keterangan</th>
+                    <th style="width: 200px; text-align: right;">Jumlah</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($payments as $index => $payment)
+                    <tr>
+                        <td style="text-align: center;">{{ $index + 1 }}</td>
+                        <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
+                        <td>{{ $payment->notes ?? 'Cicilan Komite' }}</td>
+                        <td style="text-align: right;">Rp {{ number_format($payment->amount, 0, ',', '.') }}</td>
+                    </tr>
+                @endforeach
+                <tr style="font-weight: bold; background-color: #f9f9f9;">
+                    <td colspan="3" style="text-align: right;">Total Terbayar</td>
+                    <td style="text-align: right;">Rp {{ number_format($totalPaid, 0, ',', '.') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
         <div class="row">
-            <div class="label">Status</div>
-            <div class="value"><strong>{{ $isPaidFull ? 'SUDAH' : 'BELUM' }}</strong></div>
+            <div class="label">Status Pembayaran</div>
+            <div class="value" style="color: #28a745; font-weight: bold;">SUDAH MEMBAYAR</div>
         </div>
 
         <div class="amount-box">
-            TERBILANG: Rp {{ number_format($committeePayment->amount, 0, ',', '.') }},-
+            TERBILANG: Rp {{ number_format($totalPaid, 0, ',', '.') }},-
         </div>
 
         <div class="footer">
-            <div>
-                <p>Sudimoro, {{ $committeePayment->payment_date->format('d/m/Y') }}</p>
+            <div class="signature">
+                <p>Sudimoro, {{ date('d/m/Y') }}</p>
                 <p style="margin-top: 5px;">Bendahara Komite,</p>
                 <div style="margin-top: 60px;"><strong>( {{ Auth::user()->name }} )</strong></div>
             </div>
         </div>
 
         <div style="margin-top: 30px; font-size: 10px; color: #666; font-style: italic;">
-            * Simpan bukti sumbangan ini sebagai tanda bukti yang sah.
-            <br>Dicetak pada: {{ date('d/m/Y H:i:s') }}
+            * Dokumen ini merupakan bukti pembayaran sumbangan dana komite yang sah.
+            <br>Dicetak pada: {{ date('d/m/Y H:i:s') }} oleh {{ Auth::user()->name }}
         </div>
     </div>
 </body>
