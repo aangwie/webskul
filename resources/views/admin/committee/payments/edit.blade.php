@@ -20,7 +20,7 @@
                         <div style="font-weight: 600;">{{ $committeePayment->student->schoolClass->name ?? '-' }}</div>
                     </div>
                     <div>
-                        <span style="font-size: 0.8rem; color: var(--text-light);">Total Tagihan</span>
+                        <span style="font-size: 0.8rem; color: var(--text-light);">Total Sumbangan</span>
                         <div style="font-weight: 600;">Rp
                             {{ number_format($committeePayment->committeeFee->amount, 0, ',', '.') }}</div>
                     </div>

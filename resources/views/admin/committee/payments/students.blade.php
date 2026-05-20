@@ -10,7 +10,7 @@
                 <h2><i class="fas fa-user-graduate"></i> Status Sumbangan Komite</h2>
                 <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 5px;">
                     Tahun Ajaran: {{ $committeeFee->academicYear->year }} |
-                    Tagihan: <strong>Rp {{ number_format($committeeFee->amount, 0, ',', '.') }}</strong>
+                    Sumbangan: <strong>Rp {{ number_format($committeeFee->amount, 0, ',', '.') }}</strong>
                 </p>
             </div>
             <a href="{{ route('admin.committee.payments.index') }}" class="btn btn-sm btn-danger">
@@ -25,7 +25,7 @@
                             <th>NIS</th>
                             <th>Nama Siswa</th>
                             <th>Total Bayar</th>
-                            <th>Sisa Tagihan</th>
+                            <th>Sisa Sumbangan</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>

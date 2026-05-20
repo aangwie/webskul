@@ -64,11 +64,11 @@
                     <div
                         style="margin-top: 30px; text-align: center; padding: 20px; background: rgba(40, 167, 69, 0.1); border: 2px dashed var(--success); border-radius: 12px;">
                         <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success); margin-bottom: 10px;"></i>
-                        <h3 style="color: var(--success);">Pembayaran Lunas</h3>
+                        <h3 style="color: var(--success);">Sumbangan Komite</h3>
                         <p style="margin-bottom: 15px;">Seluruh nominal dana komite telah dibayarkan.</p>
                         <a href="{{ route('admin.committee.payments.invoice', $student->id) }}"
                             class="btn btn-success" target="_blank" style="display: inline-flex; align-items: center; gap: 8px;">
-                            <i class="fas fa-print"></i> Cetak Tagihan Lunas
+                            <i class="fas fa-print"></i> Cetak Bukti Sumbangan
                         </a>
                     </div>
                 @endif
@@ -84,7 +84,7 @@
                 <div class="card-body">
                     <div style="margin-bottom: 15px;">
                         <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Total
-                            Tagihan</span>
+                            Sumbangan</span>
                         <h3 style="font-size: 1.4rem; color: var(--text);">Rp
                             {{ number_format($committeeFee->amount, 0, ',', '.') }}</h3>
                     </div>
@@ -96,7 +96,7 @@
                     </div>
                     <div style="border-top: 1px solid var(--accent); padding-top: 15px;">
                         <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Sisa
-                            Tagihan</span>
+                            Sumbangan</span>
                         <h3 style="font-size: 1.4rem; color: var(--danger);">Rp {{ number_format($remaining, 0, ',', '.') }}
                         </h3>
                     </div>
