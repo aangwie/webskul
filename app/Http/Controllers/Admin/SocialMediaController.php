@@ -36,12 +36,13 @@ class SocialMediaController extends Controller
         return redirect()->route('admin.social-media.index')->with('success', 'Media Sosial berhasil ditambahkan.');
     }
 
-    public function edit(SocialMedia $socialMedia)
+    public function edit(SocialMedia $socialMedium)
     {
+        $socialMedia = $socialMedium;
         return view('admin.social-media.edit', compact('socialMedia'));
     }
 
-    public function update(Request $request, SocialMedia $socialMedia)
+    public function update(Request $request, SocialMedia $socialMedium)
     {
         $validated = $request->validate([
             'platform' => 'required|string|max:255',
@@ -53,14 +54,14 @@ class SocialMediaController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
 
-        $socialMedia->update($validated);
+        $socialMedium->update($validated);
 
         return redirect()->route('admin.social-media.index')->with('success', 'Media Sosial berhasil diperbarui.');
     }
 
-    public function destroy(SocialMedia $socialMedia)
+    public function destroy(SocialMedia $socialMedium)
     {
-        $socialMedia->delete();
+        $socialMedium->delete();
         return redirect()->route('admin.social-media.index')->with('success', 'Media Sosial berhasil dihapus.');
     }
 }

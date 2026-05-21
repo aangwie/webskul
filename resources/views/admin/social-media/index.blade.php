@@ -43,13 +43,13 @@
                                 <a href="{{ route('admin.social-media.edit', $social) }}" class="btn-action btn-edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('admin.social-media.destroy', $social) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus?')">
+                                <form id="delete-form-{{ $social->id }}" action="{{ route('admin.social-media.destroy', $social) }}" method="POST" style="display: none;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn-action btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
                                 </form>
+                                <button type="button" class="btn-action btn-delete" onclick="confirmDelete({{ $social->id }}, '{{ $social->platform }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -63,4 +63,25 @@
         </div>
     </div>
 </div>
+
+@section('scripts')
+<script>
+    function confirmDelete(id, name) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Anda akan menghapus media sosial " + name + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--primary, #3085d6)',
+            cancelButtonColor: 'var(--danger, #d33)',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        });
+    }
+</script>
+@endsection
 @endsection

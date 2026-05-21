@@ -11,14 +11,16 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        $existsNik = count(DB::select("SHOW INDEXES FROM pmb_registrations WHERE Key_name = 'pmb_registrations_nik_unique'")) > 0;
+        $isSqlite = DB::getDriverName() === 'sqlite';
+
+        $existsNik = $isSqlite ? false : count(DB::select("SHOW INDEXES FROM pmb_registrations WHERE Key_name = 'pmb_registrations_nik_unique'")) > 0;
         if (!$existsNik) {
             Schema::table('pmb_registrations', function (Blueprint $table) {
                 $table->unique('nik');
             });
         }
 
-        $existsNisn = count(DB::select("SHOW INDEXES FROM pmb_registrations WHERE Key_name = 'pmb_registrations_nisn_unique'")) > 0;
+        $existsNisn = $isSqlite ? false : count(DB::select("SHOW INDEXES FROM pmb_registrations WHERE Key_name = 'pmb_registrations_nisn_unique'")) > 0;
         if (!$existsNisn) {
             Schema::table('pmb_registrations', function (Blueprint $table) {
                 $table->unique('nisn');

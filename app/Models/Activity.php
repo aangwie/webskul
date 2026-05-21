@@ -26,11 +26,27 @@ class Activity extends Model
     {
         parent::boot();
 
-        static::creating(function ($activity) {
-            if (empty($activity->slug)) {
-                $activity->slug = Str::slug($activity->title);
+        static::saving(function ($activity) {
+            if (empty($activity->slug) || $activity->isDirty('title') || $activity->isDirty('slug')) {
+                $baseSlug = Str::slug($activity->slug ?: $activity->title);
+                $activity->slug = static::generateUniqueSlug($baseSlug, $activity->id);
             }
         });
+    }
+
+    public static function generateUniqueSlug($slug, $excludeId = null)
+    {
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (static::where('slug', $slug)->when($excludeId, function ($query, $id) {
+            return $query->where('id', '!=', $id);
+        })->exists()) {
+            $slug = $originalSlug . '-' . $count;
+            $count++;
+        }
+
+        return $slug;
     }
 
     public function scopePublished($query)
