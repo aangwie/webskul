@@ -154,8 +154,11 @@
             <h2><i class="fas fa-chart-bar"></i> Grafik Rata-rata Skor Per Pertanyaan</h2>
         </div>
         <div class="card-body">
-            <div class="chart-container">
-                <canvas id="skmChart"></canvas>
+            <div class="chart-container" id="skmChartContainer" style="min-height: 300px;">
+                <canvas id="skmChart" style="width:100%;height:300px;"
+                    data-labels='{!! json_encode($chartLabels) !!}'
+                    data-values='{!! json_encode($chartData) !!}'
+                    data-questions='{!! json_encode($chartQuestions) !!}'></canvas>
             </div>
             <p style="text-align: center; font-size: 0.8rem; color: var(--text-light); margin-top: 10px;">
                 <i class="fas fa-info-circle"></i> Arahkan kursor ke batang grafik untuk melihat detail pertanyaan
@@ -279,98 +282,92 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('skmChart')?.getContext('2d');
-    if (!ctx) return;
+    var canvas = document.getElementById('skmChart');
+    if (!canvas) return;
 
-    const chartLabels = @json($chartLabels);
-    const chartData = @json($chartData);
-    const chartQuestions = @json($chartQuestions);
+    var ctx = canvas.getContext('2d');
 
-    // Generate gradient colors
-    const baseColor = 'rgba(30, 58, 95, ';
-    const hoverColor = 'rgba(30, 58, 95, 1)';
+    try {
+        var labels = JSON.parse(canvas.getAttribute('data-labels') || '[]');
+        var values = JSON.parse(canvas.getAttribute('data-values') || '[]');
+        var questions = JSON.parse(canvas.getAttribute('data-questions') || '[]');
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: chartLabels,
-            datasets: [{
-                label: 'Rata-rata Skor',
-                data: chartData,
-                backgroundColor: chartData.map(v => parseFloat(v) >= 3 ? 'rgba(25, 135, 84, 0.7)' : (parseFloat(v) >= 2 ? 'rgba(255, 193, 7, 0.7)' : 'rgba(220, 53, 69, 0.7)')),
-                borderColor: chartData.map(v => parseFloat(v) >= 3 ? '#198754' : (parseFloat(v) >= 2 ? '#ffc107' : '#dc3545')),
-                borderWidth: 2,
-                borderRadius: 6,
-                barPercentage: 0.6,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            aspectRatio: 2,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    enabled: true,
-                    callbacks: {
-                        title: function(context) {
-                            const index = context[0].dataIndex;
-                            return chartLabels[index];
-                        },
-                        label: function(context) {
-                            const index = context.dataIndex;
-                            return 'Rata-rata: ' + chartData[index];
-                        },
-                        afterLabel: function(context) {
-                            const index = context.dataIndex;
-                            return '\nPertanyaan: ' + chartQuestions[index];
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 4,
-                    title: {
-                        display: true,
-                        text: 'Rata-rata Skor',
-                        font: {
-                            weight: 'bold',
-                            size: 12
-                        }
-                    },
-                    ticks: {
-                        stepSize: 0.5,
-                        callback: function(value) {
-                            return value.toFixed(1);
-                        }
-                    },
-                    grid: {
-                        color: 'rgba(0,0,0,0.05)'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Pertanyaan',
-                        font: {
-                            weight: 'bold',
-                            size: 12
-                        }
-                    },
-                    grid: {
-                        display: false
-                    }
-                }
-            },
-            onHover: function(event, chartElement) {
-                event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-            }
+        if (!labels || labels.length === 0) {
+            document.getElementById('skmChartContainer').innerHTML = '<p style="text-align:center;color:#999;padding:40px;">Data grafik tidak tersedia.</p>';
+            return;
         }
-    });
+
+        var bgColors = values.map(function(v) {
+            var num = parseFloat(v);
+            if (num >= 3) return 'rgba(25, 135, 84, 0.7)';
+            if (num >= 2) return 'rgba(255, 193, 7, 0.7)';
+            return 'rgba(220, 53, 69, 0.7)';
+        });
+
+        var borderColors = values.map(function(v) {
+            var num = parseFloat(v);
+            if (num >= 3) return '#198754';
+            if (num >= 2) return '#ffc107';
+            return '#dc3545';
+        });
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Rata-rata Skor',
+                    data: values,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].label;
+                            },
+                            label: function(context) {
+                                return 'Rata-rata: ' + values[context.dataIndex];
+                            },
+                            afterLabel: function(context) {
+                                return '\n' + questions[context.dataIndex];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 4,
+                        title: { display: true, text: 'Rata-rata Skor', font: { weight: 'bold', size: 12 } },
+                        ticks: { stepSize: 0.5 },
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Pertanyaan', font: { weight: 'bold', size: 12 } },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    } catch(e) {
+        console.error('Chart error:', e);
+        var container = document.getElementById('skmChartContainer');
+        if (container) {
+            container.innerHTML = '<p style="text-align:center;color:red;padding:40px;">Error menggambar grafik.</p>';
+        }
+    }
 });
 </script>
 @endsection

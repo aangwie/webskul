@@ -123,37 +123,64 @@ class SkmController extends Controller
         $years = SkmRespondent::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
         $selectedYear = request('year', date('Y'));
 
-        $data = $this->getReportData($selectedYear);
+        $reportData = $this->getReportData($selectedYear);
+
+        // Extract variables
+        $respondents = $reportData['respondents'];
+        $questions = $reportData['questions'];
+        $averages = $reportData['averages'];
+        $ikm = $reportData['ikm'];
+        $respondentCount = $reportData['respondentCount'];
+        $totalCount = $reportData['totalCount'];
+        $distributions = $reportData['distributions'];
 
         // Prepare chart data
         $chartLabels = [];
         $chartData = [];
         $chartQuestions = [];
-        foreach ($data['questions'] as $q) {
-            $labels = 'Q' . (count($chartLabels) + 1);
-            $chartLabels[] = $labels;
-            $chartData[] = number_format($data['averages'][$q->id]['average'] ?? 0, 2);
+        foreach ($questions as $q) {
+            $chartLabels[] = 'Q' . (count($chartLabels) + 1);
+            $chartData[] = isset($averages[$q->id]) ? number_format($averages[$q->id]['average'], 2) : '0.00';
             $chartQuestions[] = $q->question_text;
         }
 
         return view('admin.skm.reports', compact(
             'years',
             'selectedYear',
-            'data',
+            'respondents',
+            'questions',
+            'averages',
+            'ikm',
+            'respondentCount',
+            'totalCount',
+            'distributions',
             'chartLabels',
             'chartData',
             'chartQuestions'
-        ) + $data);
+        ));
     }
 
     public function exportPdf(Request $request)
     {
         $selectedYear = $request->year ?? date('Y');
-        $data = $this->getReportData($selectedYear);
+        $reportData = $this->getReportData($selectedYear);
+
+        // Extract variables
+        $respondents = $reportData['respondents'];
+        $questions = $reportData['questions'];
+        $averages = $reportData['averages'];
+        $ikm = $reportData['ikm'];
+        $respondentCount = $reportData['respondentCount'];
+        $totalCount = $reportData['totalCount'];
+        $distributions = $reportData['distributions'];
 
         $school = \App\Models\SchoolProfile::first();
 
-        $pdf = Pdf::loadView('pdf.skm-report', compact('data', 'selectedYear', 'school') + $data);
+        $pdf = Pdf::loadView('pdf.skm-report', compact(
+            'respondents', 'questions', 'averages', 'ikm',
+            'respondentCount', 'totalCount', 'distributions',
+            'selectedYear', 'school'
+        ));
         $pdf->setPaper('A4', 'portrait');
 
         return $pdf->download("laporan-skm-{$selectedYear}.pdf");
