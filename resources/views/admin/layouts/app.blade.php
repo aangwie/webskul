@@ -694,6 +694,14 @@
                                 <i class="fas fa-building"></i> Fasilitas Sekolah
                             </a>
                         </li>
+                        @if(auth()->user()->isAdmin())
+                        <li>
+                            <a href="{{ route('admin.public-service-standards.index') }}"
+                                class="{{ request()->routeIs('admin.public-service-standards.*') ? 'active' : '' }}">
+                                <i class="fas fa-file-contract"></i> SPP
+                            </a>
+                        </li>
+                        @endif
 
                     </ul>
                 </li>

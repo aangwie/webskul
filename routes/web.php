@@ -261,6 +261,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/skm/respondent/{skmRespondent}', [AdminSkmController::class, 'respondentDetail'])->name('skm.respondent-detail');
         Route::delete('/skm/respondent/{skmRespondent}', [AdminSkmController::class, 'deleteRespondent'])->name('skm.delete-respondent');
     });
+
+    // SPP Management (Admin)
+    Route::middleware(['role:admin'])->prefix('public-service-standards')->name('public-service-standards.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\PublicServiceStandardController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\PublicServiceStandardController::class, 'store'])->name('store');
+        Route::delete('/{publicServiceStandard}', [\App\Http\Controllers\Admin\PublicServiceStandardController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // Frontend SKM (Public)
@@ -269,3 +276,8 @@ Route::post('/skm/identity', [FrontendSkmController::class, 'submitIdentity'])->
 Route::get('/skm/survey', [FrontendSkmController::class, 'survey'])->name('skm.survey');
 Route::post('/skm/survey', [FrontendSkmController::class, 'submitSurvey'])->name('skm.submit-survey');
 Route::get('/skm/thankyou', [FrontendSkmController::class, 'thankyou'])->name('skm.thankyou');
+
+// Frontend SPP (Public)
+Route::get('/spp', [\App\Http\Controllers\Frontend\PublicServiceStandardController::class, 'index'])->name('spp.index');
+Route::get('/spp/{publicServiceStandard}/view', [\App\Http\Controllers\Frontend\PublicServiceStandardController::class, 'showPdf'])->name('spp.view');
+Route::get('/spp/{publicServiceStandard}/download', [\App\Http\Controllers\Frontend\PublicServiceStandardController::class, 'downloadPdf'])->name('spp.download');

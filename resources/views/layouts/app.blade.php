@@ -469,6 +469,8 @@
                             </li>
                             <li><a href="{{ route('public-complaints.status') }}" class="dropdown-item">Respon Aduan</a>
                             </li>
+                            <li><a href="{{ route('spp.index') }}" class="dropdown-item">Standar Pelayanan Publik</a>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item" onclick="toggleDropdown(this)">
