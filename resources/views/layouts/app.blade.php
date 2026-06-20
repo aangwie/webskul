@@ -488,6 +488,7 @@
                             <li><a href="{{ route('komite.status') }}" class="dropdown-item">Cek Sumbangan Komite</a>
                             </li>
                             <li><a href="{{ route('ijazah.index') }}" class="dropdown-item">Cek Ijazah Digital</a></li>
+                            <li><a href="{{ route('skm.index') }}" class="dropdown-item">e-SKM (Survei Kepuasan)</a></li>
                             <li><a href="https://simsiswa.smpn6sudimoro.my.id" target="_blank" class="dropdown-item">SIM
                                     Siswa</a></li>
                             <li><a href="https://sppd.smpn6sudimoro.my.id" target="_blank"

@@ -30,6 +30,8 @@ use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\BookConditionController;
 use App\Http\Controllers\Admin\BookBorrowingController;
 use App\Http\Controllers\Admin\LibraryReportController;
+use App\Http\Controllers\Admin\SkmController as AdminSkmController;
+use App\Http\Controllers\Frontend\SkmController as FrontendSkmController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -243,4 +245,26 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('carousel/hero', [CarouselController::class, 'destroyHero'])->name('carousel.hero.destroy');
         Route::resource('carousel', CarouselController::class)->except(['show', 'create', 'edit']);
     });
+
+    // SKM Management (Admin, Teacher)
+    Route::middleware(['role:admin,teacher'])->group(function () {
+        Route::get('/skm', [AdminSkmController::class, 'index'])->name('skm.index');
+        Route::post('/skm', [AdminSkmController::class, 'store'])->name('skm.store');
+        Route::put('/skm/{skmQuestion}', [AdminSkmController::class, 'update'])->name('skm.update');
+        Route::get('/skm/{skmQuestion}/toggle-active', [AdminSkmController::class, 'toggleActive'])->name('skm.toggle-active');
+        Route::delete('/skm/{skmQuestion}', [AdminSkmController::class, 'destroy'])->name('skm.destroy');
+        Route::post('/skm/reorder', [AdminSkmController::class, 'reorder'])->name('skm.reorder');
+
+        // SKM Reports
+        Route::get('/skm/reports', [AdminSkmController::class, 'reports'])->name('skm.reports');
+        Route::get('/skm/respondent/{skmRespondent}', [AdminSkmController::class, 'respondentDetail'])->name('skm.respondent-detail');
+        Route::delete('/skm/respondent/{skmRespondent}', [AdminSkmController::class, 'deleteRespondent'])->name('skm.delete-respondent');
+    });
 });
+
+// Frontend SKM (Public)
+Route::get('/skm', [FrontendSkmController::class, 'index'])->name('skm.index');
+Route::post('/skm/identity', [FrontendSkmController::class, 'submitIdentity'])->name('skm.submit-identity');
+Route::get('/skm/survey', [FrontendSkmController::class, 'survey'])->name('skm.survey');
+Route::post('/skm/survey', [FrontendSkmController::class, 'submitSurvey'])->name('skm.submit-survey');
+Route::get('/skm/thankyou', [FrontendSkmController::class, 'thankyou'])->name('skm.thankyou');

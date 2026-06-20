@@ -728,7 +728,7 @@
                     <i class="fas fa-images"></i> Carousel
                 </a>
             </li>
-            <li class="has-submenu {{ request()->routeIs('admin.activities.*') || request()->routeIs('admin.social-media.*') || request()->routeIs('admin.information.*') || request()->routeIs('admin.public-complaints.*') ? 'active' : '' }}"
+            <li class="has-submenu {{ request()->routeIs('admin.activities.*') || request()->routeIs('admin.social-media.*') || request()->routeIs('admin.information.*') || request()->routeIs('admin.public-complaints.*') || request()->routeIs('admin.skm.*') ? 'active' : '' }}"
                 id="manajemen-menu">
                 <a href="javascript:void(0)" onclick="toggleSubmenu('manajemen-menu')" class="submenu-toggle">
                     <span><i class="fas fa-tasks"></i> Manajemen</span>
@@ -762,6 +762,18 @@
                                     <span class="badge"
                                         style="margin-left: auto; background: var(--danger); color: white;">{{ $unrespondedComplaintsCount }}</span>
                                 @endif
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.skm.index') }}"
+                                class="{{ request()->routeIs('admin.skm.index') || request()->routeIs('admin.skm.reports') || request()->routeIs('admin.skm.respondent-detail') ? 'active' : '' }}">
+                                <i class="fas fa-poll"></i> e-SKM
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.skm.reports') }}"
+                                class="{{ request()->routeIs('admin.skm.reports') || request()->routeIs('admin.skm.respondent-detail') ? 'active' : '' }}">
+                                <i class="fas fa-chart-bar"></i> Laporan SKM
                             </a>
                         </li>
                     @endif
