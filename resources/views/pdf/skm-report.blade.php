@@ -109,6 +109,15 @@
             padding-top: 15px;
             border-top: 1px solid #ddd;
         }
+        .note-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 10px;
+            color: #856404;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -208,31 +217,40 @@
         </tfoot>
     </table>
 
-    <h3 class="section-title">Daftar Responden</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Alamat</th>
-                <th>No Telpon</th>
-                <th>Tanggal</th>
-                <th>IKM</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($respondents as $r)
+    @if($includeRespondents)
+        <h3 class="section-title">Daftar Responden</h3>
+        <div class="note-box">
+            <strong>Informasi:</strong> Laporan ini menyertakan data responden sebanyak {{ $respondentCount }} orang.
+        </div>
+        <table>
+            <thead>
                 <tr>
-                    <td style="text-align: center;">{{ $loop->iteration }}</td>
-                    <td>{{ $r->name }}</td>
-                    <td>{{ $r->address }}</td>
-                    <td>{{ $r->phone }}</td>
-                    <td style="text-align: center;">{{ $r->created_at->format('d/m/Y') }}</td>
-                    <td style="text-align: center;">{{ number_format($r->average_score * 25, 2) }}</td>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>No Telpon</th>
+                    <th>Tanggal</th>
+                    <th>IKM</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach($respondents as $r)
+                    <tr>
+                        <td style="text-align: center;">{{ $loop->iteration }}</td>
+                        <td>{{ $r->name }}</td>
+                        <td>{{ $r->address }}</td>
+                        <td>{{ $r->phone }}</td>
+                        <td style="text-align: center;">{{ $r->created_at->format('d/m/Y') }}</td>
+                        <td style="text-align: center;">{{ number_format($r->average_score * 25, 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @else
+        <div class="note-box" style="background: #e8f0fe; border-color: #1e3a5f; color: #1e3a5f;">
+            <strong>Informasi:</strong> Data responden tidak disertakan dalam laporan ini. Total responden: {{ $respondentCount }} orang.
+        </div>
+    @endif
 
     <div class="footer">
         <p>Laporan ini dihasilkan secara otomatis dari sistem e-SKM {{ $school->name ?? 'SMP Negeri 6 Sudimoro' }}</p>

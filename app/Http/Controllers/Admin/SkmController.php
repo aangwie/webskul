@@ -163,23 +163,26 @@ class SkmController extends Controller
     public function exportPdf(Request $request)
     {
         $selectedYear = $request->year ?? date('Y');
+        $includeRespondents = $request->input('include_respondents', '1') === '1';
+
         $reportData = $this->getReportData($selectedYear);
 
         // Extract variables
-        $respondents = $reportData['respondents'];
+        $respondents = $includeRespondents ? $reportData['respondents'] : collect();
         $questions = $reportData['questions'];
         $averages = $reportData['averages'];
         $ikm = $reportData['ikm'];
         $respondentCount = $reportData['respondentCount'];
         $totalCount = $reportData['totalCount'];
         $distributions = $reportData['distributions'];
+        $includeRespondents = $includeRespondents;
 
         $school = \App\Models\SchoolProfile::first();
 
         $pdf = Pdf::loadView('pdf.skm-report', compact(
             'respondents', 'questions', 'averages', 'ikm',
             'respondentCount', 'totalCount', 'distributions',
-            'selectedYear', 'school'
+            'selectedYear', 'school', 'includeRespondents'
         ));
         $pdf->setPaper('A4', 'portrait');
 

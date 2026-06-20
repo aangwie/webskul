@@ -118,9 +118,9 @@
                 </div>
             </form>
             @if($respondentCount > 0)
-                <a href="{{ route('admin.skm.export-pdf', ['year' => $selectedYear]) }}" class="btn btn-danger btn-sm" target="_blank">
+                <button type="button" class="btn btn-danger btn-sm" onclick="downloadPdf()">
                     <i class="fas fa-file-pdf"></i> Download PDF
-                </a>
+                </button>
             @endif
         </div>
     </div>
@@ -281,6 +281,36 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+function downloadPdf() {
+    var selectedYear = document.querySelector('select[name="year"]').value;
+    Swal.fire({
+        title: 'Download Laporan PDF',
+        html: '<p style="margin-bottom:20px;color:#666;">Apakah Anda ingin menyertakan data responden dalam laporan PDF?</p>' +
+              '<div style="display:flex;gap:10px;justify-content:center;">' +
+              '<button class="btn btn-success" id="btnYes" style="padding:10px 25px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;background:#198754;color:white;font-size:0.95rem;">Ya, Sertakan</button>' +
+              '<button class="btn btn-warning" id="btnNo" style="padding:10px 25px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;background:#ffc107;color:#333;font-size:0.95rem;">Tidak</button>' +
+              '<button class="btn btn-danger" id="btnCancel" style="padding:10px 25px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;background:#dc3545;color:white;font-size:0.95rem;">Batal</button>' +
+              '</div>',
+        showConfirmButton: false,
+        allowOutsideClick: true,
+        didRender: function() {
+            document.getElementById('btnYes').addEventListener('click', function() {
+                var url = '{{ route("admin.skm.export-pdf") }}?year=' + selectedYear + '&include_respondents=1';
+                window.open(url, '_blank');
+                Swal.close();
+            });
+            document.getElementById('btnNo').addEventListener('click', function() {
+                var url = '{{ route("admin.skm.export-pdf") }}?year=' + selectedYear + '&include_respondents=0';
+                window.open(url, '_blank');
+                Swal.close();
+            });
+            document.getElementById('btnCancel').addEventListener('click', function() {
+                Swal.close();
+            });
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     var canvas = document.getElementById('skmChart');
     if (!canvas) return;
