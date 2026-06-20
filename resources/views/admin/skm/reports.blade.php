@@ -5,47 +5,6 @@
 
 @section('styles')
 <style>
-    .ikm-card {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-        color: var(--secondary);
-        border-radius: 16px;
-        padding: 30px;
-        text-align: center;
-        margin-bottom: 25px;
-        position: relative;
-    }
-    .ikm-card h1 {
-        font-size: 3.5rem;
-        font-weight: 800;
-        margin-bottom: 5px;
-    }
-    .ikm-card p {
-        opacity: 0.9;
-        font-size: 1rem;
-    }
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 15px;
-        margin-bottom: 25px;
-    }
-    .stat-box {
-        background: var(--secondary);
-        border: 1px solid var(--accent);
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-    }
-    .stat-box h3 {
-        font-size: 1.8rem;
-        font-weight: 800;
-        color: var(--primary);
-    }
-    .stat-box p {
-        font-size: 0.85rem;
-        color: var(--text-light);
-        margin-top: 5px;
-    }
     .result-row {
         display: flex;
         align-items: center;
@@ -127,24 +86,65 @@
 </div>
 
 @if($respondentCount > 0)
-    <div class="ikm-card animate-fade-in">
-        <p>Indeks Kepuasan Masyarakat (IKM)</p>
-        <h1>{{ number_format($ikm, 2) }}</h1>
-        <p>Skala 0 - 100 | Tahun {{ $selectedYear }}</p>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-box">
-            <h3>{{ $respondentCount }}</h3>
-            <p>Jumlah Responden</p>
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-chart-pie"></i> Ringkasan Hasil Survei Tahun {{ $selectedYear }}</h2>
         </div>
-        <div class="stat-box">
-            <h3>{{ number_format($totalCount > 0 ? ($ikm / 25) : 0, 2) }}</h3>
-            <p>Rata-rata Nilai Unsur</p>
-        </div>
-        <div class="stat-box">
-            <h3>{{ $distributions[1] + $distributions[2] + $distributions[3] + $distributions[4] }}</h3>
-            <p>Total Jawaban</p>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 60px; text-align: center;">No</th>
+                            <th>Indikator</th>
+                            <th style="width: 150px; text-align: center;">Nilai</th>
+                            <th style="width: 200px;">Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center; font-weight: 700;">1</td>
+                            <td style="font-weight: 600;">Indeks Kepuasan Masyarakat (IKM)</td>
+                            <td style="text-align: center;">
+                                <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">{{ number_format($ikm, 2) }}</span>
+                            </td>
+                            <td>
+                                @php
+                                    $ikmCategory = $ikm >= 88 ? 'Sangat Baik' : ($ikm >= 76 ? 'Baik' : ($ikm >= 62 ? 'Cukup' : 'Kurang'));
+                                    $ikmColor = $ikm >= 88 ? '#198754' : ($ikm >= 76 ? '#0d6efd' : ($ikm >= 62 ? '#ffc107' : '#dc3545'));
+                                @endphp
+                                <span class="badge" style="background: {{ $ikmColor }}; color: white; padding: 6px 16px; font-size: 0.85rem;">
+                                    {{ $ikmCategory }} (Skala 0 - 100)
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; font-weight: 700;">2</td>
+                            <td style="font-weight: 600;">Jumlah Responden</td>
+                            <td style="text-align: center;">
+                                <span style="font-size: 1.5rem; font-weight: 800; color: var(--success);">{{ $respondentCount }}</span>
+                            </td>
+                            <td>Orang yang telah berpartisipasi dalam survei</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; font-weight: 700;">3</td>
+                            <td style="font-weight: 600;">Rata-rata Nilai Unsur</td>
+                            <td style="text-align: center;">
+                                <span style="font-size: 1.5rem; font-weight: 800; color: var(--accent-gold);">{{ number_format($totalCount > 0 ? ($ikm / 25) : 0, 2) }}</span>
+                            </td>
+                            <td>Rata-rata dari seluruh skor penilaian (Skala 1 - 4)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; font-weight: 700;">4</td>
+                            <td style="font-weight: 600;">Total Jawaban</td>
+                            <td style="text-align: center;">
+                                <span style="font-size: 1.5rem; font-weight: 800; color: var(--warning);">{{ $distributions[1] + $distributions[2] + $distributions[3] + $distributions[4] }}</span>
+                            </td>
+                            <td>Total seluruh jawaban dari semua responden</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
