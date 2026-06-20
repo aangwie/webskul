@@ -6,117 +6,128 @@
     <style>
         body {
             font-family: 'DejaVu Sans', sans-serif;
-            font-size: 11px;
+            font-size: 10px;
             color: #333;
             line-height: 1.5;
-            padding: 30px;
+            padding: 25px;
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
             border-bottom: 3px solid #1e3a5f;
         }
         .header h1 {
-            font-size: 18px;
+            font-size: 16px;
             color: #1e3a5f;
             margin: 0 0 5px;
         }
         .header h2 {
-            font-size: 14px;
+            font-size: 12px;
             color: #555;
             margin: 0;
             font-weight: normal;
         }
         .header p {
-            font-size: 11px;
+            font-size: 10px;
             color: #777;
             margin: 5px 0 0;
         }
-        .ikm-box {
-            background: #1e3a5f;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-        .ikm-box h1 {
-            font-size: 36px;
-            margin: 5px 0;
-        }
-        .ikm-box p {
-            font-size: 12px;
-            margin: 3px 0;
-            opacity: 0.9;
-        }
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 25px;
-        }
-        .stat-item {
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 12px 20px;
-            flex: 1;
-            margin: 0 5px;
-        }
-        .stat-item h3 {
-            font-size: 20px;
-            color: #1e3a5f;
-            margin: 0;
-        }
-        .stat-item p {
-            font-size: 10px;
-            color: #666;
-            margin: 3px 0 0;
-        }
-        table {
+
+        /* Summary Table Style */
+        .summary-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
-        table th {
+        .summary-table th {
             background: #1e3a5f;
             color: white;
-            padding: 8px 10px;
+            padding: 10px 12px;
             text-align: left;
-            font-size: 10px;
+            font-size: 11px;
             text-transform: uppercase;
         }
-        table td {
-            padding: 7px 10px;
-            border-bottom: 1px solid #eee;
+        .summary-table td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #dee2e6;
             font-size: 10px;
+            vertical-align: middle;
         }
-        table tr:nth-child(even) {
+        .summary-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .summary-table .no-col {
+            text-align: center;
+            font-weight: bold;
+            width: 50px;
+        }
+        .summary-table .value-col {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: #1e3a5f;
+            width: 140px;
+        }
+        .summary-table .desc-col {
+            color: #666;
+            font-size: 9px;
+        }
+        .category-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Existing styles */
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table.data-table th {
+            background: #1e3a5f;
+            color: white;
+            padding: 7px 8px;
+            text-align: left;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+        table.data-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 9px;
+        }
+        table.data-table tr:nth-child(even) {
             background: #f9f9f9;
         }
+
         .section-title {
-            font-size: 13px;
+            font-size: 12px;
             color: #1e3a5f;
             border-bottom: 2px solid #1e3a5f;
             padding-bottom: 5px;
-            margin: 20px 0 15px;
+            margin: 18px 0 12px;
         }
         .footer {
             text-align: center;
             color: #999;
-            font-size: 9px;
-            margin-top: 40px;
-            padding-top: 15px;
+            font-size: 8px;
+            margin-top: 35px;
+            padding-top: 12px;
             border-top: 1px solid #ddd;
         }
         .note-box {
             background: #fff3cd;
             border: 1px solid #ffc107;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 6px;
-            font-size: 10px;
+            font-size: 9px;
             color: #856404;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -127,26 +138,52 @@
         <p>Tahun {{ $selectedYear }}</p>
     </div>
 
-    <div class="ikm-box">
-        <p>Indeks Kepuasan Masyarakat (IKM)</p>
-        <h1>{{ number_format($ikm, 2) }}</h1>
-        <p>Skala 0 - 100</p>
-    </div>
-
-    <div class="stats-row">
-        <div class="stat-item">
-            <h3>{{ $respondentCount }}</h3>
-            <p>Jumlah Responden</p>
-        </div>
-        <div class="stat-item">
-            <h3>{{ number_format($totalCount > 0 ? ($ikm / 25) : 0, 2) }}</h3>
-            <p>Rata-rata Nilai Unsur</p>
-        </div>
-        <div class="stat-item">
-            <h3>{{ $distributions[1] + $distributions[2] + $distributions[3] + $distributions[4] }}</h3>
-            <p>Total Jawaban</p>
-        </div>
-    </div>
+    <!-- Summary Table: IKM, Respondents, Avg, Total -->
+    @php
+        $ikmCategory = $ikm >= 88 ? 'Sangat Baik' : ($ikm >= 76 ? 'Baik' : ($ikm >= 62 ? 'Cukup' : 'Kurang'));
+        $ikmColor = $ikm >= 88 ? '#198754' : ($ikm >= 76 ? '#0d6efd' : ($ikm >= 62 ? '#ffc107' : '#dc3545'));
+    @endphp
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th style="width: 50px; text-align: center;">No</th>
+                <th>Indikator</th>
+                <th style="width: 140px; text-align: center;">Nilai</th>
+                <th>Keterangan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="no-col">1</td>
+                <td><strong>Indeks Kepuasan Masyarakat (IKM)</strong></td>
+                <td class="value-col">{{ number_format($ikm, 2) }}</td>
+                <td class="desc-col">
+                    <span class="category-badge" style="background: {{ $ikmColor }};">
+                        {{ $ikmCategory }}
+                    </span>
+                    &nbsp;(Skala 0 - 100)
+                </td>
+            </tr>
+            <tr>
+                <td class="no-col">2</td>
+                <td><strong>Jumlah Responden</strong></td>
+                <td class="value-col" style="color: #198754;">{{ $respondentCount }}</td>
+                <td class="desc-col">Orang yang telah berpartisipasi dalam survei</td>
+            </tr>
+            <tr>
+                <td class="no-col">3</td>
+                <td><strong>Rata-rata Nilai Unsur</strong></td>
+                <td class="value-col" style="color: #d4af37;">{{ number_format($totalCount > 0 ? ($ikm / 25) : 0, 2) }}</td>
+                <td class="desc-col">Rata-rata dari seluruh skor penilaian (Skala 1 - 4)</td>
+            </tr>
+            <tr>
+                <td class="no-col">4</td>
+                <td><strong>Total Jawaban</strong></td>
+                <td class="value-col" style="color: #ffc107;">{{ $distributions[1] + $distributions[2] + $distributions[3] + $distributions[4] }}</td>
+                <td class="desc-col">Total seluruh jawaban dari semua responden</td>
+            </tr>
+        </tbody>
+    </table>
 
     <h3 class="section-title">Distribusi Skor Penilaian</h3>
     <table>
