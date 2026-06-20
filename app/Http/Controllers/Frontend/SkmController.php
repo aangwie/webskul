@@ -14,21 +14,32 @@ class SkmController extends Controller
     public function index()
     {
         $questions = SkmQuestion::where('is_active', true)->orderBy('order')->get();
-        return view('frontend.skm.index', compact('questions'));
+        $questionsExist = $questions->isNotEmpty();
+        return view('frontend.skm.index', compact('questions', 'questionsExist'));
     }
 
     public function submitIdentity(Request $request)
     {
+        // Check if questions exist first
+        $questionsExist = SkmQuestion::where('is_active', true)->exists();
+        if (!$questionsExist) {
+            return redirect()->route('skm.index')->with('error', 'Maaf, belum ada pertanyaan survei yang tersedia. Silakan hubungi admin.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string',
             'phone' => 'required|string|max:20',
-            'cf-turnstile-response' => 'required|string', // Turnstile validation
-            'honeypot' => 'required|in:', // Honeypot must be empty
+            'cf-turnstile-response' => 'required|string',
+            'honeypot' => 'nullable|string', // Honeypot field - will be checked manually
         ], [
             'cf-turnstile-response.required' => 'Verifikasi Turnstile diperlukan.',
-            'honeypot.in' => 'Terjadi kesalahan validasi.',
         ]);
+
+        // Check honeypot manually - must be empty
+        if ($request->filled('honeypot')) {
+            return back()->with('error', 'Terjadi kesalahan validasi.')->withInput();
+        }
 
         // Validate Turnstile
         $turnstileSecret = Setting::get('turnstile_secret_key', '');
@@ -93,11 +104,14 @@ class SkmController extends Controller
         foreach ($questions as $qId) {
             $rules["score_{$qId}"] = 'required|integer|min:1|max:4';
         }
-        $rules['honeypot'] = 'required|in:';
+        $rules['honeypot'] = 'nullable|string';
 
-        $request->validate($rules, [
-            'honeypot.in' => 'Terjadi kesalahan validasi.',
-        ]);
+        $request->validate($rules);
+
+        // Check honeypot manually - must be empty
+        if ($request->filled('honeypot')) {
+            return back()->with('error', 'Terjadi kesalahan validasi.')->withInput();
+        }
 
         // Check for duplicate submission in same year
         $existing = SkmRespondent::where('phone', $respondentData['phone'])

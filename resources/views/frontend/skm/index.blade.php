@@ -112,48 +112,82 @@
                     Data diri Anda hanya digunakan untuk keperluan identifikasi responden dan dijamin kerahasiaannya.
                 </div>
 
-                <form action="{{ route('skm.submit-identity') }}" method="POST" id="identityForm">
-                    @csrf
-                    <div class="form-group">
-                        <label class="form-label">Nama Lengkap</label>
-                        <input type="text" name="name" class="form-control" placeholder="Masukkan nama lengkap" value="{{ old('name') }}" required>
+                @if(!$questionsExist)
+                    <div style="text-align: center; padding: 30px 20px;">
+                        <i class="fas fa-poll" style="font-size: 4rem; color: var(--text-light); margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--text-light); margin-bottom: 10px;">Survei Belum Tersedia</h3>
+                        <p style="color: var(--text-light);">Maaf, belum ada pertanyaan survei yang tersedia saat ini. Silakan kembali lagi nanti.</p>
                     </div>
+                @else
+                    <form action="{{ route('skm.submit-identity') }}" method="POST" id="identityForm">
+                        @csrf
+                        <div class="form-group">
+                            <label class="form-label">Nama Lengkap</label>
+                            <input type="text" name="name" class="form-control" placeholder="Masukkan nama lengkap" value="{{ old('name') }}" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Alamat</label>
-                        <textarea name="address" class="form-control" placeholder="Masukkan alamat lengkap" required>{{ old('address') }}</textarea>
-                    </div>
+                        <div class="form-group">
+                            <label class="form-label">Alamat</label>
+                            <textarea name="address" class="form-control" placeholder="Masukkan alamat lengkap" required>{{ old('address') }}</textarea>
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Nomor Telepon</label>
-                        <input type="text" name="phone" class="form-control" placeholder="Contoh: 08123456789" value="{{ old('phone') }}" required>
-                    </div>
+                        <div class="form-group">
+                            <label class="form-label">Nomor Telepon</label>
+                            <input type="text" name="phone" class="form-control" placeholder="Contoh: 08123456789" value="{{ old('phone') }}" required>
+                        </div>
 
-                    <!-- Honeypot Protection -->
-                    <div class="honeypot-field">
-                        <input type="text" name="honeypot" value="" tabindex="-1" autocomplete="off">
-                    </div>
+                        <!-- Honeypot Protection -->
+                        <div class="honeypot-field">
+                            <input type="text" name="honeypot" value="" tabindex="-1" autocomplete="off">
+                        </div>
 
-                    <!-- Cloudflare Turnstile -->
-                    @php
-                        $turnstileSiteKey = \App\Models\Setting::get('turnstile_site_key', '');
-                        $turnstileIsActive = \App\Models\Setting::get('turnstile_is_active', '0');
-                    @endphp
-                    @if($turnstileIsActive === '1' && $turnstileSiteKey)
-                        <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="light"></div>
-                        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-                    @else
-                        <input type="hidden" name="cf-turnstile-response" value="bypass">
-                    @endif
+                        <!-- Cloudflare Turnstile -->
+                        @php
+                            $turnstileSiteKey = \App\Models\Setting::get('turnstile_site_key', '');
+                            $turnstileIsActive = \App\Models\Setting::get('turnstile_is_active', '0');
+                        @endphp
+                        @if($turnstileIsActive === '1' && $turnstileSiteKey)
+                            <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="light"></div>
+                            <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                        @else
+                            <input type="hidden" name="cf-turnstile-response" value="bypass">
+                        @endif
 
-                    <div style="margin-top: 30px;">
-                        <button type="submit" class="btn-submit">
-                            Lanjutkan ke Survei <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </form>
+                        <div style="margin-top: 30px;">
+                            <button type="submit" class="btn-submit">
+                                Lanjutkan ke Survei <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                @endif
             </div>
         </div>
     </div>
 </section>
+
+@if(session('error'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '{{ session('error') }}',
+            confirmButtonColor: '#1e3a5f',
+        });
+    });
+</script>
+@endif
+
+@if(session('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            confirmButtonColor: '#1e3a5f',
+        });
+    });
+</script>
+@endif
 @endsection
