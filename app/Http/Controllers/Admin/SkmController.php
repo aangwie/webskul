@@ -7,6 +7,7 @@ use App\Models\SkmQuestion;
 use App\Models\SkmRespondent;
 use App\Models\SkmResponse;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SkmController extends Controller
 {
@@ -74,11 +75,8 @@ class SkmController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function reports()
+    private function getReportData($selectedYear)
     {
-        $years = SkmRespondent::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
-        $selectedYear = request('year', date('Y'));
-
         $respondents = SkmRespondent::where('year', $selectedYear)->with('responses.question')->get();
         $questions = SkmQuestion::where('is_active', true)->orderBy('order')->get();
 
@@ -117,17 +115,48 @@ class SkmController extends Controller
                 ->count();
         }
 
+        return compact('respondents', 'questions', 'averages', 'ikm', 'respondentCount', 'totalCount', 'distributions');
+    }
+
+    public function reports()
+    {
+        $years = SkmRespondent::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
+        $selectedYear = request('year', date('Y'));
+
+        $data = $this->getReportData($selectedYear);
+
+        // Prepare chart data
+        $chartLabels = [];
+        $chartData = [];
+        $chartQuestions = [];
+        foreach ($data['questions'] as $q) {
+            $labels = 'Q' . (count($chartLabels) + 1);
+            $chartLabels[] = $labels;
+            $chartData[] = number_format($data['averages'][$q->id]['average'] ?? 0, 2);
+            $chartQuestions[] = $q->question_text;
+        }
+
         return view('admin.skm.reports', compact(
             'years',
             'selectedYear',
-            'questions',
-            'respondents',
-            'averages',
-            'ikm',
-            'respondentCount',
-            'totalCount',
-            'distributions'
-        ));
+            'data',
+            'chartLabels',
+            'chartData',
+            'chartQuestions'
+        ) + $data);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $selectedYear = $request->year ?? date('Y');
+        $data = $this->getReportData($selectedYear);
+
+        $school = \App\Models\SchoolProfile::first();
+
+        $pdf = Pdf::loadView('pdf.skm-report', compact('data', 'selectedYear', 'school') + $data);
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->download("laporan-skm-{$selectedYear}.pdf");
     }
 
     public function respondentDetail(SkmRespondent $skmRespondent)

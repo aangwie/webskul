@@ -12,6 +12,7 @@
         padding: 30px;
         text-align: center;
         margin-bottom: 25px;
+        position: relative;
     }
     .ikm-card h1 {
         font-size: 3.5rem;
@@ -78,6 +79,24 @@
         font-size: 0.8rem;
         font-weight: 600;
     }
+    .chart-container {
+        position: relative;
+        width: 100%;
+        max-height: 400px;
+    }
+    .bar-tooltip {
+        position: absolute;
+        display: none;
+        background: var(--primary);
+        color: var(--secondary);
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        max-width: 250px;
+        z-index: 1000;
+        pointer-events: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
 </style>
 @endsection
 
@@ -85,21 +104,25 @@
 <div class="card">
     <div class="card-header">
         <h2><i class="fas fa-filter"></i> Filter Tahun</h2>
-    </div>
-    <div class="card-body">
-        <form method="GET" action="{{ route('admin.skm.reports') }}">
-            <div class="form-group" style="max-width: 300px;">
-                <label class="form-label">Pilih Tahun</label>
-                <select name="year" class="form-select" onchange="this.form.submit()">
-                    @foreach($years as $y)
-                        <option value="{{ $y }}" {{ $y == $selectedYear ? 'selected' : '' }}>{{ $y }}</option>
-                    @endforeach
-                    @if($years->isEmpty())
-                        <option value="{{ date('Y') }}">{{ date('Y') }}</option>
-                    @endif
-                </select>
-            </div>
-        </form>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <form method="GET" action="{{ route('admin.skm.reports') }}" id="filterForm">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <select name="year" class="form-select" style="width: auto;" onchange="document.getElementById('filterForm').submit()">
+                        @foreach($years as $y)
+                            <option value="{{ $y }}" {{ $y == $selectedYear ? 'selected' : '' }}>{{ $y }}</option>
+                        @endforeach
+                        @if($years->isEmpty())
+                            <option value="{{ date('Y') }}">{{ date('Y') }}</option>
+                        @endif
+                    </select>
+                </div>
+            </form>
+            @if($respondentCount > 0)
+                <a href="{{ route('admin.skm.export-pdf', ['year' => $selectedYear]) }}" class="btn btn-danger btn-sm" target="_blank">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </a>
+            @endif
+        </div>
     </div>
 </div>
 
@@ -107,7 +130,7 @@
     <div class="ikm-card animate-fade-in">
         <p>Indeks Kepuasan Masyarakat (IKM)</p>
         <h1>{{ number_format($ikm, 2) }}</h1>
-        <p>Skala 0 - 100</p>
+        <p>Skala 0 - 100 | Tahun {{ $selectedYear }}</p>
     </div>
 
     <div class="stats-grid">
@@ -122,6 +145,21 @@
         <div class="stat-box">
             <h3>{{ $distributions[1] + $distributions[2] + $distributions[3] + $distributions[4] }}</h3>
             <p>Total Jawaban</p>
+        </div>
+    </div>
+
+    <!-- Chart.js Bar Chart -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-chart-bar"></i> Grafik Rata-rata Skor Per Pertanyaan</h2>
+        </div>
+        <div class="card-body">
+            <div class="chart-container">
+                <canvas id="skmChart"></canvas>
+            </div>
+            <p style="text-align: center; font-size: 0.8rem; color: var(--text-light); margin-top: 10px;">
+                <i class="fas fa-info-circle"></i> Arahkan kursor ke batang grafik untuk melihat detail pertanyaan
+            </p>
         </div>
     </div>
 
@@ -235,4 +273,104 @@
         </div>
     </div>
 @endif
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('skmChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const chartLabels = @json($chartLabels);
+    const chartData = @json($chartData);
+    const chartQuestions = @json($chartQuestions);
+
+    // Generate gradient colors
+    const baseColor = 'rgba(30, 58, 95, ';
+    const hoverColor = 'rgba(30, 58, 95, 1)';
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Rata-rata Skor',
+                data: chartData,
+                backgroundColor: chartData.map(v => parseFloat(v) >= 3 ? 'rgba(25, 135, 84, 0.7)' : (parseFloat(v) >= 2 ? 'rgba(255, 193, 7, 0.7)' : 'rgba(220, 53, 69, 0.7)')),
+                borderColor: chartData.map(v => parseFloat(v) >= 3 ? '#198754' : (parseFloat(v) >= 2 ? '#ffc107' : '#dc3545')),
+                borderWidth: 2,
+                borderRadius: 6,
+                barPercentage: 0.6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: true,
+                    callbacks: {
+                        title: function(context) {
+                            const index = context[0].dataIndex;
+                            return chartLabels[index];
+                        },
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            return 'Rata-rata: ' + chartData[index];
+                        },
+                        afterLabel: function(context) {
+                            const index = context.dataIndex;
+                            return '\nPertanyaan: ' + chartQuestions[index];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 4,
+                    title: {
+                        display: true,
+                        text: 'Rata-rata Skor',
+                        font: {
+                            weight: 'bold',
+                            size: 12
+                        }
+                    },
+                    ticks: {
+                        stepSize: 0.5,
+                        callback: function(value) {
+                            return value.toFixed(1);
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Pertanyaan',
+                        font: {
+                            weight: 'bold',
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            onHover: function(event, chartElement) {
+                event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+            }
+        }
+    });
+});
+</script>
 @endsection

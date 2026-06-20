@@ -257,6 +257,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
         // SKM Reports
         Route::get('/skm/reports', [AdminSkmController::class, 'reports'])->name('skm.reports');
+        Route::get('/skm/export-pdf', [AdminSkmController::class, 'exportPdf'])->name('skm.export-pdf');
         Route::get('/skm/respondent/{skmRespondent}', [AdminSkmController::class, 'respondentDetail'])->name('skm.respondent-detail');
         Route::delete('/skm/respondent/{skmRespondent}', [AdminSkmController::class, 'deleteRespondent'])->name('skm.delete-respondent');
     });
