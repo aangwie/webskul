@@ -83,6 +83,17 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">Gambar Maklumat Pelayanan</label>
+                    <input type="file" name="maklumat_pelayanan_image" class="form-input" accept="image/*">
+                    <small style="display:block; color: var(--text-light); margin-top: 4px; font-size: 0.8rem;">Maksimal 1MB. Format: JPG, PNG, GIF, WebP. Akan dikonversi ke WebP.</small>
+                    @if($school->maklumat_pelayanan_image)
+                        <div style="display: flex; align-items: flex-end; gap: 12px; margin-top: 10px;">
+                            <img src="{{ $school->maklumat_pelayanan_image }}" alt="Maklumat Pelayanan" class="preview-image" style="margin-top:0; max-height:200px;">
+                        </div>
+                    @endif
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">Logo SSN</label>
                     <input type="file" name="logo_ssn" class="form-input" accept="image/*">
                     @if($school->logo_ssn)

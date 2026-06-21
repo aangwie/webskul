@@ -1041,6 +1041,42 @@
         </div>
     </div>
 
+    {{-- Maklumat Pelayanan Section --}}
+    @if(isset($school) && $school && $school->maklumat_pelayanan_image)
+        <section class="maklumat-section">
+            <div class="container" style="text-align:center;">
+                <h2 class="section-title">Maklumat Pelayanan</h2>
+                <p class="section-subtitle">Komitmen kami dalam memberikan pelayanan terbaik</p>
+            </div>
+            <div class="maklumat-container">
+                <img src="{{ $school->maklumat_pelayanan_image }}" alt="Maklumat Pelayanan" class="maklumat-image">
+            </div>
+        </section>
+        <style>
+            .maklumat-section {
+                padding: 80px 20px;
+                background: var(--secondary);
+            }
+            .maklumat-container {
+                max-width: 900px;
+                margin: 0 auto;
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: var(--shadow-lg);
+            }
+            .maklumat-image {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+            @media (max-width: 768px) {
+                .maklumat-section {
+                    padding: 50px 16px;
+                }
+            }
+        </style>
+    @endif
+
     {{-- Social Media Section --}}
     @if($socials->isNotEmpty())
         <section class="social-section">

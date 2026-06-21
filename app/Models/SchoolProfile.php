@@ -18,5 +18,6 @@ class SchoolProfile extends Model
         'history',
         'logo',
         'logo_ssn',
+        'maklumat_pelayanan_image',
     ];
 }

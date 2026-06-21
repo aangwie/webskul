@@ -39,6 +39,7 @@ class SchoolProfileController extends Controller
             'history' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'logo_ssn' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'maklumat_pelayanan_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:1024',
         ]);
 
         $school = SchoolProfile::first();
@@ -66,6 +67,22 @@ class SchoolProfileController extends Controller
             $validated['logo_ssn'] = $pathSsn;
         }
 
+        if ($request->hasFile('maklumat_pelayanan_image')) {
+            $file = $request->file('maklumat_pelayanan_image');
+            // Convert to WebP and encode as base64
+            $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
+            if ($image !== false) {
+                ob_start();
+                imagewebp($image, null, 80);
+                $webpData = ob_get_clean();
+                imagedestroy($image);
+                $validated['maklumat_pelayanan_image'] = 'data:image/webp;base64,' . base64_encode($webpData);
+            } else {
+                // Fallback: store as original format base64 if GD can't read it
+                $validated['maklumat_pelayanan_image'] = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+            }
+        }
+
         $school->fill($validated);
         $school->save();
 
@@ -81,6 +98,17 @@ class SchoolProfileController extends Controller
                 return response()->json(['success' => false, 'message' => 'Profil sekolah tidak ditemukan.'], 404);
             }
             return redirect()->back()->with('error', 'Profil sekolah tidak ditemukan.');
+        }
+
+        if ($type === 'maklumat') {
+            $school->maklumat_pelayanan_image = null;
+            $school->save();
+
+            $label = 'Gambar Maklumat Pelayanan';
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => "$label berhasil dihapus!"]);
+            }
+            return redirect()->back()->with('success', "$label berhasil dihapus!");
         }
 
         $field = $type === 'ssn' ? 'logo_ssn' : 'logo';
