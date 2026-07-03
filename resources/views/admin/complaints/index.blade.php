@@ -54,7 +54,7 @@
                             @if($complaint->attachment)
                                 @php
                                     $ext = pathinfo($complaint->attachment, PATHINFO_EXTENSION);
-                                    $url = Storage::url($complaint->attachment);
+                                    $url = route('storage.view', ['path' => $complaint->attachment]);
                                 @endphp
                                 @if(in_array($ext, ['webp', 'jpg', 'jpeg', 'png', 'gif']))
                                     <img src="{{ $url }}" alt="Lampiran" style="width: 50px; height: 40px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="openLightbox('{{ $url }}')" title="Klik untuk perbesar">

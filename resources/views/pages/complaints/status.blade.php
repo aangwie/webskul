@@ -151,7 +151,7 @@
                         </div>
                         @if($complaint->attachment)
                         <div style="margin-top: 15px;">
-                            <a href="{{ asset('storage/' . $complaint->attachment) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600;">
+                            <a href="{{ route('storage.view', ['path' => $complaint->attachment]) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600;">
                                 <i class="fas fa-paperclip"></i> Lihat Lampiran
                             </a>
                         </div>
