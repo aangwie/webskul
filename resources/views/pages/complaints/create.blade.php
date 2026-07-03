@@ -101,7 +101,7 @@
             </div>
 
             <div class="complaint-card">
-                <form action="{{ route('public-complaints.store') }}" method="POST">
+                <form action="{{ route('public-complaints.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="complaint-grid">
                         <div class="form-group">
@@ -132,6 +132,12 @@
                     <div class="form-group">
                         <label class="form-label">Deskripsi Aduan / Saran</label>
                         <textarea name="description" class="form-control" style="min-height: 150px; resize: vertical;" placeholder="Tuliskan detail aduan atau saran Anda di sini..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Lampirkan Berkas (Opsional)</label>
+                        <input type="file" name="attachment" class="form-control" accept="image/*,application/pdf">
+                        <small style="color: var(--text-light); font-size: 0.8rem;">File gambar akan dikompres ke WebP. Maksimal 500KB. Format: Gambar atau PDF</small>
                     </div>
 
                     <div style="margin-top: 30px;">

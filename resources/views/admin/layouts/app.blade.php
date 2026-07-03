@@ -917,7 +917,7 @@
             <div class="sidebar-divider"></div>
 
             <ul class="sidebar-menu">
-                <li class="has-submenu {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.profile.*') || request()->routeIs('admin.system.*') || request()->routeIs('admin.settings.smtp') ? 'active' : '' }}"
+                <li class="has-submenu {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.profile.*') || request()->routeIs('admin.whatsapp-api.*') || request()->routeIs('admin.system.*') || request()->routeIs('admin.settings.smtp') ? 'active' : '' }}"
                     id="admin-management-menu">
                     <a href="javascript:void(0)" onclick="toggleSubmenu('admin-management-menu')" class="submenu-toggle">
                         <span><i class="fas fa-user-shield"></i> Manajemen Admin</span>
@@ -934,6 +934,12 @@
                             <a href="{{ route('admin.profile.index') }}"
                                 class="{{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
                                 <i class="fas fa-user-cog"></i> Profil Admin
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.whatsapp-api.index') }}"
+                                class="{{ request()->routeIs('admin.whatsapp-api.*') ? 'active' : '' }}">
+                                <i class="fab fa-whatsapp"></i> WhatsApp API
                             </a>
                         </li>
                         <li>

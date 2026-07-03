@@ -15,6 +15,7 @@ class PublicComplaint extends Model
         'email',
         'type',
         'description',
+        'attachment',
         'complaint_code',
         'response',
         'status',

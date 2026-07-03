@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\BookConditionController;
 use App\Http\Controllers\Admin\BookBorrowingController;
 use App\Http\Controllers\Admin\LibraryReportController;
 use App\Http\Controllers\Admin\SkmController as AdminSkmController;
+use App\Http\Controllers\Admin\WhatsappApiController;
 use App\Http\Controllers\Frontend\SkmController as FrontendSkmController;
 use Illuminate\Support\Facades\Route;
 
@@ -260,6 +261,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/skm/export-pdf', [AdminSkmController::class, 'exportPdf'])->name('skm.export-pdf');
         Route::get('/skm/respondent/{skmRespondent}', [AdminSkmController::class, 'respondentDetail'])->name('skm.respondent-detail');
         Route::delete('/skm/respondent/{skmRespondent}', [AdminSkmController::class, 'deleteRespondent'])->name('skm.delete-respondent');
+    });
+
+    // WhatsApp API (Admin Only)
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/whatsapp-api', [WhatsappApiController::class, 'index'])->name('whatsapp-api.index');
+        Route::put('/whatsapp-api', [WhatsappApiController::class, 'update'])->name('whatsapp-api.update');
+        Route::post('/whatsapp-api/test', [WhatsappApiController::class, 'test'])->name('whatsapp-api.test');
     });
 
     // SPP Management (Admin)

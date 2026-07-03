@@ -149,6 +149,13 @@
                         <div style="padding: 20px; background: #f8fafc; border-radius: 12px; color: var(--text); border: 1px solid rgba(0,0,0,0.02);">
                             <p style="white-space: pre-line; line-height: 1.7;">{{ $complaint->description }}</p>
                         </div>
+                        @if($complaint->attachment)
+                        <div style="margin-top: 15px;">
+                            <a href="{{ asset('storage/' . $complaint->attachment) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600;">
+                                <i class="fas fa-paperclip"></i> Lihat Lampiran
+                            </a>
+                        </div>
+                        @endif
                     </div>
 
                     @if($complaint->response)
