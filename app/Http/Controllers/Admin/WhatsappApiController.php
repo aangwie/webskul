@@ -5,12 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\WhatsappApiSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class WhatsappApiController extends Controller
 {
     public function index()
     {
-        $setting = WhatsappApiSetting::first();
+        $setting = null;
+        if (Schema::hasTable('whatsapp_api_settings')) {
+            $setting = WhatsappApiSetting::first();
+        }
         return view('admin.whatsapp-api.index', compact('setting'));
     }
 
@@ -21,6 +25,10 @@ class WhatsappApiController extends Controller
             'api_key' => 'required',
             'nomor_pengirim' => 'required',
         ]);
+
+        if (!Schema::hasTable('whatsapp_api_settings')) {
+            return back()->with('error', 'Tabel whatsapp_api_settings belum ada. Jalankan migrasi terlebih dahulu.');
+        }
 
         $setting = WhatsappApiSetting::first();
         if (!$setting) {
@@ -42,6 +50,10 @@ class WhatsappApiController extends Controller
             'nomor_penerima' => 'required',
             'pesan' => 'required',
         ]);
+
+        if (!Schema::hasTable('whatsapp_api_settings')) {
+            return back()->with('error', 'Tabel whatsapp_api_settings belum ada. Jalankan migrasi terlebih dahulu.');
+        }
 
         $setting = WhatsappApiSetting::first();
         if (!$setting) {

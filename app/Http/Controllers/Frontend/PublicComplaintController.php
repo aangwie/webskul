@@ -7,6 +7,7 @@ use App\Models\PublicComplaint;
 use App\Models\SchoolProfile;
 use App\Models\WhatsappApiSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ComplaintCodeMail;
@@ -36,7 +37,7 @@ class PublicComplaintController extends Controller
             $file = $request->file('attachment');
             $mime = $file->getMimeType();
 
-            if (str_starts_with($mime, 'image/')) {
+            if (strpos($mime, 'image/') === 0) {
                 $img = imagecreatefromstring(file_get_contents($file->path()));
                 if ($img === false) {
                     return back()->withInput()->with('error', 'Gambar tidak valid.');
@@ -92,12 +93,12 @@ class PublicComplaintController extends Controller
 
         // Send WhatsApp notification
         try {
-            $waSetting = WhatsappApiSetting::first();
+            $waSetting = Schema::hasTable('whatsapp_api_settings') ? WhatsappApiSetting::first() : null;
             if ($waSetting && $waSetting->host_url && $waSetting->api_key && $waSetting->nomor_pengirim) {
                 $phoneClean = preg_replace('/[^0-9]/', '', $request->phone);
                 // Convert local format (08xx) to international (628xx)
                 if (strlen($phoneClean) >= 10) {
-                    if (str_starts_with($phoneClean, '0')) {
+                    if (strpos($phoneClean, '0') === 0) {
                         $phoneClean = '62' . substr($phoneClean, 1);
                     }
                     $message = "Terima kasih {$request->name}, aduan/saran Anda telah kami terima.\n\n"
