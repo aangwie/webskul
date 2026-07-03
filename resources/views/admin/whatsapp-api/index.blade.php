@@ -57,6 +57,12 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+            </div>
+        @endif
+
         <form action="{{ route('admin.whatsapp-api.test') }}" method="POST">
             @csrf
 
@@ -96,26 +102,7 @@
       -d "pesan=Halo dari WhatsAppKu!"</pre>
 
         <p style="margin: 16px 0 12px; color: var(--text-light);"><strong>PHP:</strong></p>
-        <pre style="background: var(--accent); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; line-height: 1.6;">{{ '<?php' }}
-$data = [
-    'nomor_pengirim' => '{{ $setting->nomor_pengirim }}',
-    'api_key' => '{{ substr($setting->api_key, 0, 4) }}...',
-    'nomor_penerima' => '628987654321',
-    'pesan' => 'Halo dari WhatsAppKu!',
-];
-
-$ch = curl_init('{{ $setting->host_url }}');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/x-www-form-urlencoded',
-]);
-
-$response = curl_exec($ch);
-curl_close($ch);
-
-echo $response;</pre>
+        <pre style="background: var(--accent); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; line-height: 1.6;">{{ $phpExample }}</pre>
     </div>
 </div>
 @endif

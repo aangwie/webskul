@@ -15,7 +15,29 @@ class WhatsappApiController extends Controller
         if (Schema::hasTable('whatsapp_api_settings')) {
             $setting = WhatsappApiSetting::first();
         }
-        return view('admin.whatsapp-api.index', compact('setting'));
+
+        $phpExample = null;
+        if ($setting) {
+            $phpExample = '<?php' . "\n" .
+                '$data = [' . "\n" .
+                "    'nomor_pengirim' => '" . $setting->nomor_pengirim . "',\n" .
+                "    'api_key' => '" . substr($setting->api_key, 0, 4) . "...',\n" .
+                "    'nomor_penerima' => '628987654321',\n" .
+                "    'pesan' => 'Halo dari WhatsAppKu!',\n" .
+                '];' . "\n\n" .
+                '$ch = curl_init(\'' . $setting->host_url . '\');' . "\n" .
+                'curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);' . "\n" .
+                'curl_setopt($ch, CURLOPT_POST, true);' . "\n" .
+                'curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));' . "\n" .
+                'curl_setopt($ch, CURLOPT_HTTPHEADER, [' . "\n" .
+                "    'Content-Type: application/x-www-form-urlencoded',\n" .
+                ']);' . "\n\n" .
+                '$response = curl_exec($ch);' . "\n" .
+                'curl_close($ch);' . "\n\n" .
+                'echo $response;';
+        }
+
+        return view('admin.whatsapp-api.index', compact('setting', 'phpExample'));
     }
 
     public function update(Request $request)
