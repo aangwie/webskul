@@ -60,6 +60,11 @@ Route::get('/public-storage/file', [\App\Http\Controllers\Admin\StorageHelperCon
     ->name('public.storage.view')
     ->middleware('signed');
 
+// Public storage view (no auth needed - replaces symlink for all users)
+Route::get('/storage-view/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
+    ->where('path', '.*')
+    ->name('storage.view');
+
 // Public Complaints
 Route::get('/public-complaints', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'create'])->name('public-complaints.create');
 Route::post('/public-complaints', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'store'])->name('public-complaints.store');
@@ -205,10 +210,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
         Route::post('/system/turnstile', [\App\Http\Controllers\Admin\SystemController::class, 'updateTurnstile'])->name('system.turnstile');
 
-        // Admin Storage Proxy (Restored for Admin Views)
-        Route::get('/storage-view/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
-            ->where('path', '.*')
-            ->name('storage.view');
     });
 
     // PMB Management (Admin, Admin Komite)
