@@ -23,6 +23,7 @@
                         <th>Pengadu</th>
                         <th>Jenis</th>
                         <th>Isi Aduan</th>
+                        <th>Lampiran</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
@@ -50,6 +51,23 @@
                             </div>
                         </td>
                         <td>
+                            @if($complaint->attachment)
+                                @php
+                                    $ext = pathinfo($complaint->attachment, PATHINFO_EXTENSION);
+                                    $url = Storage::url($complaint->attachment);
+                                @endphp
+                                @if(in_array($ext, ['webp', 'jpg', 'jpeg', 'png', 'gif']))
+                                    <img src="{{ $url }}" alt="Lampiran" style="width: 50px; height: 40px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="openLightbox('{{ $url }}')" title="Klik untuk perbesar">
+                                @elseif($ext === 'pdf')
+                                    <a href="{{ $url }}" target="_blank" title="Download PDF">
+                                        <i class="fas fa-file-pdf" style="font-size: 1.5rem; color: #dc3545;"></i>
+                                    </a>
+                                @endif
+                            @else
+                                <span style="color: var(--text-light); font-size: 0.8rem;">-</span>
+                            @endif
+                        </td>
+                        <td>
                             <span class="badge {{ $complaint->status == 'responded' ? 'badge-success' : 'badge-warning' }}">
                                 {{ $complaint->status == 'responded' ? 'Sudah Direspon' : 'Pending' }}
                             </span>
@@ -71,6 +89,23 @@
         </div>
     </div>
 </div>
+
+<!-- Lightbox -->
+<div id="lightbox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; cursor:pointer; display:none; align-items:center; justify-content:center;" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" style="max-width:90%; max-height:90%; border-radius:8px; box-shadow:0 0 30px rgba(0,0,0,0.5);">
+</div>
+
+<script>
+function openLightbox(url) {
+    document.getElementById('lightboxImg').src = url;
+    document.getElementById('lightbox').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+    document.body.style.overflow = '';
+}
+</script>
 
 <!-- Respond Modal -->
 <div id="respondModal" class="modal-custom" style="display: none;">
