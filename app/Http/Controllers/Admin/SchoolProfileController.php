@@ -38,7 +38,7 @@ class SchoolProfileController extends Controller
             'mission' => 'nullable|string',
             'history' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'logo_ssn' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo_ssn' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:500',
             'maklumat_pelayanan_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:1024',
         ]);
 
@@ -63,8 +63,19 @@ class SchoolProfileController extends Controller
                 Storage::disk('public')->delete($school->logo_ssn);
             }
 
-            $pathSsn = $request->file('logo_ssn')->store('school', 'public');
-            $validated['logo_ssn'] = $pathSsn;
+            $file = $request->file('logo_ssn');
+            // Convert to WebP and encode as base64
+            $image = @imagecreatefromstring(file_get_contents($file->getRealPath()));
+            if ($image !== false) {
+                ob_start();
+                imagewebp($image, null, 80);
+                $webpData = ob_get_clean();
+                imagedestroy($image);
+                $validated['logo_ssn'] = 'data:image/webp;base64,' . base64_encode($webpData);
+            } else {
+                // Fallback: store as original format base64 if GD can't read it
+                $validated['logo_ssn'] = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+            }
         }
 
         if ($request->hasFile('maklumat_pelayanan_image')) {

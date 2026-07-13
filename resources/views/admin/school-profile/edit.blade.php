@@ -96,6 +96,7 @@
                 <div class="form-group">
                     <label class="form-label">Logo SSN</label>
                     <input type="file" name="logo_ssn" class="form-input" accept="image/*">
+                    <small style="display:block; color: var(--text-light); margin-top: 4px; font-size: 0.8rem;">Maksimal 500KB. Akan dikonversi ke WebP.</small>
                     @if($school->logo_ssn)
                         <div style="display: flex; align-items: flex-end; gap: 12px; margin-top: 10px;">
                             @if(Str::startsWith($school->logo_ssn, 'data:'))
