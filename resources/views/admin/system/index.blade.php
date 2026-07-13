@@ -161,6 +161,61 @@
                 </div>
             </div>
         </div>
+
+        <!-- Database Migration -->
+        <div class="col-md-6" style="margin-bottom: 20px;">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h3><i class="fas fa-database"></i> Database Migration</h3>
+                </div>
+                <div class="card-body">
+                    <p>Jalankan migrasi database untuk memperbarui struktur tabel sesuai dengan kode terbaru.</p>
+
+                    <div
+                        style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 5px; border-left: 4px solid #ffc107;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Peringatan:</strong> Pastikan Anda telah melakukan backup database sebelum menjalankan migrasi.
+                    </div>
+
+                    <form action="{{ route('admin.system.migrate') }}" method="POST" style="margin-top: 20px;"
+                        id="migrate-form">
+                        @csrf
+                        <button type="button" class="btn btn-primary" style="color: #fff;" onclick="runMigration(this)">
+                            <i class="fas fa-play"></i> Jalankan Migrasi
+                        </button>
+                    </form>
+
+                    <script>
+                        function runMigration(btn) {
+                            Swal.fire({
+                                title: 'Jalankan Migrasi Database?',
+                                text: "Proses ini akan mengubah struktur database. Pastikan sudah backup!",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#6c757d',
+                                confirmButtonText: 'Ya, Jalankan!',
+                                cancelButtonText: 'Batal'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sedang Memproses...';
+                                    btn.disabled = true;
+                                    btn.style.opacity = '0.7';
+                                    document.getElementById('migrate-form').submit();
+                                }
+                            });
+                        }
+                    </script>
+
+                    @if(session('migrate_log'))
+                        <div style="margin-top: 20px;">
+                            <h5>Log Migrasi:</h5>
+                            <pre
+                                style="background: #1e1e1e; color: #0f0; padding: 15px; border-radius: 5px; font-family: monospace; max-height: 300px; overflow-y: auto; font-size: 12px;">{{ session('migrate_log') }}</pre>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">

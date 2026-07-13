@@ -61,9 +61,13 @@ Route::get('/public-storage/file', [\App\Http\Controllers\Admin\StorageHelperCon
     ->middleware('signed');
 
 // Public storage view (no auth needed - replaces symlink for all users)
+// Note: Two route names for compatibility (admin.storage.view used in admin views)
 Route::get('/storage-view/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
     ->where('path', '.*')
     ->name('storage.view');
+Route::get('/admin/storage-view/{path}', [\App\Http\Controllers\Admin\StorageHelperController::class, 'show'])
+    ->where('path', '.*')
+    ->name('admin.storage.view');
 
 // Public Complaints
 Route::get('/public-complaints', [\App\Http\Controllers\Frontend\PublicComplaintController::class, 'create'])->name('public-complaints.create');
@@ -209,6 +213,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/system/composer-dump', [\App\Http\Controllers\Admin\SystemController::class, 'composerDumpAutoload'])->name('system.composer-dump');
         Route::post('/system/theme', [\App\Http\Controllers\Admin\SystemController::class, 'updateTheme'])->name('system.theme');
         Route::post('/system/turnstile', [\App\Http\Controllers\Admin\SystemController::class, 'updateTurnstile'])->name('system.turnstile');
+        Route::post('/system/migrate', [\App\Http\Controllers\Admin\SystemController::class, 'migrateDatabase'])->name('system.migrate');
 
     });
 

@@ -271,6 +271,34 @@ class SystemController extends Controller
         }
     }
 
+    public function migrateDatabase()
+    {
+        try {
+            set_time_limit(300);
+            $output = [];
+            $output[] = "--- Running Database Migration ---";
+            $output[] = "Started at: " . date('Y-m-d H:i:s');
+            $output[] = "";
+
+            // Run migrate with force flag
+            Artisan::call('migrate', ['--force' => true, '--verbose' => true]);
+            $migrateOutput = Artisan::output();
+            $output[] = $migrateOutput;
+
+            $output[] = "";
+            $output[] = "--- Migration Completed at: " . date('Y-m-d H:i:s') . " ---";
+
+            $outputString = implode("\n", $output);
+
+            return back()->with('success', 'Migrasi database berhasil!')->with('migrate_log', $outputString);
+        } catch (\Exception $e) {
+            $errorOutput = "--- Migration Failed ---\n";
+            $errorOutput .= "Error: " . $e->getMessage() . "\n";
+            $errorOutput .= "Time: " . date('Y-m-d H:i:s') . "\n";
+            return back()->with('error', 'Migrasi database gagal: ' . $e->getMessage())->with('migrate_log', $errorOutput);
+        }
+    }
+
     public function composerDumpAutoload()
     {
         try {
