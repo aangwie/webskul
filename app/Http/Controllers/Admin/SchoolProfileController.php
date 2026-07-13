@@ -64,17 +64,20 @@ class SchoolProfileController extends Controller
             }
 
             $file = $request->file('logo_ssn');
-            // Convert to WebP and encode as base64
+            // Convert to WebP and save as file on disk
             $image = @imagecreatefromstring(file_get_contents($file->getRealPath()));
             if ($image !== false) {
-                ob_start();
-                imagewebp($image, null, 80);
-                $webpData = ob_get_clean();
+                $webpPath = 'school/' . pathinfo($file->hashName(), PATHINFO_FILENAME) . '.webp';
+                $tempPath = sys_get_temp_dir() . '/' . basename($webpPath);
+                imagewebp($image, $tempPath, 80);
                 imagedestroy($image);
-                $validated['logo_ssn'] = 'data:image/webp;base64,' . base64_encode($webpData);
+                Storage::disk('public')->put($webpPath, file_get_contents($tempPath));
+                @unlink($tempPath);
+                $validated['logo_ssn'] = $webpPath;
             } else {
-                // Fallback: store as original format base64 if GD can't read it
-                $validated['logo_ssn'] = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+                // Fallback: store original file if GD can't read it
+                $pathSsn = $file->store('school', 'public');
+                $validated['logo_ssn'] = $pathSsn;
             }
         }
 
