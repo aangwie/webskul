@@ -54,6 +54,10 @@ class ActivityObserver
     protected function generateSitemap()
     {
         try {
+            // Skip if Spatie Sitemap package is not installed
+            if (!class_exists('\Spatie\Sitemap\Sitemap')) {
+                return;
+            }
             Artisan::call('sitemap:generate');
         } catch (\Exception $e) {
             Log::error('Failed to generate sitemap: ' . $e->getMessage());
