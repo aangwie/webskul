@@ -159,6 +159,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             Route::get('/expenditures/get-programs', [CommitteeExpenditureController::class, 'getPrograms'])->name('expenditures.programs');
             Route::get('/expenditures/get-activities', [CommitteeExpenditureController::class, 'getActivities'])->name('expenditures.activities');
             Route::get('/expenditures/{expenditure}/print', [CommitteeExpenditureController::class, 'print'])->name('expenditures.print');
+            Route::get('/expenditures/rekap', [CommitteeExpenditureController::class, 'rekap'])->name('expenditures.rekap');
             Route::resource('expenditures', CommitteeExpenditureController::class)->names([
                 'index' => 'expenditures.index',
                 'create' => 'expenditures.create',

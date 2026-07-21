@@ -859,8 +859,14 @@
                         </li>
                         <li>
                             <a href="{{ route('admin.committee.expenditures.index') }}"
-                                class="{{ request()->routeIs('admin.committee.expenditures.*') ? 'active' : '' }}">
+                                class="{{ request()->routeIs('admin.committee.expenditures.*') && !request()->routeIs('admin.committee.expenditures.rekap') ? 'active' : '' }}">
                                 <i class="fas fa-hand-holding-heart"></i> Penggunaan
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.committee.expenditures.rekap') }}"
+                                class="{{ request()->routeIs('admin.committee.expenditures.rekap') ? 'active' : '' }}">
+                                <i class="fas fa-chart-pie"></i> Rekap Komite
                             </a>
                         </li>
                     </ul>

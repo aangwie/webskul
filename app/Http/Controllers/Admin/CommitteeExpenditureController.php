@@ -7,6 +7,8 @@ use App\Models\AcademicYear;
 use App\Models\CommitteeActivity;
 use App\Models\CommitteeProgram;
 use App\Models\CommitteeExpenditure;
+use App\Models\CommitteeFee;
+use App\Models\CommitteePayment;
 use App\Models\SchoolProfile;
 use Illuminate\Http\Request;
 
@@ -137,6 +139,44 @@ class CommitteeExpenditureController extends Controller
 
         return redirect()->route('admin.committee.expenditures.index')
             ->with('success', 'Penggunaan dana berhasil dihapus.');
+    }
+
+    public function rekap(Request $request)
+    {
+        $activeYear = AcademicYear::where('is_active', true)->first();
+        $selectedYearId = $request->get('academic_year_id', $activeYear ? $activeYear->id : null);
+
+        $academicYears = AcademicYear::orderBy('year', 'desc')->get();
+        $selectedYear = AcademicYear::find($selectedYearId);
+
+        $totalIncome = 0;
+        $previousBalance = 0;
+        $totalExpenditure = 0;
+        $accumulation = 0;
+        $remainingFunds = 0;
+
+        if ($selectedYear) {
+            // Total pembayaran diterima: payments via committee_fees for this year
+            $totalIncome = CommitteePayment::whereHas('committeeFee', function ($q) use ($selectedYearId) {
+                $q->where('academic_year_id', $selectedYearId);
+            })->sum('amount');
+
+            // Sisa saldo tahun sebelumnya
+            $previousBalance = $selectedYear->previous_balance ?? 0;
+
+            // Total pengeluaran: expenditures via activity->program for this year
+            $totalExpenditure = CommitteeExpenditure::whereHas('activity.program', function ($q) use ($selectedYearId) {
+                $q->where('academic_year_id', $selectedYearId);
+            })->sum('amount');
+
+            $accumulation = $totalIncome + $previousBalance;
+            $remainingFunds = $accumulation - $totalExpenditure;
+        }
+
+        return view('admin.committee.expenditures.rekap', compact(
+            'academicYears', 'selectedYear', 'totalIncome', 'previousBalance',
+            'totalExpenditure', 'accumulation', 'remainingFunds'
+        ));
     }
 
     public function print(CommitteeExpenditure $expenditure)
