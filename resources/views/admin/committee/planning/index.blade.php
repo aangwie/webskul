@@ -196,6 +196,47 @@
 </div>
 
 @if($selectedYear)
+<!-- Previous Balance Form & Budget Summary -->
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-wallet"></i> Saldo Tahun Sebelumnya</h2>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('admin.committee.planning.previous-balance.update', $selectedYear->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end;">
+                <div class="form-group" style="flex: 1; min-width: 250px;">
+                    <label class="form-label">Sisa Saldo Tahun Sebelumnya</label>
+                    <input type="number" name="previous_balance" class="form-input" required min="0" step="1000"
+                        value="{{ old('previous_balance', $selectedYear->previous_balance) }}"
+                        placeholder="Contoh: 2000000">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Simpan Saldo
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div style="margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
+            <div class="budget-info" style="flex: 1; min-width: 220px;">
+                <p>Sisa Saldo Tahun Sebelumnya</p>
+                <p style="font-size: 1.1rem; font-weight: 600;">Rp {{ number_format($previousBalance, 0, ',', '.') }}</p>
+            </div>
+            <div class="budget-info" style="flex: 1; min-width: 220px;">
+                <p>Perolehan Pembayaran Tahun Ini</p>
+                <p style="font-size: 1.1rem; font-weight: 600; color: var(--primary);">Rp {{ number_format($totalIncome, 0, ',', '.') }}</p>
+            </div>
+            <div class="budget-info" style="flex: 1; min-width: 220px;">
+                <p>Total Dana Tersedia</p>
+                <p style="font-size: 1.1rem; font-weight: 600; color: var(--success);">Rp {{ number_format($totalAvailableBudget, 0, ',', '.') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Add Program Form -->
 <div class="card">
     <div class="card-header">

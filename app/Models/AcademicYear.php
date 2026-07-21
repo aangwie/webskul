@@ -9,7 +9,11 @@ class AcademicYear extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['year', 'is_active'];
+    protected $fillable = ['year', 'is_active', 'previous_balance'];
+
+    protected $casts = [
+        'previous_balance' => 'decimal:2',
+    ];
 
     public function scopeActive($query)
     {

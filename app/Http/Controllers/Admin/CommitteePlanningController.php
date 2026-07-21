@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\CommitteeActivity;
+use App\Models\CommitteeFee;
+use App\Models\CommitteePayment;
 use App\Models\CommitteeProgram;
 use Illuminate\Http\Request;
 
@@ -22,19 +24,52 @@ class CommitteePlanningController extends Controller
         $selectedYear = $selectedYearId ? AcademicYear::find($selectedYearId) : $activeYear;
 
         $programs = [];
+        $totalIncome = 0;
+        $previousBalance = 0;
+        $totalAvailableBudget = 0;
+
         if ($selectedYear) {
             $programs = CommitteeProgram::where('academic_year_id', $selectedYear->id)
                 ->with('activities')
                 ->orderBy('created_at', 'desc')
                 ->get();
+
+            // Total perolehan pembayaran komite untuk tahun pelajaran yang dipilih
+            $totalIncome = CommitteePayment::whereHas('committeeFee', function ($q) use ($selectedYear) {
+                $q->where('academic_year_id', $selectedYear->id);
+            })->sum('amount');
+
+            $previousBalance = $selectedYear->previous_balance ?? 0;
+            $totalAvailableBudget = $previousBalance + $totalIncome;
         }
 
         return view('admin.committee.planning.index', compact(
             'academicYears',
             'activeYear',
             'selectedYear',
-            'programs'
+            'programs',
+            'totalIncome',
+            'previousBalance',
+            'totalAvailableBudget'
         ));
+    }
+
+    /**
+     * Update (set) the previous year's remaining balance for the selected academic year
+     */
+    public function updatePreviousBalance(Request $request, AcademicYear $academicYear)
+    {
+        $request->validate([
+            'previous_balance' => 'required|numeric|min:0',
+        ]);
+
+        $academicYear->update([
+            'previous_balance' => $request->previous_balance,
+        ]);
+
+        return redirect()
+            ->route('admin.committee.planning.index', ['year_id' => $academicYear->id])
+            ->with('success', 'Sisa saldo tahun sebelumnya berhasil disimpan.');
     }
 
     /**

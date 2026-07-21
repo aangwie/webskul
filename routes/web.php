@@ -146,6 +146,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             // Planning (Perencanaan)
             Route::get('/planning', [CommitteePlanningController::class, 'index'])->name('planning.index');
             Route::post('/planning', [CommitteePlanningController::class, 'store'])->name('planning.store');
+            Route::put('/planning/previous-balance/{academicYear}', [CommitteePlanningController::class, 'updatePreviousBalance'])->name('planning.previous-balance.update');
             Route::put('/planning/{program}', [CommitteePlanningController::class, 'update'])->name('planning.update');
             Route::delete('/planning/{program}', [CommitteePlanningController::class, 'destroy'])->name('planning.destroy');
             Route::get('/planning/{program}/activities', [CommitteePlanningController::class, 'showActivities'])->name('planning.activities');
