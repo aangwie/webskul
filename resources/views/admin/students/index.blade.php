@@ -90,14 +90,25 @@
             <div style="display: flex; align-items: center; gap: 15px;">
                 <span id="selected-count" style="font-weight: 600;">0 Siswa Terpilih</span>
             </div>
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <button type="button" class="btn btn-success btn-sm" onclick="bulkUpdateStatus('active')">
                     <i class="fas fa-check-circle"></i> Aktifkan
                 </button>
                 <button type="button" class="btn btn-danger btn-sm" onclick="bulkUpdateStatus('inactive')">
                     <i class="fas fa-times-circle"></i> Non-Aktifkan
                 </button>
-                <button type="button" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white;" onclick="clearSelection()">
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    <select id="bulk-class-select" class="form-select" style="width: auto; min-width: 150px; padding: 6px 10px; font-size: 0.85rem; border-radius: 8px; background: white; color: #333; border: 1px solid #ddd;">
+                        <option value="">Pindah ke Kelas...</option>
+                        @foreach($classes as $class)
+                        <option value="{{ $class->id }}">{{ $class->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white;" onclick="bulkMoveClass()">
+                        <i class="fas fa-arrows-alt"></i> Pindahkan
+                    </button>
+                </div>
+                <button type="button" class="btn btn-sm" style="background: rgba(255,255,255,0.3); color: white;" onclick="clearSelection()">
                     Batal
                 </button>
             </div>
@@ -284,6 +295,77 @@
                             icon: 'error',
                             title: 'Gagal',
                             text: data.message || 'Terjadi kesalahan saat memperbarui status.'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan sistem.'
+                    });
+                });
+            }
+        });
+    }
+
+    function bulkMoveClass() {
+        const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked')).map(cb => cb.value);
+        const classId = document.getElementById('bulk-class-select').value;
+
+        if (selectedIds.length === 0) return;
+
+        if (!classId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Pilih Kelas',
+                text: 'Silakan pilih kelas tujuan terlebih dahulu.'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: `Pindahkan ${selectedIds.length} siswa ke kelas yang dipilih?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--primary)',
+            cancelButtonColor: 'var(--danger)',
+            confirmButtonText: 'Ya, Pindahkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Memproses...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                fetch("{{ route('admin.students.bulk-move-class') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        student_ids: selectedIds,
+                        class_id: classId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: data.message
+                        }).then(() => window.location.reload());
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: data.message || 'Terjadi kesalahan.'
                         });
                     }
                 })

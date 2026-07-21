@@ -259,6 +259,34 @@ class StudentController extends Controller
     }
 
     /**
+     * Bulk move students to another class.
+     */
+    public function bulkMoveClass(Request $request)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya administrator yang dapat mengakses fitur ini.'
+            ], 403);
+        }
+
+        $request->validate([
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:students,id',
+            'class_id' => 'required|exists:school_classes,id'
+        ]);
+
+        Student::whereIn('id', $request->student_ids)->update([
+            'school_class_id' => $request->class_id
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Siswa berhasil dipindahkan ke kelas tujuan.'
+        ]);
+    }
+
+    /**
      * Bulk update student status.
      */
     public function bulkStatusUpdate(Request $request)
