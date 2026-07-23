@@ -5,81 +5,139 @@
 
 @section('content')
     <div style="display: grid; grid-template-columns: 1fr 350px; gap: 25px;">
-        <!-- Payment History -->
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-history"></i> Riwayat Sumbangan</h2>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Nominal</th>
-                                <th>Keterangan</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($payments as $payment)
-                                <tr>
-                                    <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
-                                    <td><strong>Rp {{ number_format($payment->amount, 0, ',', '.') }}</strong></td>
-                                    <td>{{ $payment->notes ?? '-' }}</td>
-                                    <td>
-                                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                                            <a href="{{ route('admin.committee.payments.receipt', $payment->id) }}"
-                                                class="btn btn-sm btn-success" target="_blank" title="Cetak Kwitansi">
-                                                <i class="fas fa-print"></i>
-                                            </a>
-                                            <a href="{{ route('admin.committee.payments.edit', $payment->id) }}"
-                                                class="btn btn-sm btn-warning" title="Edit Pembayaran">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="{{ route('admin.committee.payments.destroy', $payment->id) }}"
-                                                method="POST" id="delete-form-{{ $payment->id }}" style="display: inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-sm btn-danger" title="Hapus Pembayaran"
-                                                    onclick="confirmDelete({{ $payment->id }})">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" style="text-align: center; padding: 40px; color: var(--text-light);">
-                                        Belum ada riwayat pembayaran.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+        <!-- Left: Payment History -->
+        <div>
+            <!-- Current Year Payments -->
+            <div class="card" style="margin-bottom: 25px;">
+                <div class="card-header">
+                    <h2><i class="fas fa-history"></i> Riwayat Sumbangan ({{ $committeeFee->academicYear->year }})</h2>
                 </div>
-
-                @if($totalPaid >= $committeeFee->amount)
-                    <div
-                        style="margin-top: 30px; text-align: center; padding: 20px; background: rgba(40, 167, 69, 0.1); border: 2px dashed var(--success); border-radius: 12px;">
-                        <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success); margin-bottom: 10px;"></i>
-                        <h3 style="color: var(--success);">Sumbangan Komite</h3>
-                        <p style="margin-bottom: 15px;">Seluruh nominal dana komite telah dibayarkan.</p>
-                        <a href="{{ route('admin.committee.payments.invoice', $student->id) }}"
-                            class="btn btn-success" target="_blank" style="display: inline-flex; align-items: center; gap: 8px;">
-                            <i class="fas fa-print"></i> Cetak Bukti Sumbangan
-                        </a>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Nominal</th>
+                                    <th>Keterangan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($payments as $payment)
+                                    <tr>
+                                        <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
+                                        <td><strong>Rp {{ number_format($payment->amount, 0, ',', '.') }}</strong></td>
+                                        <td>{{ $payment->notes ?? '-' }}</td>
+                                        <td>
+                                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                                <a href="{{ route('admin.committee.payments.receipt', $payment->id) }}"
+                                                    class="btn btn-sm btn-success" target="_blank" title="Cetak Kwitansi">
+                                                    <i class="fas fa-print"></i>
+                                                </a>
+                                                <a href="{{ route('admin.committee.payments.edit', $payment->id) }}"
+                                                    class="btn btn-sm btn-warning" title="Edit Pembayaran">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form action="{{ route('admin.committee.payments.destroy', $payment->id) }}"
+                                                    method="POST" id="delete-form-{{ $payment->id }}" style="display: inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" class="btn btn-sm btn-danger" title="Hapus Pembayaran"
+                                                        onclick="confirmDelete({{ $payment->id }})">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 40px; color: var(--text-light);">
+                                            Belum ada riwayat pembayaran.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
-                @endif
+
+                    @if($totalPaid >= $committeeFee->amount)
+                        <div
+                            style="margin-top: 30px; text-align: center; padding: 20px; background: rgba(40, 167, 69, 0.1); border: 2px dashed var(--success); border-radius: 12px;">
+                            <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success); margin-bottom: 10px;"></i>
+                            <h3 style="color: var(--success);">Sumbangan Komite</h3>
+                            <p style="margin-bottom: 15px;">Seluruh nominal dana komite telah dibayarkan.</p>
+                            <a href="{{ route('admin.committee.payments.invoice', $student->id) }}"
+                                class="btn btn-success" target="_blank" style="display: inline-flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-print"></i> Cetak Bukti Sumbangan
+                            </a>
+                        </div>
+                    @endif
+                </div>
             </div>
+
+            <!-- All Years Payment History -->
+            @if($allPayments->count() > 0)
+                @foreach($allPayments as $yearLabel => $yearPayments)
+                    <div class="card" style="margin-bottom: 25px;">
+                        <div class="card-header">
+                            <h2><i class="fas fa-calendar-alt"></i> Riwayat Pembayaran {{ $yearLabel }}</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Tanggal</th>
+                                            <th>Nominal</th>
+                                            <th>Keterangan</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($yearPayments as $payment)
+                                            <tr>
+                                                <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
+                                                <td><strong>Rp {{ number_format($payment->amount, 0, ',', '.') }}</strong></td>
+                                                <td>{{ $payment->notes ?? '-' }}</td>
+                                                <td>
+                                                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                                        <a href="{{ route('admin.committee.payments.receipt', $payment->id) }}"
+                                                            class="btn btn-sm btn-success" target="_blank" title="Cetak Kwitansi">
+                                                            <i class="fas fa-print"></i>
+                                                        </a>
+                                                        <a href="{{ route('admin.committee.payments.edit', $payment->id) }}"
+                                                            class="btn btn-sm btn-warning" title="Edit Pembayaran">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <form action="{{ route('admin.committee.payments.destroy', $payment->id) }}"
+                                                            method="POST" id="delete-form-all-{{ $payment->id }}" style="display: inline;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button" class="btn btn-sm btn-danger" title="Hapus Pembayaran"
+                                                                onclick="confirmDelete({{ $payment->id }})">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
         </div>
 
-        <!-- Payment Form & Status -->
+        <!-- Right: Summary & Form -->
         <div>
             <div class="card" style="margin-bottom: 25px;">
                 <div class="card-header">
-                    <h2><i class="fas fa-info-circle"></i> Ringkasan</h2>
+                    <h2><i class="fas fa-info-circle"></i> Ringkasan Tahun Ini</h2>
                 </div>
                 <div class="card-body">
                     <div style="margin-bottom: 15px;">
@@ -87,23 +145,53 @@
                         <h3 style="font-size: 1.2rem; color: var(--text);">{{ $committeeFee->academicYear->year }}</h3>
                     </div>
                     <div style="margin-bottom: 15px;">
-                        <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Total
-                            Sumbangan</span>
-                        <h3 style="font-size: 1.4rem; color: var(--text);">Rp
-                            {{ number_format($committeeFee->amount, 0, ',', '.') }}</h3>
+                        <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Total Sumbangan</span>
+                        <h3 style="font-size: 1.4rem; color: var(--text);">Rp {{ number_format($committeeFee->amount, 0, ',', '.') }}</h3>
                     </div>
                     <div style="margin-bottom: 15px;">
-                        <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Sudah
-                            Dibayar</span>
-                        <h3 style="font-size: 1.4rem; color: var(--success);">Rp
-                            {{ number_format($totalPaid, 0, ',', '.') }}</h3>
+                        <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Sudah Dibayar</span>
+                        <h3 style="font-size: 1.4rem; color: var(--success);">Rp {{ number_format($totalPaid, 0, ',', '.') }}</h3>
                     </div>
                     <div style="border-top: 1px solid var(--accent); padding-top: 15px;">
-                        <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Sisa
-                            Sumbangan</span>
-                        <h3 style="font-size: 1.4rem; color: var(--danger);">Rp {{ number_format($remaining, 0, ',', '.') }}
-                        </h3>
+                        <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Sisa Sumbangan</span>
+                        <h3 style="font-size: 1.4rem; color: var(--danger);">Rp {{ number_format($remaining, 0, ',', '.') }}</h3>
                     </div>
+                </div>
+            </div>
+
+            <!-- Yearly Summaries -->
+            <div class="card" style="margin-bottom: 25px;">
+                <div class="card-header">
+                    <h2><i class="fas fa-chart-bar"></i> Riwayat per Tahun Ajaran</h2>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    @forelse($yearlySummaries as $summary)
+                        <div style="padding: 15px; border-bottom: 1px solid var(--accent);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong>{{ $summary['academic_year']->year }}</strong>
+                                @if($summary['is_paid_full'])
+                                    <span class="badge badge-success">Lunas</span>
+                                @elseif($summary['total_paid'] > 0)
+                                    <span class="badge badge-warning">Cicil</span>
+                                @else
+                                    <span class="badge badge-danger">Belum</span>
+                                @endif
+                            </div>
+                            <div style="font-size: 0.85rem; color: var(--text-light);">
+                                <div>Target: Rp {{ number_format($summary['fee_amount'], 0, ',', '.') }}</div>
+                                <div>Bayar: Rp {{ number_format($summary['total_paid'], 0, ',', '.') }}</div>
+                                <div>Sisa: Rp {{ number_format($summary['remaining'], 0, ',', '.') }}</div>
+                            </div>
+                            <a href="{{ route('admin.committee.payments.record', ['student' => $student->id, 'academic_year_id' => $summary['academic_year']->id]) }}"
+                                style="font-size: 0.8rem; margin-top: 5px; display: inline-block;">
+                                <i class="fas fa-external-link-alt"></i> Detail
+                            </a>
+                        </div>
+                    @empty
+                        <div style="padding: 20px; text-align: center; color: var(--text-light);">
+                            Belum ada data.
+                        </div>
+                    @endforelse
                 </div>
             </div>
 
@@ -147,6 +235,7 @@
             @endif
         </div>
     </div>
+
     @section('scripts')
         <script>
             function confirmDelete(id) {

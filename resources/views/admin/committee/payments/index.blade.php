@@ -13,7 +13,7 @@
             <div class="mb-4">
                 <form method="GET" action="{{ route('admin.committee.payments.index') }}" class="d-flex align-items-center gap-3">
                     <label for="academic_year_id" class="mb-0" style="font-weight: 500;">Tahun Ajaran:</label>
-                    <select name="academic_year_id" id="academic_year_id" class="form-control" style="width: 200px;" onchange="this.form.submit()">
+                    <select name="academic_year_id" id="academic_year_id" class="form-select" style="width: 200px;" onchange="this.form.submit()">
                         <option value="">-- Pilih Tahun Ajaran --</option>
                         @foreach($academicYears as $year)
                             <option value="{{ $year->id }}" {{ $selectedYear && $selectedYear->id == $year->id ? 'selected' : '' }}>

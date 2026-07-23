@@ -13,6 +13,7 @@ class CommitteePayment extends Model
     protected $fillable = [
         'student_id',
         'committee_fee_id',
+        'academic_year_id',
         'amount',
         'payment_date',
         'notes',
