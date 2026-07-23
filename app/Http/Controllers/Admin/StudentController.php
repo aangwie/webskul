@@ -315,4 +315,29 @@ class StudentController extends Controller
             'message' => 'Status siswa berhasil diperbarui.'
         ]);
     }
+
+    /**
+     * Bulk delete students.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        if (!auth()->user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya administrator yang dapat mengakses fitur ini.'
+            ], 403);
+        }
+
+        $request->validate([
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:students,id'
+        ]);
+
+        $count = Student::whereIn('id', $request->student_ids)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => $count . ' siswa berhasil dihapus.'
+        ]);
+    }
 }

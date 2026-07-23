@@ -13,7 +13,7 @@
                     Sumbangan: <strong>Rp {{ number_format($committeeFee->amount, 0, ',', '.') }}</strong>
                 </p>
             </div>
-            <a href="{{ route('admin.committee.payments.index') }}" class="btn btn-sm btn-danger">
+            <a href="{{ route('admin.committee.payments.index', ['academic_year_id' => $committeeFee->academic_year_id]) }}" class="btn btn-sm btn-danger">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
         </div>
@@ -55,7 +55,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.committee.payments.record', $student->id) }}"
+                                    <a href="{{ route('admin.committee.payments.record', ['student' => $student->id, 'academic_year_id' => $committeeFee->academic_year_id]) }}"
                                         class="btn btn-sm btn-primary">
                                         <i class="fas fa-money-check-alt"></i> Bayar / Detail
                                     </a>

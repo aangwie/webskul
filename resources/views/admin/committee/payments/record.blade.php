@@ -83,6 +83,10 @@
                 </div>
                 <div class="card-body">
                     <div style="margin-bottom: 15px;">
+                        <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Tahun Ajaran</span>
+                        <h3 style="font-size: 1.2rem; color: var(--text);">{{ $committeeFee->academicYear->year }}</h3>
+                    </div>
+                    <div style="margin-bottom: 15px;">
                         <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Total
                             Sumbangan</span>
                         <h3 style="font-size: 1.4rem; color: var(--text);">Rp
@@ -109,7 +113,7 @@
                         <h2><i class="fas fa-plus"></i> Form Pembayaran</h2>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.committee.payments.store', $student->id) }}" method="POST">
+                        <form action="{{ route('admin.committee.payments.store', ['student' => $student->id, 'academic_year_id' => $committeeFee->academic_year_id]) }}" method="POST">
                             @csrf
                             <input type="hidden" name="committee_fee_id" value="{{ $committeeFee->id }}">
 
@@ -133,7 +137,7 @@
                             <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
                                 <i class="fas fa-save"></i> Simpan Pembayaran
                             </button>
-                            <a href="{{ route('admin.committee.payments.students', $student->school_class_id) }}"
+                            <a href="{{ route('admin.committee.payments.students', ['schoolClass' => $student->school_class_id, 'academic_year_id' => $committeeFee->academic_year_id]) }}"
                                 class="btn btn-sm" style="width: 100%; justify-content: center; margin-top: 10px;">
                                 Batal
                             </a>

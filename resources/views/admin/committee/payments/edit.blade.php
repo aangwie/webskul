@@ -20,6 +20,10 @@
                         <div style="font-weight: 600;">{{ $committeePayment->student->schoolClass->name ?? '-' }}</div>
                     </div>
                     <div>
+                        <span style="font-size: 0.8rem; color: var(--text-light);">Tahun Ajaran</span>
+                        <div style="font-weight: 600;">{{ $committeePayment->committeeFee->academicYear->year }}</div>
+                    </div>
+                    <div>
                         <span style="font-size: 0.8rem; color: var(--text-light);">Total Sumbangan</span>
                         <div style="font-weight: 600;">Rp
                             {{ number_format($committeePayment->committeeFee->amount, 0, ',', '.') }}</div>
@@ -64,7 +68,7 @@
                     <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">
                         <i class="fas fa-save"></i> Simpan Perubahan
                     </button>
-                    <a href="{{ route('admin.committee.payments.record', $committeePayment->student_id) }}"
+                    <a href="{{ route('admin.committee.payments.record', ['student' => $committeePayment->student_id, 'academic_year_id' => $committeePayment->committeeFee->academic_year_id]) }}"
                         class="btn btn-secondary" style="flex: 1; justify-content: center;">
                         <i class="fas fa-times"></i> Batal
                     </a>

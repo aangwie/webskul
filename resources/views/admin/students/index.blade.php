@@ -97,6 +97,9 @@
                 <button type="button" class="btn btn-danger btn-sm" onclick="bulkUpdateStatus('inactive')">
                     <i class="fas fa-times-circle"></i> Non-Aktifkan
                 </button>
+                <button type="button" class="btn btn-danger btn-sm" style="background: #dc3545; border-color: #dc3545;" onclick="bulkDelete()">
+                    <i class="fas fa-trash"></i> Hapus
+                </button>
                 <div style="display: flex; gap: 5px; align-items: center;">
                     <select id="bulk-class-select" class="form-select" style="width: auto; min-width: 150px; padding: 6px 10px; font-size: 0.85rem; border-radius: 8px; background: white; color: #333; border: 1px solid #ddd;">
                         <option value="">Pindah ke Kelas...</option>
@@ -366,6 +369,70 @@
                             icon: 'error',
                             title: 'Gagal',
                             text: data.message || 'Terjadi kesalahan.'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan sistem.'
+                    });
+                });
+            }
+        });
+    }
+
+    function bulkDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked')).map(cb => cb.value);
+        
+        if (selectedIds.length === 0) return;
+
+        Swal.fire({
+            title: 'Hapus Data Siswa',
+            text: `Apakah Anda yakin ingin menghapus ${selectedIds.length} siswa yang dipilih? Data yang sudah dihapus tidak dapat dikembalikan!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Memproses...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch("{{ route('admin.students.bulk-destroy') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        student_ids: selectedIds
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: data.message
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: data.message || 'Terjadi kesalahan saat menghapus data.'
                         });
                     }
                 })

@@ -48,20 +48,50 @@ class CommitteeController extends Controller
         return redirect()->route('admin.committee.nominal.index')->with('success', 'Nominal dana komite berhasil disimpan.');
     }
 
-    public function indexPayments()
+    public function indexPayments(Request $request)
     {
+        $academicYears = AcademicYear::orderBy('year', 'desc')->get();
+        
+        // Get selected academic year from request or use active year
+        $selectedYearId = $request->academic_year_id;
+        $selectedYear = null;
+        
+        if ($selectedYearId) {
+            $selectedYear = AcademicYear::find($selectedYearId);
+        }
+        
+        // If no year selected or selected year not found, try to get active year
+        if (!$selectedYear) {
+            $selectedYear = AcademicYear::where('is_active', true)->first();
+        }
+        
+        // If still no year, use the first available year
+        if (!$selectedYear && $academicYears->isNotEmpty()) {
+            $selectedYear = $academicYears->first();
+        }
+        
         $classes = SchoolClass::where('is_active', true)->ordered()->get();
-        return view('admin.committee.payments.index', compact('classes'));
+        
+        return view('admin.committee.payments.index', compact('classes', 'academicYears', 'selectedYear'));
     }
 
-    public function studentPayments(SchoolClass $schoolClass)
+    public function studentPayments(SchoolClass $schoolClass, Request $request)
     {
         $students = Student::where('school_class_id', $schoolClass->id)
             ->where('is_active', true)
             ->get();
 
-        // Get the active academic year to find the relevant committee fee
-        $activeYear = AcademicYear::where('is_active', true)->first();
+        // Get the academic year from request or use active year
+        $selectedYearId = $request->academic_year_id;
+        
+        if ($selectedYearId) {
+            $activeYear = AcademicYear::find($selectedYearId);
+        }
+        
+        // If no year selected or selected year not found, try to get active year
+        if (!$activeYear) {
+            $activeYear = AcademicYear::where('is_active', true)->first();
+        }
 
         if (!$activeYear) {
             return redirect()->back()->with('error', 'Tidak ada tahun ajaran aktif. Silakan aktifkan tahun ajaran terlebih dahulu.');
@@ -88,9 +118,24 @@ class CommitteeController extends Controller
         return view('admin.committee.payments.students', compact('schoolClass', 'students', 'committeeFee'));
     }
 
-    public function recordPayment(Student $student)
+    public function recordPayment(Student $student, Request $request)
     {
-        $activeYear = AcademicYear::where('is_active', true)->first();
+        // Get the academic year from request or use active year
+        $selectedYearId = $request->academic_year_id;
+        
+        if ($selectedYearId) {
+            $activeYear = AcademicYear::find($selectedYearId);
+        }
+        
+        // If no year selected or selected year not found, try to get active year
+        if (!$activeYear) {
+            $activeYear = AcademicYear::where('is_active', true)->first();
+        }
+        
+        if (!$activeYear) {
+            return redirect()->back()->with('error', 'Tidak ada tahun ajaran aktif.');
+        }
+        
         $committeeFee = CommitteeFee::where('academic_year_id', $activeYear->id)
             ->where('school_class_id', $student->school_class_id)
             ->first();
@@ -138,7 +183,7 @@ class CommitteeController extends Controller
             'notes' => $request->notes,
         ]);
 
-        return redirect()->route('admin.committee.payments.record', $student->id)->with('success', 'Pembayaran berhasil dicatat.');
+        return redirect()->route('admin.committee.payments.record', ['student' => $student->id, 'academic_year_id' => $fee->academic_year_id])->with('success', 'Pembayaran berhasil dicatat.');
     }
 
     public function receipt(CommitteePayment $committeePayment)
@@ -225,16 +270,17 @@ class CommitteeController extends Controller
             'notes' => $request->notes,
         ]);
 
-        return redirect()->route('admin.committee.payments.record', $committeePayment->student_id)
+        return redirect()->route('admin.committee.payments.record', ['student' => $committeePayment->student_id, 'academic_year_id' => $committeePayment->committeeFee->academic_year_id])
             ->with('success', 'Pembayaran berhasil diperbarui.');
     }
 
     public function destroyPayment(CommitteePayment $committeePayment)
     {
         $studentId = $committeePayment->student_id;
+        $academicYearId = $committeePayment->committeeFee->academic_year_id;
         $committeePayment->delete();
 
-        return redirect()->route('admin.committee.payments.record', $studentId)
+        return redirect()->route('admin.committee.payments.record', ['student' => $studentId, 'academic_year_id' => $academicYearId])
             ->with('success', 'Pembayaran berhasil dihapus.');
     }
 
