@@ -3,6 +3,59 @@
 @section('title', 'Manajemen Siswa')
 @section('page-title', 'Manajemen Siswa')
 
+@section('styles')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<style>
+    .dataTables_wrapper .dataTables_length select {
+        padding: 6px 24px 6px 12px;
+        border-radius: 8px;
+        border: 2px solid var(--accent);
+        background: var(--secondary);
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 2px solid var(--accent);
+        background: var(--secondary);
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
+        margin-left: 8px;
+    }
+    .dataTables_wrapper .dataTables_filter input:focus {
+        border-color: var(--primary);
+        outline: none;
+    }
+    .dataTables_wrapper .dataTables_info {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        padding-top: 15px;
+    }
+    .dataTables_wrapper .dataTables_paginate {
+        padding-top: 15px;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border-radius: 8px !important;
+        padding: 6px 14px !important;
+        font-size: 0.85rem !important;
+        margin: 0 2px !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: var(--primary) !important;
+        color: var(--secondary) !important;
+        border: none !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: rgba(30, 58, 95, 0.1) !important;
+    }
+    #students-table_wrapper {
+        margin-top: 0;
+    }
+</style>
+@endsection
+
 @section('content')
 <!-- Statistics Cards -->
 <div class="stats-grid">
@@ -119,7 +172,7 @@
         @endif
 
         <div class="table-responsive">
-            <table>
+            <table id="students-table" class="table">
                 <thead>
                     <tr>
                         @if(auth()->user()->isAdmin())
@@ -186,24 +239,56 @@
                         </td>
                     </tr>
                     @empty
-                    <tr>
-                        <td colspan="{{ auth()->user()->isAdmin() ? '8' : '7' }}" style="text-align: center; padding: 20px; color: var(--text-light);">
-                            Data siswa tidak ditemukan.
-                        </td>
-                    </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        
-        <div style="margin-top: 20px;">
-            {{ $students->withQueryString()->links('pagination::simple-default') }}
-        </div>
     </div>
 </div>
+@endsection
+
 @section('scripts')
-@if(auth()->user()->isAdmin())
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
+$(document).ready(function() {
+    $('#students-table').DataTable({
+        language: {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ data",
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+            infoFiltered: "(difilter dari _MAX_ total data)",
+            zeroRecords: "Data tidak ditemukan",
+            paginate: {
+                first: "Pertama",
+                last: "Terakhir",
+                next: "›",
+                previous: "‹"
+            },
+        },
+        lengthMenu: [[10, 20, 30, 40, 50, -1], [10, 20, 30, 40, 50, "Semua"]],
+        pageLength: 10,
+        order: [],
+        columnDefs: [
+            @if(auth()->user()->isAdmin())
+            { orderable: false, targets: 0 },
+            { orderable: false, targets: 7 },
+            @else
+            { orderable: false, targets: 6 },
+            @endif
+        ],
+        drawCallback: function() {
+            // Rebind checkbox events after DataTables redraws
+            if (typeof bindCheckboxEvents === 'function') {
+                bindCheckboxEvents();
+            }
+        }
+    });
+});
+
+@if(auth()->user()->isAdmin())
+function bindCheckboxEvents() {
     const selectAll = document.getElementById('select-all');
     const checkboxes = document.querySelectorAll('.student-checkbox');
     const bulkBar = document.getElementById('bulk-action-bar');
@@ -213,7 +298,7 @@
         const checkedCount = document.querySelectorAll('.student-checkbox:checked').length;
         if (checkedCount > 0) {
             bulkBar.style.display = 'flex';
-            selectedCountSpan.textContent = `${checkedCount} Siswa Terpilih`;
+            selectedCountSpan.textContent = checkedCount + ' Siswa Terpilih';
         } else {
             bulkBar.style.display = 'none';
         }
@@ -221,233 +306,172 @@
 
     if (selectAll) {
         selectAll.addEventListener('change', function() {
-            checkboxes.forEach(cb => {
+            document.querySelectorAll('.student-checkbox').forEach(cb => {
                 cb.checked = selectAll.checked;
             });
             updateBulkBar();
         });
     }
 
-    checkboxes.forEach(cb => {
+    document.querySelectorAll('.student-checkbox').forEach(cb => {
+        cb.removeEventListener('change', updateBulkBar);
         cb.addEventListener('change', function() {
-            if (!this.checked) {
+            if (!this.checked && selectAll) {
                 selectAll.checked = false;
-            } else if (document.querySelectorAll('.student-checkbox:checked').length === checkboxes.length) {
+            } else if (selectAll && document.querySelectorAll('.student-checkbox:checked').length === document.querySelectorAll('.student-checkbox').length) {
                 selectAll.checked = true;
             }
             updateBulkBar();
         });
     });
+}
 
-    function clearSelection() {
-        checkboxes.forEach(cb => cb.checked = false);
-        if (selectAll) selectAll.checked = false;
-        updateBulkBar();
-    }
+// Initial bind
+bindCheckboxEvents();
 
-    function bulkUpdateStatus(status) {
-        const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked')).map(cb => cb.value);
-        
-        if (selectedIds.length === 0) return;
+function clearSelection() {
+    document.querySelectorAll('.student-checkbox').forEach(cb => cb.checked = false);
+    const selectAll = document.getElementById('select-all');
+    if (selectAll) selectAll.checked = false;
+    const bulkBar = document.getElementById('bulk-action-bar');
+    const selectedCountSpan = document.getElementById('selected-count');
+    if (bulkBar) bulkBar.style.display = 'none';
+    if (selectedCountSpan) selectedCountSpan.textContent = '0 Siswa Terpilih';
+}
 
-        const statusLabel = status === 'active' ? 'Mengaktifkan' : 'Menonaktifkan';
-        
-        Swal.fire({
-            title: 'Konfirmasi',
-            text: `Apakah Anda yakin ingin ${statusLabel} ${selectedIds.length} siswa yang dipilih?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: 'var(--primary)',
-            cancelButtonColor: 'var(--danger)',
-            confirmButtonText: 'Ya, Lanjutkan!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Show loading
-                Swal.fire({
-                    title: 'Memproses...',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
+function bulkUpdateStatus(status) {
+    const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked')).map(cb => cb.value);
+    if (selectedIds.length === 0) return;
 
-                fetch("{{ route('admin.students.bulk-status') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        student_ids: selectedIds,
-                        status: status
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil',
-                            text: data.message
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: data.message || 'Terjadi kesalahan saat memperbarui status.'
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Terjadi kesalahan sistem.'
-                    });
-                });
-            }
-        });
-    }
+    const statusLabel = status === 'active' ? 'Mengaktifkan' : 'Menonaktifkan';
 
-    function bulkMoveClass() {
-        const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked')).map(cb => cb.value);
-        const classId = document.getElementById('bulk-class-select').value;
-
-        if (selectedIds.length === 0) return;
-
-        if (!classId) {
+    Swal.fire({
+        title: 'Konfirmasi',
+        text: 'Apakah Anda yakin ingin ' + statusLabel + ' ' + selectedIds.length + ' siswa yang dipilih?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: 'var(--primary)',
+        cancelButtonColor: 'var(--danger)',
+        confirmButtonText: 'Ya, Lanjutkan!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
             Swal.fire({
-                icon: 'warning',
-                title: 'Pilih Kelas',
-                text: 'Silakan pilih kelas tujuan terlebih dahulu.'
+                title: 'Memproses...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
             });
-            return;
+
+            fetch("{{ route('admin.students.bulk-status') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ student_ids: selectedIds, status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Terjadi kesalahan.' });
+                }
+            })
+            .catch(error => {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan sistem.' });
+            });
         }
+    });
+}
 
-        Swal.fire({
-            title: 'Konfirmasi',
-            text: `Pindahkan ${selectedIds.length} siswa ke kelas yang dipilih?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: 'var(--primary)',
-            cancelButtonColor: 'var(--danger)',
-            confirmButtonText: 'Ya, Pindahkan!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Memproses...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
+function bulkMoveClass() {
+    const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked')).map(cb => cb.value);
+    const classId = document.getElementById('bulk-class-select').value;
 
-                fetch("{{ route('admin.students.bulk-move-class') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        student_ids: selectedIds,
-                        class_id: classId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil',
-                            text: data.message
-                        }).then(() => window.location.reload());
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: data.message || 'Terjadi kesalahan.'
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Terjadi kesalahan sistem.'
-                    });
-                });
-            }
-        });
+    if (selectedIds.length === 0) return;
+    if (!classId) {
+        Swal.fire({ icon: 'warning', title: 'Pilih Kelas', text: 'Silakan pilih kelas tujuan terlebih dahulu.' });
+        return;
     }
 
-    function bulkDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked')).map(cb => cb.value);
-        
-        if (selectedIds.length === 0) return;
+    Swal.fire({
+        title: 'Konfirmasi',
+        text: 'Pindahkan ' + selectedIds.length + ' siswa ke kelas yang dipilih?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: 'var(--primary)',
+        cancelButtonColor: 'var(--danger)',
+        confirmButtonText: 'Ya, Pindahkan!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-        Swal.fire({
-            title: 'Hapus Data Siswa',
-            text: `Apakah Anda yakin ingin menghapus ${selectedIds.length} siswa yang dipilih? Data yang sudah dihapus tidak dapat dikembalikan!`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Memproses...',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
+            fetch("{{ route('admin.students.bulk-move-class') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ student_ids: selectedIds, class_id: classId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message }).then(() => window.location.reload());
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Terjadi kesalahan.' });
+                }
+            })
+            .catch(error => {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan sistem.' });
+            });
+        }
+    });
+}
 
-                fetch("{{ route('admin.students.bulk-destroy') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        student_ids: selectedIds
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil',
-                            text: data.message
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: data.message || 'Terjadi kesalahan saat menghapus data.'
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Terjadi kesalahan sistem.'
-                    });
-                });
-            }
-        });
-    }
-</script>
+function bulkDelete() {
+    const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked')).map(cb => cb.value);
+    if (selectedIds.length === 0) return;
+
+    Swal.fire({
+        title: 'Hapus Data Siswa',
+        text: 'Apakah Anda yakin ingin menghapus ' + selectedIds.length + ' siswa yang dipilih? Data yang sudah dihapus tidak dapat dikembalikan!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            fetch("{{ route('admin.students.bulk-destroy') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ student_ids: selectedIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message }).then(() => window.location.reload());
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Terjadi kesalahan.' });
+                }
+            })
+            .catch(error => {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan sistem.' });
+            });
+        }
+    });
+}
 @endif
-@endsection
+</script>
 @endsection

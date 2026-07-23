@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AcademicYear;
 use App\Models\SchoolClass;
 use App\Models\Student;
+use App\Models\StudentClassHistory;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -41,7 +43,7 @@ class StudentController extends Controller
             $query->where('gender', $request->gender);
         }
 
-        $students = $query->orderBy('name')->paginate(15);
+        $students = $query->orderBy('name')->get();
         $classes = SchoolClass::active()->ordered()->get();
 
         // Statistics
@@ -99,7 +101,15 @@ class StudentController extends Controller
             $validated['tanggal_lahir'] = \Carbon\Carbon::createFromFormat('d/m/Y', $validated['tanggal_lahir'])->format('Y-m-d');
         }
 
-        Student::create($validated);
+        $student = Student::create($validated);
+
+        $activeYear = AcademicYear::where('is_active', true)->first();
+        StudentClassHistory::create([
+            'student_id' => $student->id,
+            'school_class_id' => $student->school_class_id,
+            'academic_year' => $activeYear ? $activeYear->year : null,
+            'action' => 'registered',
+        ]);
 
         return redirect()->route('admin.students.index')
             ->with('success', 'Siswa berhasil ditambahkan.');
@@ -156,7 +166,31 @@ class StudentController extends Controller
             $validated['tanggal_lahir'] = \Carbon\Carbon::createFromFormat('d/m/Y', $validated['tanggal_lahir'])->format('Y-m-d');
         }
 
+        $oldClassId = $student->school_class_id;
+        $oldActive = $student->is_active;
+
         $student->update($validated);
+
+        $activeYear = AcademicYear::where('is_active', true)->first();
+        $academicYear = $activeYear ? $activeYear->year : null;
+
+        if ($student->school_class_id != $oldClassId) {
+            StudentClassHistory::create([
+                'student_id' => $student->id,
+                'school_class_id' => $oldClassId,
+                'academic_year' => $academicYear,
+                'action' => 'moved',
+            ]);
+        }
+
+        if ($student->is_active != $oldActive) {
+            StudentClassHistory::create([
+                'student_id' => $student->id,
+                'school_class_id' => $student->school_class_id,
+                'academic_year' => $academicYear,
+                'action' => $student->is_active ? 'activated' : 'deactivated',
+            ]);
+        }
 
         return redirect()->route('admin.students.index')
             ->with('success', 'Data siswa berhasil diperbarui.');
@@ -192,6 +226,20 @@ class StudentController extends Controller
 
         try {
             \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\StudentsImport, $request->file('file'));
+
+            $activeYear = AcademicYear::where('is_active', true)->first();
+            // Log registered for newly imported students (created within last 60 seconds)
+            $newStudents = Student::where('created_at', '>=', now()->subSeconds(60))
+                ->whereDoesntHave('histories')
+                ->get();
+            foreach ($newStudents as $student) {
+                StudentClassHistory::create([
+                    'student_id' => $student->id,
+                    'school_class_id' => $student->school_class_id,
+                    'academic_year' => $activeYear ? $activeYear->year : null,
+                    'action' => 'registered',
+                ]);
+            }
             
             return response()->json([
                 'success' => true,
@@ -276,9 +324,24 @@ class StudentController extends Controller
             'class_id' => 'required|exists:school_classes,id'
         ]);
 
-        Student::whereIn('id', $request->student_ids)->update([
+        $activeYear = AcademicYear::where('is_active', true)->first();
+        $academicYear = $activeYear ? $activeYear->year : null;
+
+        $students = Student::whereIn('id', $request->student_ids)->get();
+        $studentIds = $students->pluck('id');
+
+        Student::whereIn('id', $studentIds)->update([
             'school_class_id' => $request->class_id
         ]);
+
+        foreach ($students as $student) {
+            StudentClassHistory::create([
+                'student_id' => $student->id,
+                'school_class_id' => $student->school_class_id,
+                'academic_year' => $academicYear,
+                'action' => 'moved',
+            ]);
+        }
 
         return response()->json([
             'success' => true,
@@ -305,15 +368,54 @@ class StudentController extends Controller
         ]);
 
         $status = $request->status === 'active';
-        
-        Student::whereIn('id', $request->student_ids)->update([
+        $action = $status ? 'activated' : 'deactivated';
+
+        $students = Student::whereIn('id', $request->student_ids)->get();
+        $studentIds = $students->pluck('id');
+
+        Student::whereIn('id', $studentIds)->update([
             'is_active' => $status
         ]);
+
+        $activeYear = AcademicYear::where('is_active', true)->first();
+        $academicYear = $activeYear ? $activeYear->year : null;
+
+        foreach ($students as $student) {
+            StudentClassHistory::create([
+                'student_id' => $student->id,
+                'school_class_id' => $student->school_class_id,
+                'academic_year' => $academicYear,
+                'action' => $action,
+            ]);
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Status siswa berhasil diperbarui.'
         ]);
+    }
+
+    /**
+     * Show student class change history.
+     */
+    public function history(Request $request)
+    {
+        $query = StudentClassHistory::with(['student', 'schoolClass']);
+
+        if ($request->filled('academic_year')) {
+            $query->where('academic_year', $request->academic_year);
+        }
+
+        if ($request->filled('school_class_id')) {
+            $query->where('school_class_id', $request->school_class_id);
+        }
+
+        $histories = $query->orderBy('created_at', 'desc')->get();
+
+        $academicYears = AcademicYear::orderBy('year', 'desc')->get();
+        $classes = SchoolClass::active()->ordered()->get();
+
+        return view('admin.students.history', compact('histories', 'academicYears', 'classes'));
     }
 
     /**

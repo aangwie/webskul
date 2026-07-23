@@ -670,12 +670,26 @@
                                 <i class="fas fa-chalkboard-teacher"></i> Guru
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ route('admin.students.index') }}"
-                                class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
-                                <i class="fas fa-user-graduate"></i> Siswa
-                            </a>
-                        </li>
+<li class="has-submenu {{ request()->routeIs('admin.students.*') ? 'active' : '' }}" id="students-menu">
+    <a href="javascript:void(0)" onclick="toggleSubmenu('students-menu')" class="submenu-toggle">
+        <span><i class="fas fa-user-graduate"></i> Siswa</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+    <ul class="submenu">
+        <li>
+            <a href="{{ route('admin.students.index') }}"
+                class="{{ request()->routeIs('admin.students.index') || request()->routeIs('admin.students.create') || request()->routeIs('admin.students.edit') || request()->routeIs('admin.students.import') ? 'active' : '' }}">
+                <i class="fas fa-list"></i> Data Siswa
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('admin.students.history') }}"
+                class="{{ request()->routeIs('admin.students.history') ? 'active' : '' }}">
+                <i class="fas fa-history"></i> Riwayat Mutasi
+            </a>
+        </li>
+    </ul>
+</li>
                         <li>
                             <a href="{{ route('admin.subjects.index') }}"
                                 class="{{ request()->routeIs('admin.subjects.*') ? 'active' : '' }}">

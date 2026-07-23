@@ -32,9 +32,15 @@
                             @endif
                         </td>
                         <td>
+                            @if($year->is_active)
                             <a href="{{ route('admin.committee.nominal.set', $year->id) }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-money-bill-wave"></i> Set Nominal
                             </a>
+                            @else
+                            <button class="btn btn-sm btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                <i class="fas fa-money-bill-wave"></i> Set Nominal
+                            </button>
+                            @endif
                         </td>
                     </tr>
                     @empty

@@ -31,6 +31,10 @@ class AcademicYearController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
+        if ($validated['is_active']) {
+            AcademicYear::where('is_active', true)->update(['is_active' => false]);
+        }
+
         $academicYear->update($validated);
 
         return redirect()->back()->with('success', 'Status Tahun Pelajaran berhasil diperbarui.');

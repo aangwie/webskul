@@ -109,6 +109,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/students/bulk-status', [\App\Http\Controllers\Admin\StudentController::class, 'bulkStatusUpdate'])->name('students.bulk-status');
         Route::post('/students/bulk-move-class', [\App\Http\Controllers\Admin\StudentController::class, 'bulkMoveClass'])->name('students.bulk-move-class');
         Route::post('/students/bulk-delete', [\App\Http\Controllers\Admin\StudentController::class, 'bulkDestroy'])->name('students.bulk-destroy');
+        Route::get('/students/history', [\App\Http\Controllers\Admin\StudentController::class, 'history'])->name('students.history');
         Route::resource('students', \App\Http\Controllers\Admin\StudentController::class)->except(['show']);
 
         // Information
