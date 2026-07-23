@@ -88,14 +88,12 @@ class CommitteeController extends Controller
 
     public function studentPayments(SchoolClass $schoolClass, Request $request)
     {
-        // Get the academic year from request or use active year
         $selectedYearId = $request->academic_year_id;
-        
+
         if ($selectedYearId) {
             $activeYear = AcademicYear::find($selectedYearId);
         }
-        
-        // If no year selected or selected year not found, try to get active year
+
         if (!$activeYear) {
             $activeYear = AcademicYear::where('is_active', true)->first();
         }
@@ -112,19 +110,22 @@ class CommitteeController extends Controller
             return redirect()->back()->with('error', 'Nominal dana komite untuk kelas ini belum diatur untuk tahun ajaran aktif.');
         }
 
-        // Students registered in this class for this academic year
-        $registeredIds = StudentClassHistory::where('school_class_id', $schoolClass->id)
-            ->where('academic_year', $activeYear->year)
-            ->where('action', 'registered')
-            ->pluck('student_id');
+        // 1. Students who have payment records for this academic year + class
+        $studentIdsFromPayments = CommitteePayment::where('academic_year_id', $activeYear->id)
+            ->whereHas('committeeFee', function ($q) use ($schoolClass) {
+                $q->where('school_class_id', $schoolClass->id);
+            })
+            ->pluck('student_id')
+            ->unique();
 
-        // Students currently active in this class (catches moved-to, re-registered, etc.)
-        $currentIds = Student::where('school_class_id', $schoolClass->id)
-            ->where('is_active', true)
-            ->pluck('id');
-
-        // Merge & deduplicate
-        $studentIds = $registeredIds->merge($currentIds)->unique();
+        // 2. If no payment records exist yet, fallback to currently active students in this class
+        if ($studentIdsFromPayments->isEmpty()) {
+            $studentIds = Student::where('school_class_id', $schoolClass->id)
+                ->where('is_active', true)
+                ->pluck('id');
+        } else {
+            $studentIds = $studentIdsFromPayments;
+        }
 
         if ($studentIds->isNotEmpty()) {
             $students = Student::whereIn('id', $studentIds)->orderBy('name')->get();
