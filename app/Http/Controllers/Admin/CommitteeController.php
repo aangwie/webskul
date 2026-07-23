@@ -73,7 +73,17 @@ class CommitteeController extends Controller
         
         $classes = SchoolClass::where('is_active', true)->ordered()->get();
         
-        return view('admin.committee.payments.index', compact('classes', 'academicYears', 'selectedYear'));
+        $classFeeStatus = [];
+        if ($selectedYear) {
+            foreach ($classes as $class) {
+                $fee = CommitteeFee::where('academic_year_id', $selectedYear->id)
+                    ->where('school_class_id', $class->id)
+                    ->first();
+                $classFeeStatus[$class->id] = $fee && $fee->amount > 0;
+            }
+        }
+        
+        return view('admin.committee.payments.index', compact('classes', 'academicYears', 'selectedYear', 'classFeeStatus'));
     }
 
     public function studentPayments(SchoolClass $schoolClass, Request $request)

@@ -39,14 +39,18 @@
             @else
                 <div class="stats-grid">
                     @foreach($classes as $class)
-                        <div class="stat-card" style="cursor: pointer; position: relative;"
-                            onclick="window.location='{{ route('admin.committee.payments.students', ['schoolClass' => $class->id, 'academic_year_id' => $selectedYear->id]) }}';">
+                        @php $hasFee = $classFeeStatus[$class->id] ?? false; @endphp
+                        <div class="stat-card {{ $hasFee ? '' : 'disabled-card' }}" style="cursor: {{ $hasFee ? 'pointer' : 'not-allowed' }}; position: relative; {{ $hasFee ? '' : 'opacity: 0.5;' }}"
+                            onclick="{{ $hasFee ? "window.location='" . route('admin.committee.payments.students', ['schoolClass' => $class->id, 'academic_year_id' => $selectedYear->id]) . "'" : '' }}">
                             <div class="stat-icon primary">
                                 <i class="fas fa-users"></i>
                             </div>
                             <div class="stat-info">
                                 <h3>{{ $class->name }}</h3>
                                 <p>Kelas {{ $class->grade }}</p>
+                                @if(!$hasFee)
+                                    <p style="color: var(--danger); font-size: 0.75rem; margin-top: 5px;">Nominal belum diatur</p>
+                                @endif
                             </div>
                             <div style="position: absolute; right: 20px; color: var(--text-light); opacity: 0.5;">
                                 <i class="fas fa-arrow-down"></i>
