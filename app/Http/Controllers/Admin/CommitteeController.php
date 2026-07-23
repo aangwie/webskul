@@ -102,18 +102,24 @@ class CommitteeController extends Controller
             return redirect()->back()->with('error', 'Nominal dana komite untuk kelas ini belum diatur untuk tahun ajaran aktif.');
         }
 
-        // Get students by class history for this academic year, fallback to current active students
-        $historyStudentIds = StudentClassHistory::where('school_class_id', $schoolClass->id)
+        // Students registered in this class for this academic year
+        $registeredIds = StudentClassHistory::where('school_class_id', $schoolClass->id)
             ->where('academic_year', $activeYear->year)
-            ->where('action', 'moved')
+            ->where('action', 'registered')
             ->pluck('student_id');
 
-        if ($historyStudentIds->isNotEmpty()) {
-            $students = Student::whereIn('id', $historyStudentIds)->get();
+        // Students currently active in this class (catches moved-to, re-registered, etc.)
+        $currentIds = Student::where('school_class_id', $schoolClass->id)
+            ->where('is_active', true)
+            ->pluck('id');
+
+        // Merge & deduplicate
+        $studentIds = $registeredIds->merge($currentIds)->unique();
+
+        if ($studentIds->isNotEmpty()) {
+            $students = Student::whereIn('id', $studentIds)->orderBy('name')->get();
         } else {
-            $students = Student::where('school_class_id', $schoolClass->id)
-                ->where('is_active', true)
-                ->get();
+            $students = collect();
         }
 
         foreach ($students as $student) {
@@ -147,14 +153,11 @@ class CommitteeController extends Controller
             return redirect()->back()->with('error', 'Tidak ada tahun ajaran aktif.');
         }
 
-        // Find the class this student was in for the selected academic year,
-        // fallback to current school_class_id if no history
-        $history = StudentClassHistory::where('student_id', $student->id)
+        // Find class from registered history for this academic year
+        $classIdAtThatTime = StudentClassHistory::where('student_id', $student->id)
             ->where('academic_year', $activeYear->year)
-            ->where('action', 'moved')
-            ->first();
-
-        $classIdAtThatTime = $history ? $history->school_class_id : $student->school_class_id;
+            ->where('action', 'registered')
+            ->value('school_class_id') ?? $student->school_class_id;
         
         $committeeFee = CommitteeFee::where('academic_year_id', $activeYear->id)
             ->where('school_class_id', $classIdAtThatTime)
@@ -185,12 +188,10 @@ class CommitteeController extends Controller
         // Build per-year summaries - find the correct class for each year
         $yearlySummaries = [];
         foreach ($academicYears as $ay) {
-            $ayHistory = StudentClassHistory::where('student_id', $student->id)
+            $ayClassId = StudentClassHistory::where('student_id', $student->id)
                 ->where('academic_year', $ay->year)
-                ->where('action', 'moved')
-                ->first();
-
-            $ayClassId = $ayHistory ? $ayHistory->school_class_id : $student->school_class_id;
+                ->where('action', 'registered')
+                ->value('school_class_id') ?? $student->school_class_id;
 
             $fee = CommitteeFee::where('academic_year_id', $ay->id)
                 ->where('school_class_id', $ayClassId)

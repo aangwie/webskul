@@ -364,11 +364,13 @@ class StudentController extends Controller
         $request->validate([
             'student_ids' => 'required|array',
             'student_ids.*' => 'exists:students,id',
-            'status' => 'required|in:active,inactive'
+            'status' => 'required|in:active,inactive',
+            'notes' => 'nullable|string|max:100',
         ]);
 
         $status = $request->status === 'active';
         $action = $status ? 'activated' : 'deactivated';
+        $notes = $request->notes;
 
         $students = Student::whereIn('id', $request->student_ids)->get();
         $studentIds = $students->pluck('id');
@@ -386,6 +388,13 @@ class StudentController extends Controller
                 'school_class_id' => $student->school_class_id,
                 'academic_year' => $academicYear,
                 'action' => $action,
+                'notes' => $notes,
+            ]);
+        }
+
+        if (!$status && $notes) {
+            Student::whereIn('id', $studentIds)->update([
+                'status_lulus' => $notes === 'Lulus' ? 'lulus' : null,
             ]);
         }
 

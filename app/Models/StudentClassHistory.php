@@ -12,6 +12,7 @@ class StudentClassHistory extends Model
         'school_class_id',
         'academic_year',
         'action',
+        'notes',
     ];
 
     public function student(): BelongsTo

@@ -4,6 +4,13 @@
 @section('page-title', 'Pembayaran: ' . $student->name)
 
 @section('content')
+    <div style="margin-bottom: 20px;">
+        <a href="{{ route('admin.committee.payments.students', ['schoolClass' => $student->school_class_id, 'academic_year_id' => $committeeFee->academic_year_id]) }}"
+            class="btn btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fas fa-arrow-left"></i> Kembali ke Daftar Siswa
+        </a>
+    </div>
+
     <div style="display: grid; grid-template-columns: 1fr 350px; gap: 25px;">
         <!-- Left: Payment History -->
         <div>

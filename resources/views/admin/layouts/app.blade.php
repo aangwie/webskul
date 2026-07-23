@@ -685,7 +685,7 @@
         <li>
             <a href="{{ route('admin.students.history') }}"
                 class="{{ request()->routeIs('admin.students.history') ? 'active' : '' }}">
-                <i class="fas fa-history"></i> Riwayat Mutasi
+                <i class="fas fa-history"></i> Riwayat Siswa
             </a>
         </li>
     </ul>

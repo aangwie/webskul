@@ -345,46 +345,106 @@ function bulkUpdateStatus(status) {
 
     const statusLabel = status === 'active' ? 'Mengaktifkan' : 'Menonaktifkan';
 
-    Swal.fire({
-        title: 'Konfirmasi',
-        text: 'Apakah Anda yakin ingin ' + statusLabel + ' ' + selectedIds.length + ' siswa yang dipilih?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: 'var(--primary)',
-        cancelButtonColor: 'var(--danger)',
-        confirmButtonText: 'Ya, Lanjutkan!',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Memproses...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
-
-            fetch("{{ route('admin.students.bulk-status') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ student_ids: selectedIds, status: status })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message }).then(() => {
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Terjadi kesalahan.' });
+    if (status === 'inactive') {
+        // Show reason selection for deactivation
+        Swal.fire({
+            title: 'Alasan Nonaktifkan',
+            html: `
+                <p style="margin-bottom: 15px; color: #666;">Apakah Anda yakin ingin menonaktifkan ${selectedIds.length} siswa yang dipilih?</p>
+                <select id="deactivate-reason" class="swal2-select" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #ddd; font-size: 1rem;">
+                    <option value="Lulus">Lulus</option>
+                    <option value="Mutasi">Mutasi</option>
+                </select>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--danger)',
+            cancelButtonColor: 'var(--primary)',
+            confirmButtonText: 'Ya, Nonaktifkan!',
+            cancelButtonText: 'Batal',
+            preConfirm: () => {
+                const reason = document.getElementById('deactivate-reason').value;
+                if (!reason) {
+                    Swal.showValidationMessage('Pilih alasan');
+                    return false;
                 }
-            })
-            .catch(error => {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan sistem.' });
-            });
-        }
-    });
+                return reason;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const reason = result.value;
+                Swal.fire({
+                    title: 'Memproses...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                fetch("{{ route('admin.students.bulk-status') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ student_ids: selectedIds, status: status, notes: reason })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Terjadi kesalahan.' });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan sistem.' });
+                });
+            }
+        });
+    } else {
+        // Activation - no reason needed
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: 'Apakah Anda yakin ingin ' + statusLabel + ' ' + selectedIds.length + ' siswa yang dipilih?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--primary)',
+            cancelButtonColor: 'var(--danger)',
+            confirmButtonText: 'Ya, Lanjutkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Memproses...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                fetch("{{ route('admin.students.bulk-status') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ student_ids: selectedIds, status: status })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Terjadi kesalahan.' });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan sistem.' });
+                });
+            }
+        });
+    }
 }
 
 function bulkMoveClass() {
