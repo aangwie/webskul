@@ -69,7 +69,7 @@
                         </table>
                     </div>
 
-                    @if($totalPaid >= $committeeFee->amount)
+                    @if($activeAcademicYear && $committeeFee->academic_year_id == $activeAcademicYear->id && $totalPaid >= $committeeFee->amount && $totalPaid > 0)
                         <div
                             style="margin-top: 30px; text-align: center; padding: 20px; background: rgba(40, 167, 69, 0.1); border: 2px dashed var(--success); border-radius: 12px;">
                             <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success); margin-bottom: 10px;"></i>

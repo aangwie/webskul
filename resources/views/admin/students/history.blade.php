@@ -62,6 +62,7 @@
                         <th>Kelas</th>
                         <th>Tahun Pelajaran</th>
                         <th>Aksi</th>
+                        <th>Catatan</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,10 +83,19 @@
                                     <span class="badge badge-danger">Dinonaktifkan</span>
                                 @endif
                             </td>
+                            <td>
+                                @if($history->action === 'registered' && $history->entry_type)
+                                    {{ $history->entry_type === 'new' ? 'Siswa Baru' : 'Pindahan' }}
+                                @elseif($history->notes)
+                                    {{ $history->notes }}
+                                @else
+                                    -
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center">Belum ada riwayat perubahan.</td>
+                        <td colspan="6" class="text-center">Belum ada riwayat perubahan.</td>
                         </tr>
                     @endforelse
                 </tbody>

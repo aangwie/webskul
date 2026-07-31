@@ -9,11 +9,32 @@
             <h2><i class="fas fa-file-alt"></i> Generate Laporan</h2>
         </div>
         <div class="card-body">
-            @if($activeYear)
+            @if($academicYears->isNotEmpty())
                 <div style="margin-bottom: 30px;">
-                    <h3 style="margin-bottom: 15px; color: var(--primary);">
-                        <i class="fas fa-chart-pie"></i> Ringkasan Sumbangan TA {{ $activeYear->year }}
-                    </h3>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; color: var(--primary);">
+                            <i class="fas fa-chart-pie"></i> Ringkasan Sumbangan
+                            @if($selectedSummaryYear)
+                                TA {{ $selectedSummaryYear->year }}
+                                @if($selectedSummaryYear->is_active)
+                                    <span style="font-size: 0.7rem; background: var(--success); color: white; padding: 2px 8px; border-radius: 20px; vertical-align: middle; margin-left: 6px;">Aktif</span>
+                                @endif
+                            @endif
+                        </h3>
+                        <form method="GET" action="{{ route('admin.committee.report.index') }}" style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-light); white-space: nowrap;">Pilih Tahun Ajaran:</label>
+                            <select name="summary_year_id" id="summary_year_id"
+                                onchange="this.form.submit()"
+                                style="padding: 6px 12px; border: 1px solid var(--accent); border-radius: 8px; font-size: 0.875rem; background: white; cursor: pointer; min-width: 160px;">
+                                @foreach($academicYears as $year)
+                                    <option value="{{ $year->id }}"
+                                        {{ $selectedSummaryYear && $selectedSummaryYear->id == $year->id ? 'selected' : '' }}>
+                                        {{ $year->year }} {{ $year->is_active ? '(Aktif)' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </form>
+                    </div>
                     <div class="table-responsive"
                         style="background: white; border-radius: 12px; border: 1px solid var(--accent);">
                         <table>
@@ -31,7 +52,7 @@
                                 @php $grandTarget = 0;
                                     $grandPaid = 0;
                                 $grandStudents = 0; @endphp
-                                @foreach($classSummaries as $summary)
+                                @forelse($classSummaries as $summary)
                                     @php
                                         $grandTarget += $summary['total_target'];
                                         $grandPaid += $summary['total_paid'];
@@ -57,7 +78,13 @@
                                                 style="font-size: 0.75rem; color: var(--success); font-weight: bold;">{{ number_format($percent, 1) }}%</span>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 20px; color: var(--text-light);">
+                                            <i class="fas fa-info-circle"></i> Tidak ada data nominal komite untuk tahun ajaran ini.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                             <tfoot style="background: #f8f9fa; font-weight: bold; border-top: 2px solid #ddd;">
                                 <tr>

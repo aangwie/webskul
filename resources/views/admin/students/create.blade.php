@@ -65,6 +65,17 @@
             </div>
             
             <div class="form-group">
+                <label for="entry_type" class="form-label">Tipe Pendaftaran <span style="color: red">*</span></label>
+                <select name="entry_type" id="entry_type" class="form-select" required>
+                    <option value="new" {{ old('entry_type', 'new') == 'new' ? 'selected' : '' }}>Siswa Baru</option>
+                    <option value="transfer" {{ old('entry_type') == 'transfer' ? 'selected' : '' }}>Pindahan</option>
+                </select>
+                @error('entry_type')
+                    <span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
                 <label for="gender" class="form-label">Jenis Kelamin <span style="color: red">*</span></label>
                 <select name="gender" id="gender" class="form-select" required>
                     <option value="">Pilih Jenis Kelamin</option>

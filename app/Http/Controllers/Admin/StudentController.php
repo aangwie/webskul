@@ -107,8 +107,10 @@ class StudentController extends Controller
         StudentClassHistory::create([
             'student_id' => $student->id,
             'school_class_id' => $student->school_class_id,
+            'academic_year_id' => $activeYear?->id,
             'academic_year' => $activeYear ? $activeYear->year : null,
             'action' => 'registered',
+            'entry_type' => $request->input('entry_type', 'new'),
         ]);
 
         return redirect()->route('admin.students.index')
@@ -178,6 +180,7 @@ class StudentController extends Controller
             StudentClassHistory::create([
                 'student_id' => $student->id,
                 'school_class_id' => $oldClassId,
+                'academic_year_id' => $activeYear?->id,
                 'academic_year' => $academicYear,
                 'action' => 'moved',
             ]);
@@ -187,6 +190,7 @@ class StudentController extends Controller
             StudentClassHistory::create([
                 'student_id' => $student->id,
                 'school_class_id' => $student->school_class_id,
+                'academic_year_id' => $activeYear?->id,
                 'academic_year' => $academicYear,
                 'action' => $student->is_active ? 'activated' : 'deactivated',
             ]);
@@ -236,8 +240,10 @@ class StudentController extends Controller
                 StudentClassHistory::create([
                     'student_id' => $student->id,
                     'school_class_id' => $student->school_class_id,
+                    'academic_year_id' => $activeYear?->id,
                     'academic_year' => $activeYear ? $activeYear->year : null,
                     'action' => 'registered',
+                    'entry_type' => 'transfer',
                 ]);
             }
             
@@ -338,6 +344,7 @@ class StudentController extends Controller
             StudentClassHistory::create([
                 'student_id' => $student->id,
                 'school_class_id' => $student->school_class_id,
+                'academic_year_id' => $activeYear?->id,
                 'academic_year' => $academicYear,
                 'action' => 'moved',
             ]);
@@ -386,6 +393,7 @@ class StudentController extends Controller
             StudentClassHistory::create([
                 'student_id' => $student->id,
                 'school_class_id' => $student->school_class_id,
+                'academic_year_id' => $activeYear?->id,
                 'academic_year' => $academicYear,
                 'action' => $action,
                 'notes' => $notes,

@@ -32,4 +32,9 @@ class CommitteePayment extends Model
     {
         return $this->belongsTo(CommitteeFee::class);
     }
+
+    public function academicYear(): BelongsTo
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
 }

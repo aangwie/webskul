@@ -10,9 +10,11 @@ class StudentClassHistory extends Model
     protected $fillable = [
         'student_id',
         'school_class_id',
+        'academic_year_id',
         'academic_year',
         'action',
         'notes',
+        'entry_type',
     ];
 
     public function student(): BelongsTo
@@ -24,4 +26,9 @@ class StudentClassHistory extends Model
     {
         return $this->belongsTo(SchoolClass::class);
     }
-}
+
+    public function academicYear(): BelongsTo
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
+}
