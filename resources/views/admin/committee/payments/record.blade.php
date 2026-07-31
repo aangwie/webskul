@@ -69,13 +69,13 @@
                         </table>
                     </div>
 
-                    @if($activeAcademicYear && $committeeFee->academic_year_id == $activeAcademicYear->id && $totalPaid >= $committeeFee->amount && $totalPaid > 0)
+                    @if($totalPaid >= $committeeFee->amount && $totalPaid > 0)
                         <div
                             style="margin-top: 30px; text-align: center; padding: 20px; background: rgba(40, 167, 69, 0.1); border: 2px dashed var(--success); border-radius: 12px;">
                             <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success); margin-bottom: 10px;"></i>
                             <h3 style="color: var(--success);">Sumbangan Komite</h3>
                             <p style="margin-bottom: 15px;">Seluruh nominal dana komite telah dibayarkan.</p>
-                            <a href="{{ route('admin.committee.payments.invoice', $student->id) }}"
+                            <a href="{{ route('admin.committee.payments.invoice', ['student' => $student->id, 'academic_year_id' => $committeeFee->academic_year_id]) }}"
                                 class="btn btn-success" target="_blank" style="display: inline-flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-print"></i> Cetak Bukti Sumbangan
                             </a>
@@ -84,60 +84,6 @@
                 </div>
             </div>
 
-            <!-- All Years Payment History -->
-            @if($allPayments->count() > 0)
-                @foreach($allPayments as $yearLabel => $yearPayments)
-                    <div class="card" style="margin-bottom: 25px;">
-                        <div class="card-header">
-                            <h2><i class="fas fa-calendar-alt"></i> Riwayat Pembayaran {{ $yearLabel }}</h2>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Tanggal</th>
-                                            <th>Nominal</th>
-                                            <th>Keterangan</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($yearPayments as $payment)
-                                            <tr>
-                                                <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
-                                                <td><strong>Rp {{ number_format($payment->amount, 0, ',', '.') }}</strong></td>
-                                                <td>{{ $payment->notes ?? '-' }}</td>
-                                                <td>
-                                                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                                                        <a href="{{ route('admin.committee.payments.receipt', $payment->id) }}"
-                                                            class="btn btn-sm btn-success" target="_blank" title="Cetak Kwitansi">
-                                                            <i class="fas fa-print"></i>
-                                                        </a>
-                                                        <a href="{{ route('admin.committee.payments.edit', $payment->id) }}"
-                                                            class="btn btn-sm btn-warning" title="Edit Pembayaran">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                        <form action="{{ route('admin.committee.payments.destroy', $payment->id) }}"
-                                                            method="POST" id="delete-form-all-{{ $payment->id }}" style="display: inline;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="button" class="btn btn-sm btn-danger" title="Hapus Pembayaran"
-                                                                onclick="confirmDelete({{ $payment->id }})">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            @endif
         </div>
 
         <!-- Right: Summary & Form -->

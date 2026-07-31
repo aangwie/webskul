@@ -182,6 +182,7 @@
                         @endif
                         <th>NIS</th>
                         <th>Nama Siswa</th>
+                        <th>Tahun Masuk</th>
                         <th>Kelas</th>
                         <th>L/P</th>
                         <th>Tanggal Lahir</th>
@@ -199,6 +200,7 @@
                         @endif
                         <td>{{ $student->nis ?? '-' }}</td>
                         <td><strong>{{ $student->name }}</strong></td>
+                        <td>{{ $student->enrollment_year ?? '-' }}</td>
                         <td>
                             @if($student->schoolClass)
                                 <span class="badge" style="background: rgba(30, 58, 95, 0.1); color: var(--primary);">
@@ -273,9 +275,9 @@ $(document).ready(function() {
         columnDefs: [
             @if(auth()->user()->isAdmin())
             { orderable: false, targets: 0 },
-            { orderable: false, targets: 7 },
+            { orderable: false, targets: 8 },
             @else
-            { orderable: false, targets: 6 },
+            { orderable: false, targets: 7 },
             @endif
         ],
         drawCallback: function() {

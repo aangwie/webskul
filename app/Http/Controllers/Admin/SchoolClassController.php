@@ -25,7 +25,10 @@ class SchoolClassController extends Controller
             },
         ])->ordered()->paginate(10);
 
-        return view('admin.classes.index', compact('classes'));
+        $activeYear = \App\Models\AcademicYear::where('is_active', true)->first();
+        $activeYearString = $activeYear ? $activeYear->year : '-';
+
+        return view('admin.classes.index', compact('classes', 'activeYearString'));
     }
 
     /**

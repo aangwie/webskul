@@ -111,21 +111,18 @@ class CommitteeController extends Controller
             return redirect()->back()->with('error', 'Nominal dana komite untuk kelas ini belum diatur untuk tahun ajaran aktif.');
         }
 
-        // 1. Students who have payment records for this academic year + class
-        $studentIdsFromPayments = CommitteePayment::where('academic_year_id', $activeYear->id)
-            ->whereHas('committeeFee', function ($q) use ($schoolClass) {
-                $q->where('school_class_id', $schoolClass->id);
-            })
-            ->pluck('student_id')
-            ->unique();
-
-        // 2. If no payment records exist yet, fallback to currently active students in this class
-        if ($studentIdsFromPayments->isEmpty()) {
+        // If the selected year is active, show all current active students in this class.
+        // If it's inactive, strictly show students who have a payment history (paid or amount=0) 
+        // in committee_payments for that specific academic year to avoid mixing classes.
+        if ($activeYear->is_active) {
             $studentIds = Student::where('school_class_id', $schoolClass->id)
                 ->where('is_active', true)
                 ->pluck('id');
         } else {
-            $studentIds = $studentIdsFromPayments;
+            $studentIds = CommitteePayment::where('committee_fee_id', $committeeFee->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('student_id')
+                ->unique();
         }
 
         if ($studentIds->isNotEmpty()) {
@@ -137,6 +134,7 @@ class CommitteeController extends Controller
         foreach ($students as $student) {
             $totalPaid = CommitteePayment::where('student_id', $student->id)
                 ->where('committee_fee_id', $committeeFee->id)
+                ->where('academic_year_id', $activeYear->id)
                 ->sum('amount');
 
             $student->total_paid = $totalPaid;
@@ -166,22 +164,38 @@ class CommitteeController extends Controller
             return redirect()->back()->with('error', 'Tidak ada tahun ajaran aktif.');
         }
 
-        // Find class from registered history for this academic year
-        // Primary: use academic_year_id FK; fallback to string match for old records without FK
-        $classIdAtThatTime = StudentClassHistory::where('student_id', $student->id)
-            ->where(function ($q) use ($activeYear) {
-                $q->where('academic_year_id', $activeYear->id)
-                  ->orWhere(function ($q2) use ($activeYear) {
-                      $q2->whereNull('academic_year_id')
-                         ->where('academic_year', $activeYear->year);
-                  });
-            })
-            ->where('action', 'registered')
-            ->value('school_class_id') ?? $student->school_class_id;
+        // For inactive years, find committeeFee from actual payment records first
+        // (the payment records are the source of truth for past years).
+        // For active years or if no payment exists yet, resolve from class history.
+        $committeeFee = null;
         
-        $committeeFee = CommitteeFee::where('academic_year_id', $activeYear->id)
-            ->where('school_class_id', $classIdAtThatTime)
-            ->first();
+        if (!$activeYear->is_active) {
+            // Try to find fee from existing payment records
+            $existingPayment = CommitteePayment::where('student_id', $student->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->first();
+            if ($existingPayment) {
+                $committeeFee = CommitteeFee::find($existingPayment->committee_fee_id);
+            }
+        }
+        
+        if (!$committeeFee) {
+            // Find class from registered history for this academic year
+            $classIdAtThatTime = StudentClassHistory::where('student_id', $student->id)
+                ->where(function ($q) use ($activeYear) {
+                    $q->where('academic_year_id', $activeYear->id)
+                      ->orWhere(function ($q2) use ($activeYear) {
+                          $q2->whereNull('academic_year_id')
+                             ->where('academic_year', $activeYear->year);
+                      });
+                })
+                ->where('action', 'registered')
+                ->value('school_class_id') ?? $student->school_class_id;
+            
+            $committeeFee = CommitteeFee::where('academic_year_id', $activeYear->id)
+                ->where('school_class_id', $classIdAtThatTime)
+                ->first();
+        }
 
         if (!$committeeFee) {
             return redirect()->back()->with('error', 'Nominal dana komite belum diatur.');
@@ -194,37 +208,27 @@ class CommitteeController extends Controller
             ->get();
 
         $totalPaid = $payments->sum('amount');
-        $remaining = $committeeFee->amount - $totalPaid;
-
-        // All-time payment history grouped by academic year
-        $allPayments = CommitteePayment::where('student_id', $student->id)
-            ->with('committeeFee.academicYear')
-            ->orderBy('payment_date', 'desc')
-            ->get()
-            ->groupBy(fn($p) => $p->committeeFee->academicYear->year ?? 'Tanpa TA');
+        $remaining = max(0, $committeeFee->amount - $totalPaid);
 
         $academicYears = AcademicYear::orderBy('year', 'desc')->get();
         $activeAcademicYear = AcademicYear::where('is_active', true)->first();
 
-        // Build per-year summaries - find the correct class for each year
+        // Build per-year summaries directly from committee_payments table
+        // to ensure we only show summaries for years they actually have records for.
         $yearlySummaries = [];
-        foreach ($academicYears as $ay) {
-            // Primary: use academic_year_id FK; fallback to string match for old records
-            $ayClassId = StudentClassHistory::where('student_id', $student->id)
-                ->where(function ($q) use ($ay) {
-                    $q->where('academic_year_id', $ay->id)
-                      ->orWhere(function ($q2) use ($ay) {
-                          $q2->whereNull('academic_year_id')
-                             ->where('academic_year', $ay->year);
-                      });
-                })
-                ->where('action', 'registered')
-                ->value('school_class_id') ?? $student->school_class_id;
+        
+        $studentFeeIds = CommitteePayment::where('student_id', $student->id)
+            ->pluck('committee_fee_id')
+            ->unique();
+            
+        $studentFees = CommitteeFee::whereIn('id', $studentFeeIds)
+            ->with('academicYear')
+            ->get()
+            ->sortByDesc(fn($fee) => $fee->academicYear->year ?? '');
 
-            $fee = CommitteeFee::where('academic_year_id', $ay->id)
-                ->where('school_class_id', $ayClassId)
-                ->first();
-            if (!$fee) continue;
+        foreach ($studentFees as $fee) {
+            $ay = $fee->academicYear;
+            if (!$ay) continue;
 
             $paymentsForYear = CommitteePayment::where('student_id', $student->id)
                 ->where('committee_fee_id', $fee->id)
@@ -234,14 +238,14 @@ class CommitteeController extends Controller
                 'academic_year' => $ay,
                 'fee_amount' => $fee->amount,
                 'total_paid' => $paymentsForYear,
-                'remaining' => $fee->amount - $paymentsForYear,
+                'remaining' => max(0, $fee->amount - $paymentsForYear),
                 'is_paid_full' => $paymentsForYear >= $fee->amount,
             ];
         }
 
         return view('admin.committee.payments.record', compact(
             'student', 'committeeFee', 'payments', 'totalPaid', 'remaining',
-            'allPayments', 'yearlySummaries', 'academicYears', 'activeAcademicYear'
+            'yearlySummaries', 'activeAcademicYear'
         ));
     }
 
@@ -290,15 +294,28 @@ class CommitteeController extends Controller
         return view('admin.committee.payments.receipt', compact('committeePayment', 'isPaidFull'));
     }
 
-    public function invoice(Student $student)
+    public function invoice(Request $request, Student $student)
     {
-        $activeYear = AcademicYear::where('is_active', true)->first();
+        $selectedYearId = $request->academic_year_id;
+        $activeYear = $selectedYearId ? AcademicYear::find($selectedYearId) : AcademicYear::where('is_active', true)->first();
+        
         if (!$activeYear) {
-            return redirect()->back()->with('error', 'Tahun ajaran aktif belum ditentukan.');
+            return redirect()->back()->with('error', 'Tahun ajaran belum ditentukan.');
         }
 
+        $classIdAtThatTime = \App\Models\StudentClassHistory::where('student_id', $student->id)
+            ->where(function ($q) use ($activeYear) {
+                $q->where('academic_year_id', $activeYear->id)
+                  ->orWhere(function ($q2) use ($activeYear) {
+                      $q2->whereNull('academic_year_id')
+                         ->where('academic_year', $activeYear->year);
+                  });
+            })
+            ->where('action', 'registered')
+            ->value('school_class_id') ?? $student->school_class_id;
+
         $committeeFee = CommitteeFee::where('academic_year_id', $activeYear->id)
-            ->where('school_class_id', $student->school_class_id)
+            ->where('school_class_id', $classIdAtThatTime)
             ->first();
 
         if (!$committeeFee) {

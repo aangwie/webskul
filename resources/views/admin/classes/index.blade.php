@@ -30,7 +30,7 @@
                     <tr>
                         <td><strong>{{ $class->name }}</strong></td>
                         <td>{{ $class->grade }}</td>
-                        <td>{{ $class->academic_year }}</td>
+                        <td>{{ $activeYearString }}</td>
                         <td>
                             <span class="badge badge-success">{{ $class->total_students }} Siswa</span>
                         </td>
